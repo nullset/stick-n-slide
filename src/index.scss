@@ -46,9 +46,9 @@ table {
 // ------------ STICKY STYLES ---------------- //
 
 table.sticky {
-  // Prevent FOUC when page is first loaded.
-  visibility: hidden;
-  display: block;
+  // // Prevent FOUC when page is first loaded.
+  // visibility: hidden;
+  // display: block;
   overflow-x: auto;
   // overflow-x: hidden;
 }

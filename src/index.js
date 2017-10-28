@@ -5,11 +5,13 @@ $(document).ready(() => {
     
   $.fn.stickyTable = function (args) {
     this.each(() => {
-      const $table = this;
+      const $wrapper = this;
+      const $table = this.find('> table');
       const table = $table[0];
       const tableStyles = window.getComputedStyle(table);
       window.tableStyles = tableStyles;
-      const $wrapper = wrapTable($table, tableStyles);
+      // const $wrapper = wrapTable($table, tableStyles);
+      styleWrapper($wrapper, tableStyles);
       const wrapper = $wrapper[0];
       // const stickyElems = Array.from(table.querySelectorAll('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]'));
       const stickyElems = $table.find('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]').toArray();
@@ -69,6 +71,15 @@ $(document).ready(() => {
       $table.wrap($wrapper);
 
       return $table.parent();
+    }
+
+    function styleWrapper($wrapper, tableStyles) {
+      $wrapper.addClass('sticky-table-wrapper').css({
+        maxWidth: '100%',
+        maxHeight: '500px',
+        overflowX: 'auto',
+        overflowY: 'auto',
+      });
     }
 
     function wheelHandler(event, wrapper, $wrapper, stickyElems) {
@@ -150,6 +161,7 @@ $(document).ready(() => {
 
 $(document).ready(function() {
   var $table = $('#blah');
+  var $wrapper = $('#scroller');
   
   $table.find('thead th:nth-child(-n+3)').each((i, th) => {
     $(th).addClass('sticky--is-stuck');
@@ -173,6 +185,7 @@ $(document).ready(function() {
   $table.find('tbody tr:nth-child(7) *:nth-child(-n+1)').addClass('sticky--is-stuck-x');
   
   
-  $table.stickyTable();
+  // $table.stickyTable();
+  $wrapper.stickyTable();
   
 });
