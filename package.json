@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\"",
+    "start": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\" --host 0.0.0.0 --disable-host-check",
     "build": "webpack --env production",
     "lint:js": "jshint app/ webpack.*.js --cache",
     "lint:style": "stylelint src/**/*.scss"
