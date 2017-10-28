@@ -137,6 +137,7 @@ table.sticky {
         margin-right: inherit;
         margin-bottom: inherit;
         margin-left: inherit;
+        border-width: 1px; // Interestingly this fixes the issue in FF and IE.
         // top: calc(-1 * var(--border-top-width));
         // right: calc(-1 * var(--border-right-width));
         // bottom: calc(-1 * var(--border-bottom-width));
