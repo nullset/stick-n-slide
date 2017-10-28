@@ -12,6 +12,7 @@ const PATHS = {
 const commonConfig = merge([
   {
     entry: {
+      polyfill: "babel-polyfill",
       index: PATHS.src,
     },
     output: {
@@ -31,6 +32,7 @@ const commonConfig = merge([
   },
   parts.lintJavaScript({ include: PATHS.src }),
   parts.lintCSS({ include: PATHS.src }),
+  parts.loadJavaScript({ include: PATHS.src }),
 ]);
 
 const productionConfig = merge([

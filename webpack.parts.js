@@ -7,8 +7,8 @@ exports.devServer = ({ host, port } = {}) => ({
     host, // Defaults to `localhost`
     port, // Defaults to 8080
     overlay: {
-      errors: true,
-    //   // warnings: true,
+      // errors: true,
+      // warnings: true,
     },
   },
 });
@@ -22,8 +22,12 @@ exports.lintJavaScript = ({ include, exclude, options }) => ({
         exclude,
         enforce: 'pre',
 
-        loader: 'jshint-loader',
-        options,
+        use: [
+          {
+            loader: 'eslint-loader',
+            options,    
+          },
+        ],
       },
     ],
   },
@@ -93,6 +97,28 @@ exports.lintCSS = ({ include, exclude }) => ({
           plugins: () => ([
             require('stylelint')(),
           ]),
+        },
+      },
+    ],
+  },
+});
+
+exports.loadJavaScript = ({ include, exclude }) => ({
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        include,
+        exclude,
+
+        loader: 'babel-loader',
+        options: {
+          // Enable caching for improved performance during
+          // development.
+          // It uses default OS directory by default. If you need
+          // something more custom, pass a path to it.
+          // I.e., { cacheDirectory: '<path>' }
+          cacheDirectory: true,
         },
       },
     ],
