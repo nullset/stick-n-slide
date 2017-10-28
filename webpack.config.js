@@ -1,8 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
-
 const parts = require('./webpack.parts');
+const webpack = require('webpack');
 
 const PATHS = {
   src: path.join(__dirname, 'src'),
@@ -22,6 +22,10 @@ const commonConfig = merge([
       new HtmlWebpackPlugin({
         title: 'Webpack demo',
         template: './template/template.ejs',
+      }),
+      new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
       }),
     ],
   },

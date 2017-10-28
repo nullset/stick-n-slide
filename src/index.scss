@@ -1,3 +1,225 @@
-body {
-  font-size: 30px;
+table {
+  $borderWidth: 1px;
+  border-collapse: collapse;
+  max-height: 400px;
+  max-width: 100%;
+  thead {
+    th {
+      background: rgb(102, 152, 245);
+      padding: 30px;
+      border: $borderWidth solid rgb(79, 116, 185);
+    }
+  }
+  tbody {
+    tr {
+      &:nth-child(2n+1) {
+        th, td {
+          background: #fff;          
+        }
+      }
+      &:nth-child(2n) {
+        th, td {
+          background: #efefef;            
+        }
+      }
+    }
+    th, td {
+      padding: 50px 30px;
+      border: $borderWidth solid lightgray;
+    }
+  }
+  th, td {
+    &:last-child {
+      // background: rgb(172, 172, 253) !important;
+      // border-left-width: 3px;
+      // border-color: rgb(122, 122, 180);
+    }
+    &:nth-child(2) {
+      // border-left: 3px solid red;
+    }
+  }
+  .sticky--is-stuck-x {
+    background: rgb(229, 238, 255) !important;
+  }
+}
+
+// ------------ STICKY STYLES ---------------- //
+
+table.sticky {
+  // Prevent FOUC when page is first loaded.
+  visibility: hidden;
+  display: block;
+  overflow-x: auto;
+  // overflow-x: hidden;
+}
+.sticky-table-wrapper {
+  display: inline-block;
+  padding-right: 8px;
+  overflow: auto;
+  position: relative;
+  width: 500px;
+  border: 1px solid red;
+  &.sticky--is-scrolling {
+    th, td {
+      &[class*="sticky--is-stuck"] {
+        // box-shadow: 4px 2px 4px rgba(0,0,0,0.3), 2px 4px 4px rgba(0,0,0,0.3);
+        box-shadow: inherit;
+      }
+    }
+  }
+  &:not(.sticky--is-scrolling) {
+    th, td {
+      &[class*="sticky--is-stuck"] {
+        box-shadow: none !important;
+      }
+    }
+  }
+
+  table.sticky {
+    // border-collapse: separate !important;
+    border-spacing: 0px !important;
+    box-sizing: border-box !important;
+    // Return table display back to normal.
+    display: table;
+    visibility: visible;
+    max-height: inherit !important;
+    max-width: inherit !important;
+  }
+  thead {
+    // If there is more than one <thead>, ensure that cells within secondary <thead> do not have top border.
+    &:not(:first-child) {
+      th, td {
+        border-top-width: 0;
+      }
+    }
+    // If there is more than one <tr> within a <thead>, ensure that cells within secondary <tr> do not have top border.
+    tr:not(:first-child) {
+      th, td {
+        border-top-width: 0;
+      }
+    }
+    // If a table has a <thead> followed by a <tbody>, ensure that cells within <tbody> do not have a top border.
+    + tbody {
+      th, td {
+        border-top-width: 0;
+      }
+    }
+  }
+  tbody:first-child {
+    // If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border.
+    tr:not(:first-child) {
+      th, td {
+        border-top-width: 0;
+      }
+    }
+  }
+
+  thead, tbody {
+    *[class*="sticky--is-stuck"] {
+      position: relative;
+      transition: box-shadow 0.1s;
+      margin-top: -1px;
+      margin-bottom: -1px;
+      margin-right: -1px;
+      margin-left: -1px;
+
+      // &:before {
+      //   content: "";
+      //   position: absolute;
+      //   z-index: -1;
+
+      //   // // With borders --------------
+      //   // top: 0;
+      //   // right: 0;
+      //   // bottom: 0;
+      //   // left: 0;
+      //   // margin-right: calc(-1 * var(--shadow-x-offset));
+      //   // margin-bottom: calc(-1 * var(--shadow-y-offset));
+      //   // border-right: var(--shadow-x-offset) solid rgba(0,0,0,0.3);
+      //   // border-bottom: var(--shadow-y-offset) solid rgba(0,0,0,0.3);
+
+      //   // // With backgrounds. Leaves a few px uncovered.  --------------
+      //   // top: 0;
+      //   // right: calc(-1 * var(--shadow-x-offset));
+      //   // bottom: calc(-1 * var(--shadow-y-offset));
+      //   // left: -1px;
+      //   // background-image: linear-gradient(
+      //   //   to right, 
+      //   //   transparent,
+      //   //   transparent calc(100% - var(--shadow-x-offset)),
+      //   //   cyan calc(100% - var(--shadow-x-offset)),
+      //   //   transparent
+      //   // ), linear-gradient(
+      //   //   to bottom, 
+      //   //   transparent,
+      //   //   transparent calc(100% - var(--shadow-y-offset)),
+      //   //   red calc(100% - var(--shadow-y-offset)),
+      //   //   transparent
+      //   // );
+      // }
+      
+      // Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
+      // (as, from the rendering engine perspective, it is no longer a part of the table).
+      // We need to add these borders back via some css generated elements.
+      &:before {
+        content: "";
+        position: absolute;
+        border-top: inherit;
+        border-left: inherit;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin-top: inherit;
+        margin-right: inherit;
+        margin-bottom: inherit;
+        margin-left: inherit;
+        z-index: 5;
+        // top: calc(-1 * var(--border-top-width));
+        // right: calc(-1 * var(--border-right-width));
+        // bottom: calc(-1 * var(--border-bottom-width));
+        // left: calc(-1 * var(--border-left-width));
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        border-right: inherit;
+        border-bottom: inherit;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin-top: inherit;
+        margin-right: inherit;
+        margin-bottom: inherit;
+        margin-left: inherit;
+        z-index: 10;
+        // top: calc(-1 * var(--border-top-width));
+        // right: calc(-1 * var(--border-right-width));
+        // bottom: calc(-1 * var(--border-bottom-width));
+        // left: calc(-1 * var(--border-left-width));
+      }
+      // &:after {
+      //   content: "";
+      //   position: absolute;
+      //   border: inherit;        
+      //   top: 0;
+      //   right: 0;
+      //   bottom: 0;
+      //   left: 0;
+      //   margin-top: inherit;
+      //   margin-right: inherit;
+      //   margin-bottom: inherit;
+      //   margin-left: inherit;
+      //   z-index: 10;
+      //   // top: calc(-1 * var(--border-top-width));
+      //   // right: calc(-1 * var(--border-right-width));
+      //   // bottom: calc(-1 * var(--border-bottom-width));
+      //   // left: calc(-1 * var(--border-left-width));
+      // }
+    }
+    *.sticky--is-stuck {
+      z-index: 100;
+    }
+  }
 }
