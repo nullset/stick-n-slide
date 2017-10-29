@@ -11,7 +11,6 @@ $(document).ready(() => {
       const tableStyles = window.getComputedStyle(table);
       window.tableStyles = tableStyles;
       // const $wrapper = wrapTable($table, tableStyles);
-      styleWrapper($wrapper, tableStyles);
       const wrapper = $wrapper[0];
       // const stickyElems = Array.from(table.querySelectorAll('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]'));
       const stickyElems = $table.find('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]').toArray();
@@ -30,19 +29,34 @@ $(document).ready(() => {
       // Set initial position of elements to 0.
       positionStickyElements(stickyElems);
 
-      stickyElems.forEach((cell) => {
-        const cellStyles = window.getComputedStyle(cell);
-        ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
-          ['Width'].forEach((property) => {
-            cell.style.setProperty(`--border-${side.toLowerCase()}-${property.toLowerCase()}`, cellStyles[`border${side}${property}`]);
-          });
-        });
-      });
-
-      $wrapper.off('wheel.stickyTable mousewheel.stickyTable', wheelHandler).on('wheel.stickyTable mousewheel.stickyTable', function (event) {
+      // $wrapper.off('wheel.stickyTable mousewheel.stickyTable', wheelHandler).on('wheel.stickyTable mousewheel.stickyTable', function (event) {
+      wrapper.addEventListener('wheel', (event) => {
         wheelEventTriggered = true;
+        const { deltaX, deltaY } = event;
+        const wrapperRect = wrapper.getBoundingClientRect();
+        const { scrollLeft, scrollTop } = wrapper;
+        const tableRect = table.getBoundingClientRect();
+
         event.preventDefault();
-        wheelHandler(event, wrapper, $wrapper, stickyElems);
+        wheelHandler(event, wrapper, $wrapper, stickyElems);  
+
+        // if (
+        //   ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && scrollTop - tableRect.height - wrapperRect.height > 0))
+        //   ||
+        //   ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollLeft - tableRect.width - wrapperRect.width > 0))
+        // ) {
+        //   event.preventDefault();
+        //   wheelHandler(event, wrapper, $wrapper, stickyElems);
+        // }
+
+        // if (
+        //   (wrapper.scrollTop + deltaY > 0 || wrapper.scrollTop + deltaY < wrapperRect.height)
+        //   &&
+        //   (wrapper.scrollLeft + deltaX > 0 || wrapper.scrollLeft + deltaX < wrapperRect.width)
+        // ) {
+        //   event.preventDefault();
+        //   wheelHandler(event, wrapper, $wrapper, stickyElems);
+        // }
       });
 
       $wrapper.off('scroll.stickyTable', scrollHandler).on('scroll.stickyTable', () => {
@@ -56,34 +70,8 @@ $(document).ready(() => {
       return {$table, $wrapper};
     });
 
-    function wrapTable($table, tableStyles) {
-      const $wrapper = $('<div class="sticky-table-wrapper">');
-
-      // Set styles.
-      $wrapper.css({
-        maxWidth: tableStyles.maxWidth,
-        maxHeight: tableStyles.maxHeight,
-        overflowX: tableStyles.maxWidth === 'none' ? 'hidden' : 'auto',
-        overflowY: tableStyles.maxHeight === 'none' ? 'hidden' : 'auto',
-      });
-
-      // Wrap existing table inside wrapper.
-      $table.wrap($wrapper);
-
-      return $table.parent();
-    }
-
-    function styleWrapper($wrapper, tableStyles) {
-      $wrapper.addClass('sticky-table-wrapper').css({
-        maxWidth: '100%',
-        maxHeight: '500px',
-        overflowX: 'auto',
-        overflowY: 'auto',
-      });
-    }
-
     function wheelHandler(event, wrapper, $wrapper, stickyElems) {
-      const { deltaX, deltaY } = event.originalEvent;
+      const { deltaX, deltaY } = event;
       const { scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
       const maxWidth = scrollWidth - clientWidth;
       const maxHeight = scrollHeight - clientHeight;
@@ -129,7 +117,7 @@ $(document).ready(() => {
 
     function calculateShadow(offset) {
       let shadow = Math.ceil(offset/10);
-      let max = 6;
+      let max = 4;
       let min = 1;
       if (shadow > max) return max;
       if (shadow < min) return min;
@@ -141,13 +129,17 @@ $(document).ready(() => {
         let shadowX = calculateShadow(offsetX);
         let shadowY = calculateShadow(offsetY);
         let transforms = [];
+        // let shadows = [];
         cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(0,0,0,0.3)`;
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateX(${offsetX}px)`);
+          // shadows.push(`${shadowX}px ${0}px ${shadowY}px rgba(0,0,0,0.3)`);
         }
         if (!cell.classList.contains('sticky--is-stuck-x') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateY(${offsetY}px)`);
+          // shadows.push(`${0}px ${shadowY}px ${shadowX}px rgba(0,0,0,0.3)`);
         }
+        // cell.style.boxShadow = shadows.join(',');
         cell.style.transform = transforms.join(' ');
       });
     }

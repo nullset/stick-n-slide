@@ -45,27 +45,16 @@ table {
 
 // ------------ STICKY STYLES ---------------- //
 
-table.sticky {
-  // // Prevent FOUC when page is first loaded.
-  // visibility: hidden;
-  // display: block;
-  overflow-x: auto;
-  // overflow-x: hidden;
-}
 .sticky-table-wrapper {
   display: inline-block;
-  padding-right: 8px;
+  padding-right: 4px;
   overflow: auto;
-  width: 500px;
+  max-width: 500px;
+  max-height: 500px;
+
+  // width: 500px;
   border: 1px solid red;
-  &.sticky--is-scrolling {
-    th, td {
-      &[class*="sticky--is-stuck"] {
-        // box-shadow: 4px 2px 4px rgba(0,0,0,0.3), 2px 4px 4px rgba(0,0,0,0.3);
-        box-shadow: inherit;
-      }
-    }
-  }
+  // When the wrapper is not scrolled, there should be no shadow.
   &:not(.sticky--is-scrolling) {
     th, td {
       &[class*="sticky--is-stuck"] {
@@ -74,36 +63,6 @@ table.sticky {
     }
   }
 
-  table.sticky {
-    // border-collapse: separate !important;
-    border-spacing: 0px !important;
-    box-sizing: border-box !important;
-    // Return table display back to normal.
-    display: table;
-    visibility: visible;
-    max-height: inherit !important;
-    max-width: inherit !important;
-  }
-  thead {
-    // If there is more than one <thead>, ensure that cells within secondary <thead> do not have top border.
-    &:not(:first-child) {
-      th, td {
-        border-top-width: 0;
-      }
-    }
-    // If there is more than one <tr> within a <thead>, ensure that cells within secondary <tr> do not have top border.
-    tr:not(:first-child) {
-      th, td {
-        border-top-width: 0;
-      }
-    }
-    // If a table has a <thead> followed by a <tbody>, ensure that cells within <tbody> do not have a top border.
-    + tbody {
-      th, td {
-        border-top-width: 0;
-      }
-    }
-  }
   tbody:first-child {
     // If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border.
     tr:not(:first-child) {
@@ -133,19 +92,20 @@ table.sticky {
         right: 0;
         bottom: 0;
         left: 0;
-        margin-top: inherit;
-        margin-right: inherit;
-        margin-bottom: inherit;
-        margin-left: inherit;
-        border-width: 1px; // Interestingly this fixes the issue in FF and IE.
-        // top: calc(-1 * var(--border-top-width));
-        // right: calc(-1 * var(--border-right-width));
-        // bottom: calc(-1 * var(--border-bottom-width));
-        // left: calc(-1 * var(--border-left-width));
+        margin: inherit;
+        border-width: 1px;
       }
     }
     *.sticky--is-stuck {
       z-index: 100;
     }
+  }
+}
+
+// ------------ STICKY STYLES ---------------- //
+
+@-moz-document url-prefix() { 
+  .sticky-table-wrapper {
+    padding-right: 16px;    
   }
 }
