@@ -128,9 +128,9 @@ $(document).ready(() => {
     }
 
     function calculateShadow(offset) {
-      let shadow = offset/10;
+      let shadow = Math.ceil(offset/10);
       let max = 6;
-      let min = 2;
+      let min = 1;
       if (shadow > max) return max;
       if (shadow < min) return min;
       return shadow;
@@ -141,7 +141,7 @@ $(document).ready(() => {
         let shadowX = calculateShadow(offsetX);
         let shadowY = calculateShadow(offsetY);
         let transforms = [];
-        cell.style.boxShadow = `${shadowX}px ${shadowY}px ${shadowX}px rgba(0,0,0,0.15), ${shadowX}px ${shadowY}px ${shadowY}px  rgba(0,0,0,0.15)`;
+        cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(0,0,0,0.3)`;
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateX(${offsetX}px)`);
         }
