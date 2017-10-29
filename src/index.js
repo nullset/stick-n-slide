@@ -20,12 +20,6 @@ $(document).ready(() => {
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
       let wheelEventTriggered = false;
 
-      // Set initial scrolled value.
-      // Use .setAttribute rather that .data() or .dataset for massive speed boost.
-      // https://jsperf.com/dataset-vs-jquery-data
-      wrapper.setAttribute('data-scroll-left', 0);
-      wrapper.setAttribute('data-scroll-top', 0);      
-
       // Set initial position of elements to 0.
       positionStickyElements(stickyElems);
 
@@ -33,17 +27,17 @@ $(document).ready(() => {
       wrapper.addEventListener('wheel', (event) => {
         wheelEventTriggered = true;
         const { deltaX, deltaY } = event;
-        const { scrollLeft, scrollTop } = wrapper;
-        const wrapperRect = wrapper.getBoundingClientRect();
-        const tableRect = table.getBoundingClientRect();
+        const { scrollLeft, scrollTop, scrollWidth, scrollHeight } = wrapper;
+        const { width, height } = wrapper.getBoundingClientRect();
 
         if ( 
-          ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && tableRect.height - scrollTop - wrapperRect.height > 0))
+          ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
           ||
-          ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && tableRect.width - scrollLeft - wrapperRect.width > 0))
+          ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
         ) {
           event.preventDefault();
-          wheelHandler(event, wrapper, $wrapper, stickyElems);
+          wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, width, height });
+          // wheelHandler(event, wrapper, stickyElems);
         }
       });
 
@@ -58,13 +52,9 @@ $(document).ready(() => {
       return {$table, $wrapper};
     });
 
-    function wheelHandler(event, wrapper, $wrapper, stickyElems) {
-      const { deltaX, deltaY } = event;
-      const { scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
-      const maxWidth = scrollWidth - clientWidth;
-      const maxHeight = scrollHeight - clientHeight;
-      const scrollLeft = parseInt(wrapper.getAttribute('data-scroll-left'), 10);
-      const scrollTop = parseInt(wrapper.getAttribute('data-scroll-top'), 10);
+    function wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, width, height }) {
+      const maxWidth = scrollWidth - width;
+      const maxHeight = scrollHeight - height;
       let newX = scrollLeft + deltaX;
       let newY = scrollTop + deltaY;
       if (newX >= maxWidth) {
@@ -84,8 +74,6 @@ $(document).ready(() => {
       } else {
         wrapper.classList.remove('sticky--is-scrolling');
       }
-      wrapper.setAttribute('data-scroll-left', newX);
-      wrapper.setAttribute('data-scroll-top', newY);
       positionStickyElements(stickyElems, newX, newY);
       wrapper.scrollLeft = newX;
       wrapper.scrollTop = newY;
