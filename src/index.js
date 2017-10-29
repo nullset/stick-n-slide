@@ -23,7 +23,6 @@ $(document).ready(() => {
       // Set initial position of elements to 0.
       positionStickyElements(stickyElems);
 
-      // $wrapper.off('wheel.stickyTable mousewheel.stickyTable', wheelHandler).on('wheel.stickyTable mousewheel.stickyTable', function (event) {
       wrapper.addEventListener('wheel', (event) => {
         wheelEventTriggered = true;
         const { deltaX, deltaY } = event;
@@ -37,11 +36,10 @@ $(document).ready(() => {
         ) {
           event.preventDefault();
           wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, width, height });
-          // wheelHandler(event, wrapper, stickyElems);
         }
       });
 
-      $wrapper.off('scroll.stickyTable', scrollHandler).on('scroll.stickyTable', () => {
+      wrapper.addEventListener('scroll', () => {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
