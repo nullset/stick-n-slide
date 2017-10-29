@@ -33,30 +33,18 @@ $(document).ready(() => {
       wrapper.addEventListener('wheel', (event) => {
         wheelEventTriggered = true;
         const { deltaX, deltaY } = event;
-        const wrapperRect = wrapper.getBoundingClientRect();
         const { scrollLeft, scrollTop } = wrapper;
+        const wrapperRect = wrapper.getBoundingClientRect();
         const tableRect = table.getBoundingClientRect();
 
-        event.preventDefault();
-        wheelHandler(event, wrapper, $wrapper, stickyElems);  
-
-        // if (
-        //   ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && scrollTop - tableRect.height - wrapperRect.height > 0))
-        //   ||
-        //   ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollLeft - tableRect.width - wrapperRect.width > 0))
-        // ) {
-        //   event.preventDefault();
-        //   wheelHandler(event, wrapper, $wrapper, stickyElems);
-        // }
-
-        // if (
-        //   (wrapper.scrollTop + deltaY > 0 || wrapper.scrollTop + deltaY < wrapperRect.height)
-        //   &&
-        //   (wrapper.scrollLeft + deltaX > 0 || wrapper.scrollLeft + deltaX < wrapperRect.width)
-        // ) {
-        //   event.preventDefault();
-        //   wheelHandler(event, wrapper, $wrapper, stickyElems);
-        // }
+        if ( 
+          ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && tableRect.height - scrollTop - wrapperRect.height > 0))
+          ||
+          ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && tableRect.width - scrollLeft - wrapperRect.width > 0))
+        ) {
+          event.preventDefault();
+          wheelHandler(event, wrapper, $wrapper, stickyElems);
+        }
       });
 
       $wrapper.off('scroll.stickyTable', scrollHandler).on('scroll.stickyTable', () => {
