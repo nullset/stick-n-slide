@@ -145,10 +145,10 @@ $(document).ready(function() {
   // });
   
   
-  $table.find('tbody tr:nth-child(n+1):nth-child(-n+5) *:nth-child(-n+3)').addClass('sticky--is-stuck-x');
+  $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('sticky--is-stuck-x');
   
-  $table.find('tbody tr:nth-child(6) *:nth-child(-n+2)').addClass('sticky--is-stuck-x');
-  $table.find('tbody tr:nth-child(7) *:nth-child(-n+1)').addClass('sticky--is-stuck-x');
+  $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('sticky--is-stuck-x');
+  $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('sticky--is-stuck-x');
   
   
   // $table.stickyTable();
