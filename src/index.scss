@@ -4,10 +4,14 @@ table {
   max-height: 400px;
   max-width: 100%;
   thead {
+    tr {
+      background: yellow;
+    }
     th {
       background: rgb(102, 152, 245);
       padding: 30px;
       border: $borderWidth solid rgb(79, 116, 185);
+      transform-origin: 0 0;
     }
   }
   tbody {
@@ -76,10 +80,10 @@ table {
     *[class*="sticky--is-stuck"] {
       position: relative;
       transition: box-shadow 0.1s;
-      margin-top: -1px;
-      margin-bottom: -1px;
-      margin-right: -1px;
-      margin-left: -1px;
+      // margin-top: -1px;
+      // margin-bottom: -1px;
+      // margin-right: -1px;
+      // margin-left: -1px;
       
       // Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
       // (as, from the rendering engine perspective, it is no longer a part of the table).
@@ -93,7 +97,7 @@ table {
         bottom: 0;
         left: 0;
         margin: inherit;
-        border-width: 1px;
+        // border-width: 1px;
       }
     }
     *.sticky--is-stuck {
