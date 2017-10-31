@@ -26,7 +26,7 @@ $(document).ready(() => {
       wrapper.addEventListener('wheel', (event) => {
         wheelEventTriggered = true;
         const { deltaX, deltaY } = event;
-        const { scrollLeft, scrollTop, scrollWidth, scrollHeight } = wrapper;
+        const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
         const { width, height } = wrapper.getBoundingClientRect();
 
         if ( 
@@ -35,7 +35,7 @@ $(document).ready(() => {
           ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
         ) {
           event.preventDefault();
-          wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, width, height });
+          wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight });
         }
       });
 
@@ -50,9 +50,9 @@ $(document).ready(() => {
       return {$table, $wrapper};
     });
 
-    function wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, width, height }) {
-      const maxWidth = scrollWidth - width;
-      const maxHeight = scrollHeight - height;
+    function wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight }) {
+      const maxWidth = scrollWidth - clientWidth;
+      const maxHeight = scrollHeight - clientHeight;
       let newX = scrollLeft + deltaX;
       let newY = scrollTop + deltaY;
       if (newX >= maxWidth) {
