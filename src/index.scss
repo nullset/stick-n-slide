@@ -55,6 +55,10 @@ table {
   overflow: auto;
   max-width: 500px;
   max-height: 500px;
+  box-sizing: border-box;
+  * {
+    box-sizing: inherit;
+  }
 
   // width: 500px;
   border: 1px solid red;
@@ -97,6 +101,12 @@ table {
         bottom: 0;
         left: 0;
         margin: inherit;
+
+        // top: calc(-1 * var(--border-top-width));
+        // right: calc(-1 * var(--border-right-width));
+        // bottom: calc(-1 * var(--border-bottom-width));
+        // left: calc(-1 * var(--border-left-width));
+
         // border-width: 1px;
       }
     }
@@ -108,7 +118,7 @@ table {
 
 // ------------ STICKY STYLES ---------------- //
 
-@-moz-document url-prefix() { 
+@-moz-document url-prefix() {
   .sticky-table-wrapper {
     padding-right: 16px;    
   }

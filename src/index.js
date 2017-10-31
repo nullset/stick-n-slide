@@ -15,11 +15,23 @@ $(document).ready(() => {
       // const stickyElems = Array.from(table.querySelectorAll('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]'));
       const stickyElems = $table.find('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]').toArray();
       stickyElems.forEach((cell) => {
-        const cellStyles = window.getComputedStyle(cell, ':before');
+        const cellStyles = window.getComputedStyle(cell, ':before');        
+        
         ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
           ['Width'].forEach((property) => {
             // cell.style.setProperty(`--border-${side.toLowerCase()}-${property.toLowerCase()}`, cellStyles[`border${side}${property}`]);
-            cell.style[`margin${side}`] = `-${cellStyles[`border${side}${property}`]}`;
+            const borderWidth = cellStyles[`border${side}${property}`];
+            let tableOffset;
+            if (side === 'Top' || side === 'Bottom') {
+              tableOffset = tableStyles.borderTopWidth;
+            } else {
+              tableOffset = tableStyles.borderLeftWidth;
+            }
+            if (side === 'Right' || side === 'Bottom') {
+              tableOffset = `-${tableOffset}`;
+            }
+            cell.style[`margin${side}`] = `calc(-1 * (${borderWidth} + ${tableOffset}))`;
+            // cell.style[`margin${side}`] = `-${cellStyles[`border${side}${property}`]}`;
           });
         });
       });
@@ -109,7 +121,11 @@ $(document).ready(() => {
         let shadowX = calculateShadow(offsetX);
         let shadowY = calculateShadow(offsetY);
         let transforms = [];
-        // let shadows = [];
+
+        // Firefox has both an X and a Y rounding error when calculating translations on table cells.
+        // Fix this abberation.
+        // transforms.push(`translate(-${borderLeftWidth}, -${borderTopWidth})`);
+
         cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(0,0,0,0.3)`;
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateX(${offsetX}px)`);
