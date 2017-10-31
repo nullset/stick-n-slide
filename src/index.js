@@ -14,14 +14,21 @@ $(document).ready(() => {
       const wrapper = $wrapper[0];
       // const stickyElems = Array.from(table.querySelectorAll('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]'));
       const stickyElems = $table.find('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]').toArray();
-      console.log('stickyElems', stickyElems);
-
+      stickyElems.forEach((cell) => {
+        const cellStyles = window.getComputedStyle(cell, ':before');
+        ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+          ['Width'].forEach((property) => {
+            // cell.style.setProperty(`--border-${side.toLowerCase()}-${property.toLowerCase()}`, cellStyles[`border${side}${property}`]);
+            cell.style[`margin${side}`] = `-${cellStyles[`border${side}${property}`]}`;
+          });
+        });
+      });
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
       let wheelEventTriggered = false;
 
       // Set initial position of elements to 0.
-      positionStickyElements(stickyElems);
+      positionStickyElements(table, stickyElems);
 
       wrapper.addEventListener('wheel', (event) => {
         wheelEventTriggered = true;
@@ -35,7 +42,7 @@ $(document).ready(() => {
           ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
         ) {
           event.preventDefault();
-          wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight });
+          wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight });
         }
       });
 
@@ -50,7 +57,7 @@ $(document).ready(() => {
       return {$table, $wrapper};
     });
 
-    function wheelHandler({ wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight }) {
+    function wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight }) {
       const maxWidth = scrollWidth - clientWidth;
       const maxHeight = scrollHeight - clientHeight;
       let newX = scrollLeft + deltaX;
@@ -72,7 +79,7 @@ $(document).ready(() => {
       } else {
         wrapper.classList.remove('sticky--is-scrolling');
       }
-      positionStickyElements(stickyElems, newX, newY);
+      positionStickyElements(table, stickyElems, newX, newY);
       wrapper.scrollLeft = newX;
       wrapper.scrollTop = newY;
     }
@@ -84,8 +91,6 @@ $(document).ready(() => {
     }
 
     function updateScrollPosition(wrapper, stickyElems) {
-      wrapper.setAttribute('data-scroll-left', wrapper.scrollLeft);
-      wrapper.setAttribute('data-scroll-top', wrapper.scrollTop);
       positionStickyElements(stickyElems, wrapper.scrollLeft, wrapper.scrollTop);
     }
 
@@ -98,7 +103,8 @@ $(document).ready(() => {
       return shadow;
     }
 
-    function positionStickyElements(elems, offsetX = 0, offsetY = 0) {
+    function positionStickyElements(table, elems, offsetX = 0, offsetY = 0) {
+      const { borderTopWidth, borderLeftWidth } = window.getComputedStyle(table);
       elems.forEach((cell) => {
         let shadowX = calculateShadow(offsetX);
         let shadowY = calculateShadow(offsetY);
@@ -106,11 +112,11 @@ $(document).ready(() => {
         // let shadows = [];
         cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(0,0,0,0.3)`;
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
-          transforms.push(`translateX(${offsetX}px)`);
+          transforms.push(`translateX(calc(${offsetX}px - ${borderLeftWidth}))`);
           // shadows.push(`${shadowX}px ${0}px ${shadowY}px rgba(0,0,0,0.3)`);
         }
         if (!cell.classList.contains('sticky--is-stuck-x') || cell.classList.contains('sticky--is-stuck')) {
-          transforms.push(`translateY(${offsetY}px)`);
+          transforms.push(`translateY(calc(${offsetY}px - ${borderTopWidth}))`);
           // shadows.push(`${0}px ${shadowY}px ${shadowX}px rgba(0,0,0,0.3)`);
         }
         // cell.style.boxShadow = shadows.join(',');
