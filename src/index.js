@@ -112,11 +112,11 @@ $(document).ready(() => {
         // let shadows = [];
         cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(0,0,0,0.3)`;
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
-          transforms.push(`translateX(calc(${offsetX}px - ${borderLeftWidth}))`);
+          transforms.push(`translateX(${offsetX}px)`);
           // shadows.push(`${shadowX}px ${0}px ${shadowY}px rgba(0,0,0,0.3)`);
         }
         if (!cell.classList.contains('sticky--is-stuck-x') || cell.classList.contains('sticky--is-stuck')) {
-          transforms.push(`translateY(calc(${offsetY}px - ${borderTopWidth}))`);
+          transforms.push(`translateY(${offsetY}px)`);
           // shadows.push(`${0}px ${shadowY}px ${shadowX}px rgba(0,0,0,0.3)`);
         }
         // cell.style.boxShadow = shadows.join(',');
