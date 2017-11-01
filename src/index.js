@@ -15,7 +15,7 @@ $(document).ready(() => {
       // const stickyElems = Array.from(table.querySelectorAll('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]'));
       const stickyElems = $table.find('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]').toArray();
       stickyElems.forEach((cell) => {
-        const cellStyles = window.getComputedStyle(cell, ':before');        
+        const cellStyles = window.getComputedStyle(cell);        
         
         ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
           ['Width'].forEach((property) => {
@@ -117,16 +117,22 @@ $(document).ready(() => {
 
     function positionStickyElements(table, elems, offsetX = 0, offsetY = 0) {
       const { borderTopWidth, borderLeftWidth } = window.getComputedStyle(table);
+      const elemsLength = elems.length;
       elems.forEach((cell) => {
         let shadowX = calculateShadow(offsetX);
         let shadowY = calculateShadow(offsetY);
         let transforms = [];
+        const cellStyles = window.getComputedStyle(cell);
+        const shadowColor = cellStyles.backgroundColor.replace('rgb(', '').replace(')', '').split(',').map((value) => Math.round(parseInt(value, 10) * .7)).join(',');
 
         // Firefox has both an X and a Y rounding error when calculating translations on table cells.
         // Fix this abberation.
         // transforms.push(`translate(-${borderLeftWidth}, -${borderTopWidth})`);
-
-        cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(0,0,0,0.3)`;
+        if (!cell.nextElementSibling) {
+          cell.style.boxShadow = `0 ${shadowY * 2}px ${Math.sqrt(shadowX + shadowY)}px -${shadowX}px rgba(${shadowColor},0.5)`;
+        } else {
+          cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(${shadowColor},0.5)`;
+        }
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateX(${offsetX}px)`);
           // shadows.push(`${shadowX}px ${0}px ${shadowY}px rgba(0,0,0,0.3)`);

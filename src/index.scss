@@ -84,6 +84,7 @@ table {
     *[class*="sticky--is-stuck"] {
       position: relative;
       transition: box-shadow 0.1s;
+      
       // margin-top: -1px;
       // margin-bottom: -1px;
       // margin-right: -1px;
@@ -92,7 +93,7 @@ table {
       // Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
       // (as, from the rendering engine perspective, it is no longer a part of the table).
       // We need to add these borders back via some css generated elements.
-      &:before {
+      &:after {
         content: "";
         position: absolute;
         border: inherit;        
@@ -101,13 +102,14 @@ table {
         bottom: 0;
         left: 0;
         margin: inherit;
-
         // top: calc(-1 * var(--border-top-width));
         // right: calc(-1 * var(--border-right-width));
         // bottom: calc(-1 * var(--border-bottom-width));
         // left: calc(-1 * var(--border-left-width));
 
         // border-width: 1px;
+      }
+      &:last-child {
       }
     }
     *.sticky--is-stuck {
