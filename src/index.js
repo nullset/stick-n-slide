@@ -123,15 +123,15 @@ $(document).ready(() => {
         let shadowY = calculateShadow(offsetY);
         let transforms = [];
         const cellStyles = window.getComputedStyle(cell);
-        const shadowColor = cellStyles.backgroundColor.replace('rgb(', '').replace(')', '').split(',').map((value) => Math.round(parseInt(value, 10) * .7)).join(',');
+        const shadowColor = cellStyles.backgroundColor.replace('rgb(', '').replace(')', '').split(',').map((value) => Math.round(parseInt(value, 10) * .6)).join(',');
 
         // Firefox has both an X and a Y rounding error when calculating translations on table cells.
         // Fix this abberation.
         // transforms.push(`translate(-${borderLeftWidth}, -${borderTopWidth})`);
         if (!cell.nextElementSibling) {
-          cell.style.boxShadow = `0 ${shadowY * 2}px ${Math.sqrt(shadowX + shadowY)}px -${shadowX}px rgba(${shadowColor},0.5)`;
+          cell.style.boxShadow = `0 ${shadowY * 2}px ${Math.sqrt(shadowX + shadowY)}px -${shadowX}px rgba(${shadowColor},0.7)`;
         } else {
-          cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(${shadowColor},0.5)`;
+          cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(${shadowColor},0.7)`;
         }
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateX(${offsetX}px)`);
