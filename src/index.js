@@ -106,12 +106,12 @@ $(document).ready(() => {
       positionStickyElements(stickyElems, wrapper.scrollLeft, wrapper.scrollTop);
     }
 
-    function calculateShadow(offset) {
+    function calculateShadow(offset, borderWidth) {
       let shadow = Math.ceil(offset/10);
-      let max = 4;
-      let min = 1;
-      if (shadow > max) return max;
-      if (shadow < min) return min;
+      let max = 2;
+      let min = 0;
+      if (shadow > max) return max + borderWidth;
+      if (shadow < min) return min + borderWidth;
       return shadow;
     }
 
@@ -119,19 +119,19 @@ $(document).ready(() => {
       const { borderTopWidth, borderLeftWidth } = window.getComputedStyle(table);
       const elemsLength = elems.length;
       elems.forEach((cell) => {
-        let shadowX = calculateShadow(offsetX);
-        let shadowY = calculateShadow(offsetY);
-        let transforms = [];
         const cellStyles = window.getComputedStyle(cell);
+        let shadowX = calculateShadow(offsetX, parseInt(cellStyles.borderRightWidth, 10));
+        let shadowY = calculateShadow(offsetY, parseInt(cellStyles.borderBottomWidth, 10));
+        let transforms = [];
         const shadowColor = cellStyles.backgroundColor.replace('rgb(', '').replace(')', '').split(',').map((value) => Math.round(parseInt(value, 10) * .6)).join(',');
 
         // Firefox has both an X and a Y rounding error when calculating translations on table cells.
         // Fix this abberation.
         // transforms.push(`translate(-${borderLeftWidth}, -${borderTopWidth})`);
         if (!cell.nextElementSibling) {
-          cell.style.boxShadow = `0 ${shadowY * 2}px ${Math.sqrt(shadowX + shadowY)}px -${shadowX}px rgba(${shadowColor},0.7)`;
+          cell.style.boxShadow = `0 ${shadowY * 2}px ${Math.ceil(Math.sqrt(shadowX + shadowY))}px -${shadowX}px rgba(${shadowColor},0.7)`;
         } else {
-          cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.sqrt(shadowX + shadowY)}px rgba(${shadowColor},0.7)`;
+          cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.ceil(Math.sqrt(shadowX + shadowY))}px rgba(${shadowColor},0.7)`;
         }
         if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateX(${offsetX}px)`);
