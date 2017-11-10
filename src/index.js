@@ -58,11 +58,11 @@ $(document).ready(() => {
         }
       });
 
-      wrapper.addEventListener('scroll', () => {
+      wrapper.addEventListener('scroll', (event) => {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
-          scrollHandler(wrapper, stickyElems);
+          scrollHandler(table, stickyElems, wrapper);
         }
       });
 
@@ -96,14 +96,14 @@ $(document).ready(() => {
       wrapper.scrollTop = newY;
     }
 
-    function scrollHandler(wrapper, stickyElems) {
-      requestAnimationFrame(() => {
-        updateScrollPosition(wrapper, stickyElems);
-      });
+    function scrollHandler(table, stickyElems, wrapper) {
+      // requestAnimationFrame(() => {
+        updateScrollPosition(table, stickyElems, wrapper);
+      // });
     }
 
-    function updateScrollPosition(wrapper, stickyElems) {
-      positionStickyElements(stickyElems, wrapper.scrollLeft, wrapper.scrollTop);
+    function updateScrollPosition(table, stickyElems, wrapper) {
+      positionStickyElements(table, stickyElems, wrapper.scrollLeft, wrapper.scrollTop);
     }
 
     function calculateShadowColor(cell, opacity) {
@@ -127,26 +127,28 @@ $(document).ready(() => {
     }
 
     function positionStickyElements(table, elems, offsetX = 0, offsetY = 0) {
-      elems.forEach((cell, i) => {
-        let transforms = [];
-        const shadowColor = calculateShadowColor(cell, 0.4);
-        let xShadow = '0 0';
-        let yShadow = '0 0';
-        let shadow;
-        if (cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
-          transforms.push(`translateY(${offsetY}px)`);
-          shadow = calculateShadowOffset(offsetY);
-          yShadow = `0 ${shadow}px ${shadowColor}`;
-        }
-        if (cell.classList.contains('sticky--is-stuck-x') || cell.classList.contains('sticky--is-stuck')) {
-          transforms.push(`translateX(${offsetX}px)`);
-          shadow = calculateShadowOffset(offsetX);
-          xShadow = `${shadow}px 0 ${shadowColor}`;
-        }
-        cell.style.transform = transforms.join(' ');
-        cell.style.setProperty('--x-shadow', xShadow);
-        cell.style.setProperty('--y-shadow', yShadow);
-      });
+      if (elems) {
+        elems.forEach((cell, i) => {
+          let transforms = [];
+          const shadowColor = calculateShadowColor(cell, 0.4);
+          let xShadow = '0 0';
+          let yShadow = '0 0';
+          let shadow;
+          if (cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
+            transforms.push(`translateY(${offsetY}px)`);
+            shadow = calculateShadowOffset(offsetY);
+            yShadow = `0 ${shadow}px ${shadowColor}`;
+          }
+          if (cell.classList.contains('sticky--is-stuck-x') || cell.classList.contains('sticky--is-stuck')) {
+            transforms.push(`translateX(${offsetX}px)`);
+            shadow = calculateShadowOffset(offsetX);
+            xShadow = `${shadow}px 0 ${shadowColor}`;
+          }
+          cell.style.transform = transforms.join(' ');
+          cell.style.setProperty('--x-shadow', xShadow);
+          cell.style.setProperty('--y-shadow', yShadow);
+        });
+      }
     }
 
     return this;
