@@ -106,15 +106,6 @@ $(document).ready(() => {
       positionStickyElements(stickyElems, wrapper.scrollLeft, wrapper.scrollTop);
     }
 
-    function calculateShadow(offset, borderWidth) {
-      let shadow = Math.ceil(offset/10);
-      let max = 2;
-      let min = 0;
-      if (shadow > max) return max + borderWidth;
-      if (shadow < min) return min + borderWidth;
-      return shadow;
-    }
-
     function calculateShadowColor(cell, opacity) {
       const rgb = window.getComputedStyle(cell)
         .backgroundColor
@@ -136,8 +127,6 @@ $(document).ready(() => {
     }
 
     function positionStickyElements(table, elems, offsetX = 0, offsetY = 0) {
-      const { borderTopWidth, borderLeftWidth } = window.getComputedStyle(table);
-      const elemsLength = elems.length;
       elems.forEach((cell, i) => {
         let transforms = [];
         const shadowColor = calculateShadowColor(cell, 0.4);
@@ -155,7 +144,6 @@ $(document).ready(() => {
           xShadow = `${shadow}px 0 ${shadowColor}`;
         }
         cell.style.transform = transforms.join(' ');
-        // cell.style.boxShadow = `${xShadow}, ${yShadow}`;
         cell.style.setProperty('--x-shadow', xShadow);
         cell.style.setProperty('--y-shadow', yShadow);
       });
