@@ -115,34 +115,49 @@ $(document).ready(() => {
       return shadow;
     }
 
+    function calculateShadowColor(cell, opacity) {
+      const rgb = window.getComputedStyle(cell)
+        .backgroundColor
+        .replace('rgb(', '')
+        .replace(')', '')
+        .split(',')
+        .map((value) => Math.round(parseInt(value, 10) * .3))
+        .join(',');
+      return `rgba(${rgb},${opacity})`;
+    }
+
+    function calculateShadowOffset(value) {
+      value = Math.ceil(value/10);
+      if (value > 3) {
+        return 3;
+      } else {
+        return value;
+      }
+    }
+
     function positionStickyElements(table, elems, offsetX = 0, offsetY = 0) {
       const { borderTopWidth, borderLeftWidth } = window.getComputedStyle(table);
       const elemsLength = elems.length;
-      elems.forEach((cell) => {
-        const cellStyles = window.getComputedStyle(cell);
-        let shadowX = calculateShadow(offsetX, parseInt(cellStyles.borderRightWidth, 10));
-        let shadowY = calculateShadow(offsetY, parseInt(cellStyles.borderBottomWidth, 10));
+      elems.forEach((cell, i) => {
         let transforms = [];
-        const shadowColor = cellStyles.backgroundColor.replace('rgb(', '').replace(')', '').split(',').map((value) => Math.round(parseInt(value, 10) * .6)).join(',');
-
-        // Firefox has both an X and a Y rounding error when calculating translations on table cells.
-        // Fix this abberation.
-        // transforms.push(`translate(-${borderLeftWidth}, -${borderTopWidth})`);
-        if (!cell.nextElementSibling) {
-          cell.style.boxShadow = `0 ${shadowY * 2}px ${Math.ceil(Math.sqrt(shadowX + shadowY))}px -${shadowX}px rgba(${shadowColor},0.7)`;
-        } else {
-          cell.style.boxShadow = `${shadowX}px ${shadowY}px ${Math.ceil(Math.sqrt(shadowX + shadowY))}px rgba(${shadowColor},0.7)`;
-        }
-        if (!cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
-          transforms.push(`translateX(${offsetX}px)`);
-          // shadows.push(`${shadowX}px ${0}px ${shadowY}px rgba(0,0,0,0.3)`);
-        }
-        if (!cell.classList.contains('sticky--is-stuck-x') || cell.classList.contains('sticky--is-stuck')) {
+        const shadowColor = calculateShadowColor(cell, 0.4);
+        let xShadow = '0 0';
+        let yShadow = '0 0';
+        let shadow;
+        if (cell.classList.contains('sticky--is-stuck-y') || cell.classList.contains('sticky--is-stuck')) {
           transforms.push(`translateY(${offsetY}px)`);
-          // shadows.push(`${0}px ${shadowY}px ${shadowX}px rgba(0,0,0,0.3)`);
+          shadow = calculateShadowOffset(offsetY);
+          yShadow = `0 ${shadow}px ${shadowColor}`;
         }
-        // cell.style.boxShadow = shadows.join(',');
+        if (cell.classList.contains('sticky--is-stuck-x') || cell.classList.contains('sticky--is-stuck')) {
+          transforms.push(`translateX(${offsetX}px)`);
+          shadow = calculateShadowOffset(offsetX);
+          xShadow = `${shadow}px 0 ${shadowColor}`;
+        }
         cell.style.transform = transforms.join(' ');
+        // cell.style.boxShadow = `${xShadow}, ${yShadow}`;
+        cell.style.setProperty('--x-shadow', xShadow);
+        cell.style.setProperty('--y-shadow', yShadow);
       });
     }
 

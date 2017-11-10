@@ -71,6 +71,14 @@ table {
     }
   }
 
+  th, td {
+    &[class~="sticky--is-stuck"] {
+      &:last-of-type {
+        background: red;          
+      }
+    }
+  }
+
   tbody:first-child {
     // If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border.
     tr:not(:first-child) {
@@ -102,14 +110,8 @@ table {
         bottom: 0;
         left: 0;
         margin: inherit;
-        // top: calc(-1 * var(--border-top-width));
-        // right: calc(-1 * var(--border-right-width));
-        // bottom: calc(-1 * var(--border-bottom-width));
-        // left: calc(-1 * var(--border-left-width));
-
-        // border-width: 1px;
-      }
-      &:last-child {
+        transition: box-shadow .1s;
+        box-shadow: var(--x-shadow), var(--y-shadow);
       }
     }
     *.sticky--is-stuck {
