@@ -375,6 +375,98 @@
         <tfoot></tfoot>
       </table>
     </div>
+    <button id="backgroundColor">Change background</button>
+    <button id="borderColor">Change border color</button>
+    <button id="borderWidth">Change border width</button>
+    <button id="mergeCellRow">Merge cell</button>
+    <button id="changeContent">Change content</button>
+    
+    <script>
+      function randomColor() {
+        return '#' + (Math.random()*0xFFFFFF<<0).toString(16);
+      }
+
+      function randomNumber() {
+        return Math.floor(Math.random() * 6) + 1;
+      }
+
+      function backgroundColor(event) {
+        event.target.style.backgroundColor = randomColor();
+      }
+
+      document.getElementById('backgroundColor').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', backgroundColor);
+        } else {
+          document.querySelector('table').removeEventListener('click', backgroundColor);
+        }
+      });
+
+      function borderColor(event) {
+        event.target.style.borderColor = randomColor();
+      }
+
+      document.getElementById('borderColor').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', borderColor);
+        } else {
+          document.querySelector('table').removeEventListener('click', borderColor);
+        }
+      });
+
+      function borderWidth(event) {
+        event.target.style.borderWidth = randomNumber() + 'px';
+      }
+
+      document.getElementById('borderWidth').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', borderWidth);
+        } else {
+          document.querySelector('table').removeEventListener('click', borderWidth);
+        }
+      });
+
+      function mergeCellRow(event) {
+        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
+          if (event.target.nextElementSibling) {
+            event.target.colSpan = event.target.colSpan + event.target.nextElementSibling.colSpan;
+            event.target.nextElementSibling.remove();
+          }
+        }
+      }
+
+      document.getElementById('mergeCellRow').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', mergeCellRow);
+        } else {
+          document.querySelector('table').removeEventListener('click', mergeCellRow);
+        }
+      });
+
+      function changeContent(event) {
+        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
+          fetch('http://www.randomtext.me/api/lorem/p-1/5-15')
+          .then(response => response.json())
+          .then((json) => {
+            event.target.innerHTML = json.text_out;
+          })
+        }
+      }
+
+      document.getElementById('changeContent').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', changeContent);
+        } else {
+          document.querySelector('table').removeEventListener('click', changeContent);
+        }
+      });
+
+    </script>
     <p>oeuoeu</p>
     <p>oeuoeu</p>
     <p>oeuoeu</p>
