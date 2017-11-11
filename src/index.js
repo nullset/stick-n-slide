@@ -10,8 +10,19 @@ $(document).ready(() => {
       const $wrapper = $table.parent();
       const wrapper = $wrapper[0];
 
+      // Must test for FF, because it does some seriously horrible things to the table layout.
+      const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
       const tableStyles = window.getComputedStyle(table);
       const stickyElems = $table.find('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]').toArray();
+
+      wrapper.style.position = 'relative';
+      table.style.position = 'relative';
+      ['Top', 'Left'].forEach((side) => {
+        if (table[`offset${side}`] > 0) {
+          table.style[side.toLowerCase()] = `-${table[`offset${side}`]}px`;
+        }
+      });
 
       stickyElems.forEach((cell) => {
         const cellStyles = window.getComputedStyle(cell);        
@@ -19,19 +30,42 @@ $(document).ready(() => {
         ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
           ['Width'].forEach((property) => {
             const borderWidth = cellStyles[`border${side}${property}`];
-            let tableOffset;
-            if (side === 'Top' || side === 'Bottom') {
-              tableOffset = tableStyles.borderTopWidth;
+
+            // Use a !isFirefox because there's no reason to penalize every other browser for FF weirdness.
+            if (!isFirefox) {
+              cell.style[`margin${side}`] = `-${borderWidth}`;
             } else {
-              tableOffset = tableStyles.borderLeftWidth;
+              // Fixes for 1 px
+              // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
             }
-            if (side === 'Right' || side === 'Bottom') {
-              tableOffset = `-${tableOffset}`;
-            }
-            cell.style[`margin${side}`] = `calc(-1 * (${borderWidth} + ${tableOffset}))`;
+            
+
+            // let tableOffset = 0;
+            // if (side === 'Top' || side === 'Bottom') {
+            //   tableOffset = tableStyles.borderTopWidth;
+            // } else {
+            //   tableOffset = tableStyles.borderLeftWidth;
+            // }
+            // if (side === 'Right' || side === 'Bottom') {
+            //   tableOffset = `-${tableOffset}`;
+            // }
+            // cell.style[`margin${side}`] = `calc(-1 * (${borderWidth} + ${tableOffset}))`;
           });
         });
       });
+
+      function altSide(side) {
+        switch(side) {
+        case 'Left':
+          return 'Right';
+        case 'Right':
+          return 'Left';
+        case 'Top':
+          return 'Bottom';
+        case 'Bottom':
+          return 'Top';
+        }
+      }
 
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
