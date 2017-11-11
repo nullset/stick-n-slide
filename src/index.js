@@ -5,21 +5,19 @@ $(document).ready(() => {
     
   $.fn.stickyTable = function (args) {
     this.each(() => {
-      const $wrapper = this;
-      const $table = this.find('> table');
+      const $table = this;
       const table = $table[0];
-      const tableStyles = window.getComputedStyle(table);
-      window.tableStyles = tableStyles;
-      // const $wrapper = wrapTable($table, tableStyles);
+      const $wrapper = $table.parent();
       const wrapper = $wrapper[0];
-      // const stickyElems = Array.from(table.querySelectorAll('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]'));
+
+      const tableStyles = window.getComputedStyle(table);
       const stickyElems = $table.find('th[class*="sticky--is-stuck"], td[class*="sticky--is-stuck"]').toArray();
+
       stickyElems.forEach((cell) => {
         const cellStyles = window.getComputedStyle(cell);        
         
         ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
           ['Width'].forEach((property) => {
-            // cell.style.setProperty(`--border-${side.toLowerCase()}-${property.toLowerCase()}`, cellStyles[`border${side}${property}`]);
             const borderWidth = cellStyles[`border${side}${property}`];
             let tableOffset;
             if (side === 'Top' || side === 'Bottom') {
@@ -31,10 +29,10 @@ $(document).ready(() => {
               tableOffset = `-${tableOffset}`;
             }
             cell.style[`margin${side}`] = `calc(-1 * (${borderWidth} + ${tableOffset}))`;
-            // cell.style[`margin${side}`] = `-${cellStyles[`border${side}${property}`]}`;
           });
         });
       });
+
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
       let wheelEventTriggered = false;
@@ -56,9 +54,9 @@ $(document).ready(() => {
           event.preventDefault();
           wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight });
         }
-      });
+      }, {capture: true});
 
-      wrapper.addEventListener('scroll', (event) => {
+      wrapper.addEventListener('scroll', () => {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
@@ -86,20 +84,13 @@ $(document).ready(() => {
       if (newY <= 0) {
         newY = 0;
       }
-      if (newX > 0 || newY > 0) {
-        wrapper.classList.add('sticky--is-scrolling');
-      } else {
-        wrapper.classList.remove('sticky--is-scrolling');
-      }
       positionStickyElements(table, stickyElems, newX, newY);
       wrapper.scrollLeft = newX;
       wrapper.scrollTop = newY;
     }
 
     function scrollHandler(table, stickyElems, wrapper) {
-      // requestAnimationFrame(() => {
-        updateScrollPosition(table, stickyElems, wrapper);
-      // });
+      updateScrollPosition(table, stickyElems, wrapper);
     }
 
     function updateScrollPosition(table, stickyElems, wrapper) {
@@ -185,6 +176,6 @@ $(document).ready(function() {
   
   
   // $table.stickyTable();
-  $wrapper.stickyTable();
+  $table.stickyTable();
   
 });

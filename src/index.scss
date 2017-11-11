@@ -62,22 +62,6 @@ table {
 
   // width: 500px;
   border: 1px solid red;
-  // When the wrapper is not scrolled, there should be no shadow.
-  &:not(.sticky--is-scrolling) {
-    th, td {
-      &[class*="sticky--is-stuck"] {
-        box-shadow: none !important;
-      }
-    }
-  }
-
-  th, td {
-    &[class~="sticky--is-stuck"] {
-      &:last-of-type {
-        background: red;          
-      }
-    }
-  }
 
   tbody:first-child {
     // If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border.
