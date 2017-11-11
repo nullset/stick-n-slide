@@ -35,8 +35,8 @@ $(document).ready(() => {
             if (!isFirefox) {
               cell.style[`margin${side}`] = `-${borderWidth}`;
             } else {
-              // Fixes for 1 px
-              // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
+              // Fixes for 1 px, but nothing else :()
+              cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
             }
             
 
