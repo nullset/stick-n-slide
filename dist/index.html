@@ -40,7 +40,7 @@
         border: 2px solid lightgray;
       }
     </style>
-  </head>
+  <link href="index.css" rel="stylesheet"></head>
   <body>
     <p>oeuoeu</p>
     <p>oeuoeu</p>
@@ -526,7 +526,9 @@
           $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('Stick-n-Slide--is-stuck-x');
           $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('Stick-n-Slide--is-stuck-x');
                   
-          $table.stickyTable();
+          // $table.stickyTable();
+          debugger
+          stickNSlide($table.toArray())
 
         }, 5000)        
       });  
@@ -556,5 +558,5 @@
     <p>oeuoeu</p>
     <p>oeuoeu</p>
 
-  <script type="text/javascript" src="entry.js"></script></body>
+  <script type="text/javascript" src="index.js"></script></body>
 </html>

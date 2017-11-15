@@ -25,6 +25,7 @@ const commonConfig = merge([
       filename: '[name].js',
       library: 'stick-n-slide',
       libraryTarget: 'umd',
+      umdNamedDefine: true,
     },
     plugins: [
       new HtmlWebpackPlugin({
