@@ -3,6 +3,43 @@
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <style>
+      .wrapper {
+        display: inline-block;
+        overflow: auto;
+        max-width: 100%;
+        max-height: 500px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        border: 1px solid red;
+      }
+      table {
+        border-collapse: collapse;
+        max-height: 400px;
+        max-width: 100%;
+      }
+      table thead tr {
+        background: yellow;
+      }
+      table thead th {
+        background: #6698f5;
+        padding: 30px;
+        border: 2px solid #4f74b9;
+      }
+      table tbody tr:nth-child(2n+1) th,
+      table tbody tr:nth-child(2n+1) td {
+          background: #fff;
+      }
+      table tbody tr:nth-child(2n) th,
+      table tbody tr:nth-child(2n) td {
+          background: #efefef;
+      }
+      table tbody th,
+      table tbody td {
+        padding: 50px 30px;
+        border: 2px solid lightgray;
+      }
+    </style>
   </head>
   <body>
     <p>oeuoeu</p>
@@ -13,8 +50,8 @@
     <p>oeuoeu</p>
     <p>oeuoeu</p>
     <p>oeuoeu</p>
-    <div id="scroller" class="sticky-table-wrapper">
-      <table id="blah" class="sticky sticky--weight-x">
+    <div class="wrapper">
+      <table>
         <thead>
           <tr>
             <th>1</th>
@@ -378,7 +415,7 @@
     <div>
       <button id="backgroundColor">Change background</button>
       <button id="borderColor">Change border color</button>
-      <button id="borderWidth">Change border width</button>
+      <!-- <button id="borderWidth">Change border width</button> -->
       <button id="mergeCellRow">Merge cell</button>
       <button id="changeContent">Change content</button>
     </div>
@@ -418,18 +455,18 @@
         }
       });
 
-      function borderWidth(event) {
-        event.target.style.borderWidth = randomNumber() + 'px';
-      }
+      // function borderWidth(event) {
+      //   event.target.style.borderWidth = randomNumber() + 'px';
+      // }
 
-      document.getElementById('borderWidth').addEventListener('click', (event)=> {
-        event.currentTarget.active = !event.currentTarget.active;
-        if (event.currentTarget.active) {
-          document.querySelector('table').addEventListener('click', borderWidth);
-        } else {
-          document.querySelector('table').removeEventListener('click', borderWidth);
-        }
-      });
+      // document.getElementById('borderWidth').addEventListener('click', (event)=> {
+      //   event.currentTarget.active = !event.currentTarget.active;
+      //   if (event.currentTarget.active) {
+      //     document.querySelector('table').addEventListener('click', borderWidth);
+      //   } else {
+      //     document.querySelector('table').removeEventListener('click', borderWidth);
+      //   }
+      // });
 
       function mergeCellRow(event) {
         if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
@@ -468,6 +505,33 @@
         }
       });
 
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
+    <script>
+      $(document).ready(function() {
+        setTimeout(() => {
+          var $table = $('table');
+          
+          $table.find('thead th:nth-child(-n+3)').each((i, th) => {
+            $(th).addClass('Stick-n-Slide--is-stuck');
+          });
+          
+          $table.find('thead th:nth-child(n+4)').each((i, th) => {
+            $(th).addClass('Stick-n-Slide--is-stuck-y');
+          });
+          
+          $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('Stick-n-Slide--is-stuck-x');
+          
+          $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('Stick-n-Slide--is-stuck-x');
+          $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('Stick-n-Slide--is-stuck-x');
+                  
+          // $table.stickyTable();
+          debugger
+          stickNSlide($table.toArray())
+
+        }, 5000)        
+      });  
     </script>
     <p>oeuoeu</p>
     <p>oeuoeu</p>

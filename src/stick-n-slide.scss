@@ -1,0 +1,49 @@
+
+table.Stick-n-Slide {
+  box-sizing: border-box;
+  * {
+    box-sizing: border-box;
+  }
+  tbody:first-child {
+    /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */
+    tr:not(:first-child) {
+      th, td {
+        border-top-width: 0;
+      }
+    }
+  }
+
+  thead, tbody {
+    *[class*="Stick-n-Slide--is-stuck"] {
+      position: relative;
+      transition: box-shadow 0.1s;
+      
+      /*
+      // Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
+      // (as, from the rendering engine perspective, it is no longer a part of the table).
+      // We need to add these borders back via some css generated elements.
+      */
+      &:after {
+        content: "";
+        position: absolute;
+        border: inherit;        
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: inherit;
+        transition: box-shadow .1s;
+        box-shadow: var(--x-shadow), var(--y-shadow);
+      }
+    }
+    *.Stick-n-Slide--is-stuck {
+      z-index: 100;
+    }
+    *.Stick-n-Slide--is-stuck-x {
+      z-index: 90;
+    }
+    *.Stick-n-Slide--is-stuck-y {
+      z-index: 80;
+    }
+  }
+}

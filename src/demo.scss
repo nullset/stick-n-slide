@@ -1,0 +1,48 @@
+table {
+  $borderWidth: 1px;
+  border-collapse: collapse;
+  max-height: 400px;
+  max-width: 100%;
+  thead {
+    tr {
+      background: yellow;
+    }
+    th {
+      background: rgb(102, 152, 245);
+      padding: 30px;
+      border: $borderWidth solid rgb(79, 116, 185);
+      transform-origin: 0 0;
+    }
+  }
+  tbody {
+    tr {
+      &:nth-child(2n+1) {
+        th, td {
+          background: #fff;          
+        }
+      }
+      &:nth-child(2n) {
+        th, td {
+          background: #efefef;            
+        }
+      }
+    }
+    th, td {
+      padding: 50px 30px;
+      border: $borderWidth solid lightgray;
+    }
+  }
+  th, td {
+    &:last-child {
+      // background: rgb(172, 172, 253) !important;
+      // border-left-width: 3px;
+      // border-color: rgb(122, 122, 180);
+    }
+    &:nth-child(2) {
+      // border-left: 3px solid red;
+    }
+  }
+  .sticky--is-stuck-x {
+    background: rgb(229, 238, 255) !important;
+  }
+}

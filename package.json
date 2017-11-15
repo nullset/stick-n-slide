@@ -1,7 +1,11 @@
 {
-  "name": "webpack-common",
+  "name": "stick-n-slide",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/entry.js",
+  "files": [
+    "dist/entry.js",
+    "dist/entry.css"
+  ],
   "license": "MIT",
   "scripts": {
     "start": "nodemon --watch webpack.config.js --exec \"webpack-dev-server --env development\" --host 0.0.0.0 --disable-host-check",

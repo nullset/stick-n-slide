@@ -3,8 +3,558 @@
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
     <title>Webpack demo</title>
-  <link href="index.css" rel="stylesheet"></head>
+    <style>
+      .wrapper {
+        display: inline-block;
+        overflow: auto;
+        max-width: 100%;
+        max-height: 500px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        border: 1px solid red;
+      }
+      table {
+        border-collapse: collapse;
+        max-height: 400px;
+        max-width: 100%;
+      }
+      table thead tr {
+        background: yellow;
+      }
+      table thead th {
+        background: #6698f5;
+        padding: 30px;
+        border: 2px solid #4f74b9;
+      }
+      table tbody tr:nth-child(2n+1) th,
+      table tbody tr:nth-child(2n+1) td {
+          background: #fff;
+      }
+      table tbody tr:nth-child(2n) th,
+      table tbody tr:nth-child(2n) td {
+          background: #efefef;
+      }
+      table tbody th,
+      table tbody td {
+        padding: 50px 30px;
+        border: 2px solid lightgray;
+      }
+    </style>
+  </head>
   <body>
-    This is the template.
-  <script type="text/javascript" src="index.js"></script></body>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <div class="wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+            <th>10</th>
+            <th>11</th>
+            <th>12</th>
+            <th>13</th>
+            <th>14</th>
+            <th>15</th>
+            <th>16</th>
+            <th>17</th>
+            <th>18</th>
+            <th>19</th>
+            <th>20</th>
+          </tr>
+          <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+            <th>10</th>
+            <th>11</th>
+            <th>12</th>
+            <th>13</th>
+            <th>14</th>
+            <th>15</th>
+            <th>16</th>
+            <th>17</th>
+            <th>18</th>
+            <th>19</th>
+            <th>20</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>1</th>
+            <th>2</th>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+          </tr>
+    
+        </tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+    <div>
+      <button id="backgroundColor">Change background</button>
+      <button id="borderColor">Change border color</button>
+      <!-- <button id="borderWidth">Change border width</button> -->
+      <button id="mergeCellRow">Merge cell</button>
+      <button id="changeContent">Change content</button>
+    </div>
+    
+    <script>
+      function randomColor() {
+        return '#' + (Math.random()*0xFFFFFF<<0).toString(16);
+      }
+
+      function randomNumber() {
+        return Math.floor(Math.random() * 6) + 1;
+      }
+
+      function backgroundColor(event) {
+        event.target.style.backgroundColor = randomColor();
+      }
+
+      document.getElementById('backgroundColor').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', backgroundColor);
+        } else {
+          document.querySelector('table').removeEventListener('click', backgroundColor);
+        }
+      });
+
+      function borderColor(event) {
+        event.target.style.borderColor = randomColor();
+      }
+
+      document.getElementById('borderColor').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', borderColor);
+        } else {
+          document.querySelector('table').removeEventListener('click', borderColor);
+        }
+      });
+
+      // function borderWidth(event) {
+      //   event.target.style.borderWidth = randomNumber() + 'px';
+      // }
+
+      // document.getElementById('borderWidth').addEventListener('click', (event)=> {
+      //   event.currentTarget.active = !event.currentTarget.active;
+      //   if (event.currentTarget.active) {
+      //     document.querySelector('table').addEventListener('click', borderWidth);
+      //   } else {
+      //     document.querySelector('table').removeEventListener('click', borderWidth);
+      //   }
+      // });
+
+      function mergeCellRow(event) {
+        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
+          if (event.target.nextElementSibling) {
+            event.target.colSpan = event.target.colSpan + event.target.nextElementSibling.colSpan;
+            event.target.nextElementSibling.remove();
+          }
+        }
+      }
+
+      document.getElementById('mergeCellRow').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', mergeCellRow);
+        } else {
+          document.querySelector('table').removeEventListener('click', mergeCellRow);
+        }
+      });
+
+      function changeContent(event) {
+        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
+          fetch('http://www.randomtext.me/api/lorem/p-1/5-15')
+          .then(response => response.json())
+          .then((json) => {
+            event.target.innerHTML = json.text_out;
+          })
+        }
+      }
+
+      document.getElementById('changeContent').addEventListener('click', (event)=> {
+        event.currentTarget.active = !event.currentTarget.active;
+        if (event.currentTarget.active) {
+          document.querySelector('table').addEventListener('click', changeContent);
+        } else {
+          document.querySelector('table').removeEventListener('click', changeContent);
+        }
+      });
+
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
+    <script>
+      $(document).ready(function() {
+        setTimeout(() => {
+          var $table = $('table');
+          
+          $table.find('thead th:nth-child(-n+3)').each((i, th) => {
+            $(th).addClass('Stick-n-Slide--is-stuck');
+          });
+          
+          $table.find('thead th:nth-child(n+4)').each((i, th) => {
+            $(th).addClass('Stick-n-Slide--is-stuck-y');
+          });
+          
+          $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('Stick-n-Slide--is-stuck-x');
+          
+          $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('Stick-n-Slide--is-stuck-x');
+          $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('Stick-n-Slide--is-stuck-x');
+                  
+          $table.stickyTable();
+
+        }, 5000)        
+      });  
+    </script>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+    <p>oeuoeu</p>
+
+  <script type="text/javascript" src="entry.js"></script></body>
 </html>

@@ -12,23 +12,44 @@ const PATHS = {
 const commonConfig = merge([
   {
     entry: {
-      polyfill: "babel-polyfill",
+      // polyfill: 'babel-polyfill',
       index: PATHS.src,
+      // entry: './src/index.js',
+      // output: {
+      //   path: path.resolve(__dirname, 'dist'),
+      //   filename: 'index.js',
+      // },
     },
     output: {
       path: PATHS.dist,
       filename: '[name].js',
+      library: 'stick-n-slide',
+      libraryTarget: 'umd',
     },
     plugins: [
       new HtmlWebpackPlugin({
         title: 'Webpack demo',
         template: './template/template.ejs',
       }),
-      new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-      }),
+      // new webpack.ProvidePlugin({
+      //   $: 'jquery',
+      //   jQuery: 'jquery',
+      // }),
     ],
+    externals: {
+      jquery: {
+        commonjs: 'jQuery',
+        commonjs2: 'jQuery',
+        amd: 'jQuery',
+        root: '$',
+      },
+      $: {
+        commonjs: 'jQuery',
+        commonjs2: 'jQuery',
+        amd: 'jQuery',
+        root: '$',
+      },
+    },
   },
   parts.lintJavaScript({ include: PATHS.src }),
   parts.lintCSS({ include: PATHS.src }),
@@ -37,7 +58,7 @@ const commonConfig = merge([
 
 const productionConfig = merge([
   parts.extractCSS({
-    use: ['css-loader', parts.autoprefix()],
+    use: ['css-loader', 'fast-sass-loader', parts.autoprefix()],
   }),
 ]);
 
