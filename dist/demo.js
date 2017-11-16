@@ -292,13 +292,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             width = _wrapper$getBoundingC.width,
             height = _wrapper$getBoundingC.height;
 
-        if (scrollTop === 0 && deltaY > 0 || scrollTop > 0 && scrollHeight - scrollTop - height > 0 || scrollLeft === 0 && deltaX > 0 || scrollLeft > 0 && scrollWidth - scrollLeft - width > 0) {
+        if (isIE || isIEedge) {
+          event.preventDefault();
+          event.stopPropagation();
+          wheelHandler({ table: table, wrapper: wrapper, stickyElems: stickyElems, deltaX: deltaX, deltaY: deltaY, scrollLeft: scrollLeft, scrollTop: scrollTop, scrollWidth: scrollWidth, scrollHeight: scrollHeight, clientWidth: clientWidth, clientHeight: clientHeight });
+        } else if (scrollTop === 0 && deltaY > 0 || scrollTop > 0 && scrollHeight - scrollTop - height > 0 || scrollLeft === 0 && deltaX > 0 || scrollLeft > 0 && scrollWidth - scrollLeft - width > 0) {
           event.preventDefault();
           wheelHandler({ table: table, wrapper: wrapper, stickyElems: stickyElems, deltaX: deltaX, deltaY: deltaY, scrollLeft: scrollLeft, scrollTop: scrollTop, scrollWidth: scrollWidth, scrollHeight: scrollHeight, clientWidth: clientWidth, clientHeight: clientHeight });
         }
       }, { capture: true });
 
-      wrapper.addEventListener('scroll', function () {
+      wrapper.addEventListener('scroll', function (event) {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {

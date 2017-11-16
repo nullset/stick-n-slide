@@ -65,7 +65,11 @@ export default function(elems) {
         const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
         const { width, height } = wrapper.getBoundingClientRect();
 
-        if ( 
+        if (isIE || isIEedge) {
+          event.preventDefault();
+          event.stopPropagation();
+          wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight });
+        } else if ( 
           ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
           ||
           ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
@@ -75,7 +79,7 @@ export default function(elems) {
         }
       }, {capture: true});
 
-      wrapper.addEventListener('scroll', () => {
+      wrapper.addEventListener('scroll', (event) => {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
