@@ -8,7 +8,7 @@
   border: 1px solid red;
 }
 table {
-  $borderWidth: 4px;
+  $borderWidth: 1px;
   border-collapse: collapse;
   max-height: 400px;
   max-width: 100%;
@@ -51,7 +51,7 @@ table {
       // border-left: 3px solid red;
     }
   }
-  .Stick-n-Slide--is-stuck-x {
+  .sns--is-stuck-x {
     background: rgb(229, 238, 255) !important;
   }
 }

@@ -20,12 +20,12 @@ export default function(elems) {
       const isIEedge = userAgent.indexOf('edge') > -1;
 
       let stickyElems = [];
-      ['Stick-n-Slide--is-stuck', 'Stick-n-Slide--is-stuck-x', 'Stick-n-Slide--is-stuck-y'].forEach((className) => {
+      ['sns--is-stuck', 'sns--is-stuck-x', 'sns--is-stuck-y'].forEach((className) => {
         stickyElems = stickyElems.concat(Array.from(table.querySelectorAll(`.${className}`)));
       });
 
       wrapper.style.position = 'relative';
-      table.classList.add('Stick-n-Slide');
+      table.classList.add('sns');
       table.style.position = 'relative';
 
       ['Top', 'Left'].forEach((side) => {
@@ -158,12 +158,12 @@ export default function(elems) {
         let xShadow = '0 0';
         let yShadow = '0 0';
         let shadow;
-        if (cell.classList.contains('Stick-n-Slide--is-stuck-y') || cell.classList.contains('Stick-n-Slide--is-stuck')) {
+        if (cell.classList.contains('sns--is-stuck-y') || cell.classList.contains('sns--is-stuck')) {
           transforms.push(`translateY(${offsetY}px)`);
           shadow = calculateShadowOffset(offsetY);
           yShadow = `0 ${shadow}px ${shadowColor}`;
         }
-        if (cell.classList.contains('Stick-n-Slide--is-stuck-x') || cell.classList.contains('Stick-n-Slide--is-stuck')) {
+        if (cell.classList.contains('sns--is-stuck-x') || cell.classList.contains('sns--is-stuck')) {
           transforms.push(`translateX(${offsetX}px)`);
           shadow = calculateShadowOffset(offsetX);
           xShadow = `${shadow}px 0 ${shadowColor}`;

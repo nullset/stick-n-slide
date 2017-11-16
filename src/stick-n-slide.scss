@@ -1,5 +1,5 @@
 
-table.Stick-n-Slide {
+table.sns {
   box-sizing: border-box;
   * {
     box-sizing: border-box;
@@ -14,7 +14,7 @@ table.Stick-n-Slide {
   }
 
   thead, tbody {
-    *[class*="Stick-n-Slide--is-stuck"] {
+    *[class*="sns--is-stuck"] {
       position: relative;
       transition: box-shadow 0.1s;
       
@@ -47,20 +47,20 @@ table.Stick-n-Slide {
         z-index: 1;
       }
     }
-    *.Stick-n-Slide--is-stuck {
+    *.sns--is-stuck {
       z-index: 100;
     }
-    *.Stick-n-Slide--is-stuck-x {
+    *.sns--is-stuck-x {
       z-index: 90;
     }
-    *.Stick-n-Slide--is-stuck-y {
+    *.sns--is-stuck-y {
       z-index: 80;
     }
   }
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  table.Stick-n-Slide {
+  table.sns {
     margin-top: -2px;
     margin-left: -1px;
   }
