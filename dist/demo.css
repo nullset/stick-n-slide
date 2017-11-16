@@ -15,9 +15,15 @@ table.Stick-n-Slide {
     transition: box-shadow 0.1s;
     transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;
     /*
-      // Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
-      // (as, from the rendering engine perspective, it is no longer a part of the table).
-      // We need to add these borders back via some css generated elements.
+        Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
+        (as, from the rendering engine perspective, it is no longer a part of the table).
+        We need to add these borders back via some css generated elements.
+      */
+    /*
+        Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.
+        Because of this, clicking on these elements once they have been "translated" via translate()
+        can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering
+        which fixes the issue.
       */ }
     table.Stick-n-Slide thead *[class*="Stick-n-Slide--is-stuck"]:after, table.Stick-n-Slide tbody *[class*="Stick-n-Slide--is-stuck"]:after {
       content: "";
