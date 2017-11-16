@@ -177,17 +177,17 @@ __WEBPACK_IMPORTED_MODULE_1_jquery___default()(document).ready(function () {
   var $table = __WEBPACK_IMPORTED_MODULE_1_jquery___default()('table');
 
   $table.find('thead th:nth-child(-n+3)').each(function (i, th) {
-    __WEBPACK_IMPORTED_MODULE_1_jquery___default()(th).addClass('Stick-n-Slide--is-stuck');
+    __WEBPACK_IMPORTED_MODULE_1_jquery___default()(th).addClass('sns--is-stuck');
   });
 
   $table.find('thead th:nth-child(n+4)').each(function (i, th) {
-    __WEBPACK_IMPORTED_MODULE_1_jquery___default()(th).addClass('Stick-n-Slide--is-stuck-y');
+    __WEBPACK_IMPORTED_MODULE_1_jquery___default()(th).addClass('sns--is-stuck-y');
   });
 
-  $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('Stick-n-Slide--is-stuck-x');
+  $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('sns--is-stuck-x');
 
-  $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('Stick-n-Slide--is-stuck-x');
-  $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('Stick-n-Slide--is-stuck-x');
+  $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('sns--is-stuck-x');
+  $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('sns--is-stuck-x');
 
   // $table.stickyTable();
   Object(__WEBPACK_IMPORTED_MODULE_0__index__["default"])($table);
@@ -238,12 +238,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var isIEedge = userAgent.indexOf('edge') > -1;
 
       var stickyElems = [];
-      ['Stick-n-Slide--is-stuck', 'Stick-n-Slide--is-stuck-x', 'Stick-n-Slide--is-stuck-y'].forEach(function (className) {
+      ['sns--is-stuck', 'sns--is-stuck-x', 'sns--is-stuck-y'].forEach(function (className) {
         stickyElems = stickyElems.concat(Array.from(table.querySelectorAll('.' + className)));
       });
 
       wrapper.style.position = 'relative';
-      table.classList.add('Stick-n-Slide');
+      table.classList.add('sns');
       table.style.position = 'relative';
 
       ['Top', 'Left'].forEach(function (side) {
@@ -391,12 +391,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         var xShadow = '0 0';
         var yShadow = '0 0';
         var shadow = void 0;
-        if (cell.classList.contains('Stick-n-Slide--is-stuck-y') || cell.classList.contains('Stick-n-Slide--is-stuck')) {
+        if (cell.classList.contains('sns--is-stuck-y') || cell.classList.contains('sns--is-stuck')) {
           transforms.push('translateY(' + offsetY + 'px)');
           shadow = calculateShadowOffset(offsetY);
           yShadow = '0 ' + shadow + 'px ' + shadowColor;
         }
-        if (cell.classList.contains('Stick-n-Slide--is-stuck-x') || cell.classList.contains('Stick-n-Slide--is-stuck')) {
+        if (cell.classList.contains('sns--is-stuck-x') || cell.classList.contains('sns--is-stuck')) {
           transforms.push('translateX(' + offsetX + 'px)');
           shadow = calculateShadowOffset(offsetX);
           xShadow = shadow + 'px 0 ' + shadowColor;

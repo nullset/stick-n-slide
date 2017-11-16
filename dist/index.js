@@ -104,12 +104,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var isIEedge = userAgent.indexOf('edge') > -1;
 
       var stickyElems = [];
-      ['Stick-n-Slide--is-stuck', 'Stick-n-Slide--is-stuck-x', 'Stick-n-Slide--is-stuck-y'].forEach(function (className) {
+      ['sns--is-stuck', 'sns--is-stuck-x', 'sns--is-stuck-y'].forEach(function (className) {
         stickyElems = stickyElems.concat(Array.from(table.querySelectorAll('.' + className)));
       });
 
       wrapper.style.position = 'relative';
-      table.classList.add('Stick-n-Slide');
+      table.classList.add('sns');
       table.style.position = 'relative';
 
       ['Top', 'Left'].forEach(function (side) {
@@ -257,12 +257,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         var xShadow = '0 0';
         var yShadow = '0 0';
         var shadow = void 0;
-        if (cell.classList.contains('Stick-n-Slide--is-stuck-y') || cell.classList.contains('Stick-n-Slide--is-stuck')) {
+        if (cell.classList.contains('sns--is-stuck-y') || cell.classList.contains('sns--is-stuck')) {
           transforms.push('translateY(' + offsetY + 'px)');
           shadow = calculateShadowOffset(offsetY);
           yShadow = '0 ' + shadow + 'px ' + shadowColor;
         }
-        if (cell.classList.contains('Stick-n-Slide--is-stuck-x') || cell.classList.contains('Stick-n-Slide--is-stuck')) {
+        if (cell.classList.contains('sns--is-stuck-x') || cell.classList.contains('sns--is-stuck')) {
           transforms.push('translateX(' + offsetX + 'px)');
           shadow = calculateShadowOffset(offsetX);
           xShadow = shadow + 'px 0 ' + shadowColor;

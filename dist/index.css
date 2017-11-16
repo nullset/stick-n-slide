@@ -1,14 +1,14 @@
-table.Stick-n-Slide {
+table.sns {
   -webkit-box-sizing: border-box;
   box-sizing: border-box; }
-  table.Stick-n-Slide * {
+  table.sns * {
     -webkit-box-sizing: border-box;
     box-sizing: border-box; }
-  table.Stick-n-Slide tbody:first-child {
+  table.sns tbody:first-child {
     /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */ }
-    table.Stick-n-Slide tbody:first-child tr:not(:first-child) th, table.Stick-n-Slide tbody:first-child tr:not(:first-child) td {
+    table.sns tbody:first-child tr:not(:first-child) th, table.sns tbody:first-child tr:not(:first-child) td {
       border-top-width: 0; }
-  table.Stick-n-Slide thead *[class*="Stick-n-Slide--is-stuck"], table.Stick-n-Slide tbody *[class*="Stick-n-Slide--is-stuck"] {
+  table.sns thead *[class*="sns--is-stuck"], table.sns tbody *[class*="sns--is-stuck"] {
     position: relative;
     -webkit-transition: -webkit-box-shadow 0.1s;
     transition: -webkit-box-shadow 0.1s;
@@ -25,7 +25,7 @@ table.Stick-n-Slide {
         can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering
         which fixes the issue.
       */ }
-    table.Stick-n-Slide thead *[class*="Stick-n-Slide--is-stuck"]:after, table.Stick-n-Slide tbody *[class*="Stick-n-Slide--is-stuck"]:after {
+    table.sns thead *[class*="sns--is-stuck"]:after, table.sns tbody *[class*="sns--is-stuck"]:after {
       content: "";
       position: absolute;
       border: inherit;
@@ -40,17 +40,17 @@ table.Stick-n-Slide {
       transition: box-shadow .1s, -webkit-box-shadow .1s;
       -webkit-box-shadow: var(--x-shadow), var(--y-shadow);
       box-shadow: var(--x-shadow), var(--y-shadow); }
-    table.Stick-n-Slide thead *[class*="Stick-n-Slide--is-stuck"] input, table.Stick-n-Slide thead *[class*="Stick-n-Slide--is-stuck"] select, table.Stick-n-Slide thead *[class*="Stick-n-Slide--is-stuck"] textarea, table.Stick-n-Slide thead *[class*="Stick-n-Slide--is-stuck"] button, table.Stick-n-Slide tbody *[class*="Stick-n-Slide--is-stuck"] input, table.Stick-n-Slide tbody *[class*="Stick-n-Slide--is-stuck"] select, table.Stick-n-Slide tbody *[class*="Stick-n-Slide--is-stuck"] textarea, table.Stick-n-Slide tbody *[class*="Stick-n-Slide--is-stuck"] button {
+    table.sns thead *[class*="sns--is-stuck"] input, table.sns thead *[class*="sns--is-stuck"] select, table.sns thead *[class*="sns--is-stuck"] textarea, table.sns thead *[class*="sns--is-stuck"] button, table.sns tbody *[class*="sns--is-stuck"] input, table.sns tbody *[class*="sns--is-stuck"] select, table.sns tbody *[class*="sns--is-stuck"] textarea, table.sns tbody *[class*="sns--is-stuck"] button {
       position: relative;
       z-index: 1; }
-  table.Stick-n-Slide thead *.Stick-n-Slide--is-stuck, table.Stick-n-Slide tbody *.Stick-n-Slide--is-stuck {
+  table.sns thead *.sns--is-stuck, table.sns tbody *.sns--is-stuck {
     z-index: 100; }
-  table.Stick-n-Slide thead *.Stick-n-Slide--is-stuck-x, table.Stick-n-Slide tbody *.Stick-n-Slide--is-stuck-x {
+  table.sns thead *.sns--is-stuck-x, table.sns tbody *.sns--is-stuck-x {
     z-index: 90; }
-  table.Stick-n-Slide thead *.Stick-n-Slide--is-stuck-y, table.Stick-n-Slide tbody *.Stick-n-Slide--is-stuck-y {
+  table.sns thead *.sns--is-stuck-y, table.sns tbody *.sns--is-stuck-y {
     z-index: 80; }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  table.Stick-n-Slide {
+  table.sns {
     margin-top: -2px;
     margin-left: -1px; } }
