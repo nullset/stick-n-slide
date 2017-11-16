@@ -1,3 +1,12 @@
+.wrapper {
+  display: inline-block;
+  overflow: auto;
+  max-width: 100%;
+  max-height: 500px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid red;
+}
 table {
   $borderWidth: 1px;
   border-collapse: collapse;
@@ -42,7 +51,14 @@ table {
       // border-left: 3px solid red;
     }
   }
-  .sticky--is-stuck-x {
+  .Stick-n-Slide--is-stuck-x {
     background: rgb(229, 238, 255) !important;
   }
+}
+
+button[data-active="true"] {
+  background: lime;
+}
+code {
+  background: #ddd;
 }

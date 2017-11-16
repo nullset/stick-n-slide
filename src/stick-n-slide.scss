@@ -35,6 +35,11 @@ table.Stick-n-Slide {
         transition: box-shadow .1s;
         box-shadow: var(--x-shadow), var(--y-shadow);
       }
+
+      input, select, textarea, button {
+        position: relative;
+        z-index: 1;
+      }
     }
     *.Stick-n-Slide--is-stuck {
       z-index: 100;

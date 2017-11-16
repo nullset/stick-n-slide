@@ -3,17 +3,23 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const parts = require('./webpack.parts');
 const webpack = require('webpack');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const PATHS = {
   src: path.join(__dirname, 'src'),
   dist: path.join(__dirname, 'dist'),
 };
 
+const pathsToClean = [
+  'dist',
+];
+
 const commonConfig = merge([
   {
     entry: {
-      // polyfill: 'babel-polyfill',
-      index: PATHS.src,
+      polyfill: 'babel-polyfill',
+      index: path.join(PATHS.src, 'index'),
+      demo: path.join(PATHS.src, 'demo'),
       // entry: './src/index.js',
       // output: {
       //   path: path.resolve(__dirname, 'dist'),
@@ -32,6 +38,7 @@ const commonConfig = merge([
         title: 'Webpack demo',
         template: './template/template.ejs',
       }),
+      new CleanWebpackPlugin(pathsToClean),
       // new webpack.ProvidePlugin({
       //   $: 'jquery',
       //   jQuery: 'jquery',

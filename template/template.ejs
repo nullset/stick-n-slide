@@ -4,52 +4,17 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
     <title><%= htmlWebpackPlugin.options.title %></title>
     <style>
-      .wrapper {
-        display: inline-block;
-        overflow: auto;
-        max-width: 100%;
-        max-height: 500px;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        border: 1px solid red;
-      }
-      table {
-        border-collapse: collapse;
-        max-height: 400px;
-        max-width: 100%;
-      }
-      table thead tr {
-        background: yellow;
-      }
-      table thead th {
-        background: #6698f5;
-        padding: 30px;
-        border: 2px solid #4f74b9;
-      }
-      table tbody tr:nth-child(2n+1) th,
-      table tbody tr:nth-child(2n+1) td {
-          background: #fff;
-      }
-      table tbody tr:nth-child(2n) th,
-      table tbody tr:nth-child(2n) td {
-          background: #efefef;
-      }
-      table tbody th,
-      table tbody td {
-        padding: 50px 30px;
-        border: 2px solid lightgray;
-      }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
   </head>
   <body>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
+    <h1>Stick-n-Slide</h1>
+    <p>Because sometimes you want to stick, and sometimes you want to slide</p>
+    <video id="slipnslide" src="../assets/video.mp4" controls height="200"></video>
+    <script>
+      document.getElementById('slipnslide').playbackRate = 5;
+    </script>
+
     <div class="wrapper">
       <table>
         <thead>
@@ -407,11 +372,11 @@
             <td>19</td>
             <td>20</td>
           </tr>
-    
         </tbody>
         <tfoot></tfoot>
       </table>
     </div>
+
     <div>
       <button id="backgroundColor">Change background</button>
       <button id="borderColor">Change border color</button>
@@ -419,144 +384,32 @@
       <button id="mergeCellRow">Merge cell</button>
       <button id="changeContent">Change content</button>
     </div>
-    
-    <script>
-      function randomColor() {
-        return '#' + (Math.random()*0xFFFFFF<<0).toString(16);
-      }
 
-      function randomNumber() {
-        return Math.floor(Math.random() * 6) + 1;
-      }
+    <h2>How to use</h2>
+    <ol>
+      <li>Make a table</li>
+      <li>Ensure that the the table cells have backgrounds, borders defined directly on them</li>
+      <li>Wrap the table in some containing element like a &lt;div&gt;, and make sure the &lt;div&gt; has <code>height/width</code> and <code>overflow</code> specified correctly so the table can be scrolled if it is too large for its container</li>
+      <li>
+        Add classes to the cells that you want to stick in place
+        <dl>
+          <dt><code>.sns-stuck</code></dt>
+          <dd>Ensures the cell does not move at all when scrolled, in either vertical or horizontal directions</dd>
+          <dt><code>.sns-stuck-x</code></dt>
+          <dd>Cell can be scrolled vertically, but not horizontally</dd>
+          <dt><code>.sns-stuck-y</code></dt>
+          <dd>Cell can be scrolled horizontally, but not vertically</dd>
+        </dl>
+      </li>
+      <li>Get a reference to your table(s), either via native JS or jQuery</li>
+      <li>Call <code>stickNSlide(table)</code> or <code>stickNSlide(tables)</code></li>
+    </ol>
 
-      function backgroundColor(event) {
-        event.target.style.backgroundColor = randomColor();
-      }
-
-      document.getElementById('backgroundColor').addEventListener('click', (event)=> {
-        event.currentTarget.active = !event.currentTarget.active;
-        if (event.currentTarget.active) {
-          document.querySelector('table').addEventListener('click', backgroundColor);
-        } else {
-          document.querySelector('table').removeEventListener('click', backgroundColor);
-        }
-      });
-
-      function borderColor(event) {
-        event.target.style.borderColor = randomColor();
-      }
-
-      document.getElementById('borderColor').addEventListener('click', (event)=> {
-        event.currentTarget.active = !event.currentTarget.active;
-        if (event.currentTarget.active) {
-          document.querySelector('table').addEventListener('click', borderColor);
-        } else {
-          document.querySelector('table').removeEventListener('click', borderColor);
-        }
-      });
-
-      // function borderWidth(event) {
-      //   event.target.style.borderWidth = randomNumber() + 'px';
-      // }
-
-      // document.getElementById('borderWidth').addEventListener('click', (event)=> {
-      //   event.currentTarget.active = !event.currentTarget.active;
-      //   if (event.currentTarget.active) {
-      //     document.querySelector('table').addEventListener('click', borderWidth);
-      //   } else {
-      //     document.querySelector('table').removeEventListener('click', borderWidth);
-      //   }
-      // });
-
-      function mergeCellRow(event) {
-        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
-          if (event.target.nextElementSibling) {
-            event.target.colSpan = event.target.colSpan + event.target.nextElementSibling.colSpan;
-            event.target.nextElementSibling.remove();
-          }
-        }
-      }
-
-      document.getElementById('mergeCellRow').addEventListener('click', (event)=> {
-        event.currentTarget.active = !event.currentTarget.active;
-        if (event.currentTarget.active) {
-          document.querySelector('table').addEventListener('click', mergeCellRow);
-        } else {
-          document.querySelector('table').removeEventListener('click', mergeCellRow);
-        }
-      });
-
-      function changeContent(event) {
-        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
-          fetch('http://www.randomtext.me/api/lorem/p-1/5-15')
-          .then(response => response.json())
-          .then((json) => {
-            event.target.innerHTML = json.text_out;
-          })
-        }
-      }
-
-      document.getElementById('changeContent').addEventListener('click', (event)=> {
-        event.currentTarget.active = !event.currentTarget.active;
-        if (event.currentTarget.active) {
-          document.querySelector('table').addEventListener('click', changeContent);
-        } else {
-          document.querySelector('table').removeEventListener('click', changeContent);
-        }
-      });
-
-    </script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
-    <script>
-      $(document).ready(function() {
-        setTimeout(() => {
-          var $table = $('table');
-          
-          $table.find('thead th:nth-child(-n+3)').each((i, th) => {
-            $(th).addClass('Stick-n-Slide--is-stuck');
-          });
-          
-          $table.find('thead th:nth-child(n+4)').each((i, th) => {
-            $(th).addClass('Stick-n-Slide--is-stuck-y');
-          });
-          
-          $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('Stick-n-Slide--is-stuck-x');
-          
-          $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('Stick-n-Slide--is-stuck-x');
-          $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('Stick-n-Slide--is-stuck-x');
-                  
-          // $table.stickyTable();
-          debugger
-          stickNSlide($table.toArray())
-
-        }, 5000)        
-      });  
-    </script>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
-    <p>oeuoeu</p>
+    <h2>Known limitations</h2>
+    <h3>Firefox pre-57.0 (Quantum) versions</h3>
+    <ul>
+      <li>Having stuck cells with border widths of more than 1px would produce inconsistent results</li>
+    </ul>
 
   </body>
 </html>
