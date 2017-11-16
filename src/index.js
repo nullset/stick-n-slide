@@ -14,7 +14,10 @@ export default function(elems) {
       const wrapper = table.parentElement;
 
       // Must test for FF, because it does some seriously horrible things to the table layout.
-      const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isFirefox = userAgent.indexOf('firefox') > -1;
+      const isIE = userAgent.indexOf('trident') > -1;
+      const isIEedge = userAgent.indexOf('edge') > -1;
 
       let stickyElems = [];
       ['Stick-n-Slide--is-stuck', 'Stick-n-Slide--is-stuck-x', 'Stick-n-Slide--is-stuck-y'].forEach((className) => {
@@ -39,7 +42,7 @@ export default function(elems) {
             const borderWidth = cellStyles[`border${side}${property}`];
 
             // Use a !isFirefox because there's no reason to penalize every other browser for FF weirdness.
-            if (!isFirefox) {
+            if (!isFirefox && !isIE && !isIEedge) {
               cell.style[`margin${side}`] = `-${borderWidth}`;
             } else {
               // Fixes FF for 1 px, but nothing else :(

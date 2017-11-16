@@ -52,3 +52,10 @@ table.Stick-n-Slide {
     }
   }
 }
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  table.Stick-n-Slide {
+    margin-top: -2px;
+    margin-left: -1px;
+  }
+}
