@@ -15,6 +15,10 @@ table.sns {
     transition: box-shadow 0.1s;
     transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;
     /*
+        Add a zero-width space character to any stuck element. This prevents an issue in IE where
+        cells with no content are collapsed.
+      */
+    /*
         Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
         (as, from the rendering engine perspective, it is no longer a part of the table).
         We need to add these borders back via some css generated elements.
@@ -26,6 +30,8 @@ table.sns {
         which fixes the issue.
       */ }
     table.sns thead *[class*="sns--is-stuck"]:after, table.sns tbody *[class*="sns--is-stuck"]:after {
+      content: "\200B"; }
+    table.sns thead *[class*="sns--is-stuck"]:before, table.sns tbody *[class*="sns--is-stuck"]:before {
       content: "";
       position: absolute;
       border: inherit;

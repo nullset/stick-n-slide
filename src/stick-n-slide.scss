@@ -17,13 +17,21 @@ table.sns {
     *[class*="sns--is-stuck"] {
       position: relative;
       transition: box-shadow 0.1s;
+
+      /*
+        Add a zero-width space character to any stuck element. This prevents an issue in IE where
+        cells with no content are collapsed.
+      */
+      &:after {
+        content: "\200B";
+      }
       
       /*
         Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
         (as, from the rendering engine perspective, it is no longer a part of the table).
         We need to add these borders back via some css generated elements.
       */
-      &:after {
+      &:before {
         content: "";
         position: absolute;
         border: inherit;        
