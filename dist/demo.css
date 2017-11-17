@@ -15,7 +15,7 @@ table.sns {
     transition: box-shadow 0.1s;
     transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;
     /*
-        Add a zero-width space character to any stuck element. This prevents an issue in IE where
+        Add a zero-width space character to any empty stuck element. This prevents an issue in IE where
         cells with no content are collapsed.
       */
     /*
@@ -29,7 +29,7 @@ table.sns {
         can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering
         which fixes the issue.
       */ }
-    table.sns thead *[class*="sns--is-stuck"]:after, table.sns tbody *[class*="sns--is-stuck"]:after {
+    table.sns thead *[class*="sns--is-stuck"]:empty:after, table.sns tbody *[class*="sns--is-stuck"]:empty:after {
       content: "\200B"; }
     table.sns thead *[class*="sns--is-stuck"]:before, table.sns tbody *[class*="sns--is-stuck"]:before {
       content: "";
