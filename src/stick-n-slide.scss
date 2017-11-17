@@ -19,11 +19,13 @@ table.sns {
       transition: box-shadow 0.1s;
 
       /*
-        Add a zero-width space character to any stuck element. This prevents an issue in IE where
+        Add a zero-width space character to any empty stuck element. This prevents an issue in IE where
         cells with no content are collapsed.
       */
-      &:after {
-        content: "\200B";
+      &:empty {
+        &:after {
+          content: "\200B";
+        }
       }
       
       /*
