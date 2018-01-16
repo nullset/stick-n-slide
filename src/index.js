@@ -13,7 +13,7 @@ function altSide(side) {
   }
 }
 
-function wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow }) {
+function wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback }) {
   const maxWidth = scrollWidth - clientWidth;
   const maxHeight = scrollHeight - clientHeight;
   let newX = scrollLeft + deltaX;
@@ -33,6 +33,9 @@ function wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft,
   positionStickyElements(table, stickyElems, showShadow, newX, newY);
   wrapper.scrollLeft = newX;
   wrapper.scrollTop = newY;
+  if (callback) {
+    callback(newX, newY);
+  }
 }
 
 function calculateShadowOffset(value) {
@@ -89,18 +92,21 @@ function positionShadow(cell, showShadow, offsetX, offsetY) {
   cell.style.setProperty('--y-shadow', yShadow);
 }
 
-function scrollHandler(table, stickyElems, wrapper, showShadow) {
-  updateScrollPosition(table, stickyElems, wrapper, showShadow);
+function scrollHandler(table, stickyElems, wrapper, showShadow, callback) {
+  updateScrollPosition(table, stickyElems, wrapper, showShadow, callback);
 }
 
-function updateScrollPosition(table, stickyElems, wrapper, showShadow) {
+function updateScrollPosition(table, stickyElems, wrapper, showShadow, callback) {
   positionStickyElements(table, stickyElems, showShadow, wrapper.scrollLeft, wrapper.scrollTop);
+  if (callback) {
+    callback(wrapper.scrollLeft, wrapper.scrollTop);
+  }
 }
 
 
 export default function(elems, options = {}) {
-  const { showShadow } = options;
-  
+  const { showShadow, callback } = options;
+
   // Convert a jQuery object to an array, or convert a single element to an array.
   if (typeof elems.toArray === 'function') {
     elems = elems.toArray();
@@ -165,7 +171,7 @@ export default function(elems, options = {}) {
         const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
         const { width, height } = wrapper.getBoundingClientRect();
 
-        const handleWheel = wheelHandler.bind(null, { table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow });
+        const handleWheel = wheelHandler.bind(null, { table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback });
 
         if (isIE || isIEedge) {
           event.preventDefault();
@@ -185,7 +191,7 @@ export default function(elems, options = {}) {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
-          scrollHandler(table, stickyElems, wrapper, showShadow);
+          scrollHandler(table, stickyElems, wrapper, showShadow, callback);
         }
       });
 

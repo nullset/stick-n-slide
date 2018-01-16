@@ -243,7 +243,8 @@ function wheelHandler(_ref) {
       scrollHeight = _ref.scrollHeight,
       clientWidth = _ref.clientWidth,
       clientHeight = _ref.clientHeight,
-      showShadow = _ref.showShadow;
+      showShadow = _ref.showShadow,
+      callback = _ref.callback;
 
   var maxWidth = scrollWidth - clientWidth;
   var maxHeight = scrollHeight - clientHeight;
@@ -264,6 +265,9 @@ function wheelHandler(_ref) {
   positionStickyElements(table, stickyElems, showShadow, newX, newY);
   wrapper.scrollLeft = newX;
   wrapper.scrollTop = newY;
+  if (callback) {
+    callback(newX, newY);
+  }
 }
 
 function calculateShadowOffset(value) {
@@ -319,17 +323,21 @@ function positionShadow(cell, showShadow, offsetX, offsetY) {
   cell.style.setProperty('--y-shadow', yShadow);
 }
 
-function scrollHandler(table, stickyElems, wrapper, showShadow) {
-  updateScrollPosition(table, stickyElems, wrapper, showShadow);
+function scrollHandler(table, stickyElems, wrapper, showShadow, callback) {
+  updateScrollPosition(table, stickyElems, wrapper, showShadow, callback);
 }
 
-function updateScrollPosition(table, stickyElems, wrapper, showShadow) {
+function updateScrollPosition(table, stickyElems, wrapper, showShadow, callback) {
   positionStickyElements(table, stickyElems, showShadow, wrapper.scrollLeft, wrapper.scrollTop);
+  if (callback) {
+    callback(wrapper.scrollLeft, wrapper.scrollTop);
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (function (elems) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var showShadow = options.showShadow;
+  var showShadow = options.showShadow,
+      callback = options.callback;
 
   // Convert a jQuery object to an array, or convert a single element to an array.
 
@@ -405,7 +413,7 @@ function updateScrollPosition(table, stickyElems, wrapper, showShadow) {
             width = _wrapper$getBoundingC.width,
             height = _wrapper$getBoundingC.height;
 
-        var handleWheel = wheelHandler.bind(null, { table: table, wrapper: wrapper, stickyElems: stickyElems, deltaX: deltaX, deltaY: deltaY, scrollLeft: scrollLeft, scrollTop: scrollTop, scrollWidth: scrollWidth, scrollHeight: scrollHeight, clientWidth: clientWidth, clientHeight: clientHeight, showShadow: showShadow });
+        var handleWheel = wheelHandler.bind(null, { table: table, wrapper: wrapper, stickyElems: stickyElems, deltaX: deltaX, deltaY: deltaY, scrollLeft: scrollLeft, scrollTop: scrollTop, scrollWidth: scrollWidth, scrollHeight: scrollHeight, clientWidth: clientWidth, clientHeight: clientHeight, showShadow: showShadow, callback: callback });
 
         if (isIE || isIEedge) {
           event.preventDefault();
@@ -421,7 +429,7 @@ function updateScrollPosition(table, stickyElems, wrapper, showShadow) {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
-          scrollHandler(table, stickyElems, wrapper, showShadow);
+          scrollHandler(table, stickyElems, wrapper, showShadow, callback);
         }
       });
     }
