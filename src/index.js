@@ -147,12 +147,22 @@ export default function(elems, options = {}) {
           ['Width'].forEach((property) => {
             const borderWidth = cellStyles[`border${side}${property}`];
 
+            // if (isFirefox) {
+            //   cell.style[`margin${side}`] = `calc(1 * (${borderWidth} + ${borderWidth}))`;
+            // } else if (isIE || isIEedge) {
+            //   cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
+            // } else {
+            //   cell.style[`margin${side}`] = `-${borderWidth}`;
+            // }
+            
             // Use a !isFirefox because there's no reason to penalize every other browser for FF weirdness.
             if (!isFirefox && !isIE && !isIEedge) {
               cell.style[`margin${side}`] = `-${borderWidth}`;
             } else {
               // Fixes FF for 1 px, but nothing else :(
-              cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
+              console.log('--- border', borderWidth);
+              cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
+              // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
             }
           });
         });
