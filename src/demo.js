@@ -99,11 +99,15 @@ $(document).ready(function() {
     $(th).addClass('sns--is-stuck-y');
   });
   
-  $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('sns--is-stuck-x');
+  $table.find('tbody > tr:nth-child(n+1):nth-child(-n+11) > *:nth-child(-n+3)').addClass('sns--is-stuck-x');
   
-  $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('sns--is-stuck-x');
-  $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('sns--is-stuck-x');
-          
+  $table.find('tbody > tr:nth-child(12) > *:nth-child(-n+2)').addClass('sns--is-stuck-x');
+  $table.find('tbody > tr:nth-child(13) > *:nth-child(-n+1)').addClass('sns--is-stuck-x');
+  
+  $table.find('b').on('click', function() {
+    alert();
+  });
+
   // $table.stickyTable();
   stickNSlide($table);
 });  

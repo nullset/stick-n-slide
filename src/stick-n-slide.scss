@@ -33,17 +33,29 @@ table.sns {
         (as, from the rendering engine perspective, it is no longer a part of the table).
         We need to add these borders back via some css generated elements.
       */
-      &:before {
-        content: "";
-        position: absolute;
-        border: inherit;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        margin: inherit;
-        transition: box-shadow .1s;
-        box-shadow: var(--x-shadow), var(--y-shadow);
+      &:not(.blah), .sns__cell-inner {
+        b {
+          position: relative;
+          z-index: 1;
+        }
+        &:before {
+          content: "";
+          position: absolute;
+          border: inherit;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          margin: inherit;
+          transition: box-shadow .1s;
+          box-shadow: var(--x-shadow), var(--y-shadow);
+          z-index: 0;
+        }
+      }
+      .sns__cell-inner {
+        height: 100%;
+        // background: rgba(0,255,0,0.3);
+        position: relative;
       }
 
       /*

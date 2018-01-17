@@ -141,32 +141,58 @@ export default function(elems, options = {}) {
       });
 
       stickyElems.forEach((cell) => {
-        const cellStyles = window.getComputedStyle(cell);        
-        
-        ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
-          ['Width'].forEach((property) => {
-            const borderWidth = cellStyles[`border${side}${property}`];
+        const cellStyles = window.getComputedStyle(cell);
 
-            // if (isFirefox) {
-            //   cell.style[`margin${side}`] = `calc(1 * (${borderWidth} + ${borderWidth}))`;
-            // } else if (isIE || isIEedge) {
-            //   cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
-            // } else {
-            //   cell.style[`margin${side}`] = `-${borderWidth}`;
-            // }
-            
-            // Use a !isFirefox because there's no reason to penalize every other browser for FF weirdness.
-            if (!isFirefox && !isIE && !isIEedge) {
-              cell.style[`margin${side}`] = `-${borderWidth}`;
-            } else {
-              // Fixes FF for 1 px, but nothing else :(
-              console.log('--- border', borderWidth);
-              cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
-              // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
-            }
+        if (isIE && !isIEedge) {
+          cell.classList.add('blah');
+          let newWrapper = document.createElement('div');
+          newWrapper.setAttribute('class', 'sns__cell-inner');
+          while (cell.firstChild) {
+            newWrapper.appendChild(cell.firstChild);
+          }
+          cell.innerHTML = '';
+          cell.appendChild(newWrapper);
+
+          ['padding', 'border'].forEach((property) => {
+            ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+              if (property === 'border') {
+                const borderWidth = cellStyles[`border${side}Width`];
+                newWrapper.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} / 2))`;
+
+                ['Width', 'Color', 'Style'].forEach((attr) => {
+                  const value = cellStyles[`${property}${side}${attr}`];
+                  newWrapper.style[`${property}${side}${attr}`] = value;
+                });
+                
+              } else {
+                newWrapper.style[`${property}${side}`] = cellStyles[`${property}${side}`];
+              }
+            });
+            cell.style[property] = '0';
           });
-        });
+
+
+        } else {
+          ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+            ['Width'].forEach((property) => {
+              const borderWidth = cellStyles[`border${side}${property}`];
+              if (!isFirefox && !isIEedge) {
+                cell.style[`margin${side}`] = `-${borderWidth}`;
+              } else {
+                // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
+                cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
+              }
+            });
+          });  
+        }        
       });
+
+      // stickyElems = Array.prototype.slice.call(stickyElems).map((cell) => {
+      //   const elem = cell.querySelector('.sns__cell-inner');
+      //   elem.classList = cell.classList;
+      //   elem.classList.remove('blah');
+      //   return elem;
+      // });
 
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
