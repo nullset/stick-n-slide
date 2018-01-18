@@ -103,6 +103,36 @@ function updateScrollPosition(table, stickyElems, wrapper, showShadow, callback)
   }
 }
 
+function buildInnerCell(cell) {
+  const cellStyles = window.getComputedStyle(cell);
+  cell.classList.add('blah');
+  let innerCell = document.createElement('div');
+  innerCell.setAttribute('class', 'sns__cell-inner');
+  while (cell.firstChild) {
+    innerCell.appendChild(cell.firstChild);
+  }
+  cell.innerHTML = '';
+  cell.appendChild(innerCell);
+
+  ['padding', 'border'].forEach((property) => {
+    ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+      if (property === 'border') {
+        const borderWidth = cellStyles[`border${side}Width`];
+        innerCell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} / 2))`;
+
+        ['Width', 'Color', 'Style'].forEach((attr) => {
+          const value = cellStyles[`${property}${side}${attr}`];
+          innerCell.style[`${property}${side}${attr}`] = value;
+        });
+        
+      } else {
+        innerCell.style[`${property}${side}`] = cellStyles[`${property}${side}`];
+      }
+    });
+    cell.style[property] = '0';
+  });
+}
+
 
 export default function(elems, options = {}) {
   const { showShadow, callback } = options;
@@ -141,50 +171,85 @@ export default function(elems, options = {}) {
       });
 
       stickyElems.forEach((cell) => {
-        const cellStyles = window.getComputedStyle(cell);
 
-        if (isIE && !isIEedge) {
-          cell.classList.add('blah');
-          let newWrapper = document.createElement('div');
-          newWrapper.setAttribute('class', 'sns__cell-inner');
-          while (cell.firstChild) {
-            newWrapper.appendChild(cell.firstChild);
+        // Behavior for IE11.
+        // if (isIE && !isIEedge) {
+          buildInnerCell(cell);
+
+        // Everything other than IE11.
+        // } else {
+        //   const cellStyles = window.getComputedStyle(cell);
+        //   ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+        //     ['Width'].forEach((property) => {
+        //       const borderWidth = cellStyles[`border${side}${property}`];
+        //       if (!isFirefox && !isIEedge) {
+        //         cell.style[`margin${side}`] = `-${borderWidth}`;
+        //       } else {
+        //         // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
+        //         cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
+        //       }
+        //     });
+        //   });  
+        // }        
+
+        let observer = new MutationObserver((mutations) => {
+          const mutation = mutations[0];
+
+          // If first mutation is only mutating the style, assume it is just a transform mutation to handle scrolling and do nothing.
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            return;
           }
-          cell.innerHTML = '';
-          cell.appendChild(newWrapper);
+          
+          const firstChild = cell.children[0];
+          if (cell.children.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
+            console.log('do nothing');
+            // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
+            return;
+          } else {
+            const innerCell = cell.querySelector('.sns__cell-inner');
+            console.log(innerCell);
+            // cell.children.length > 0 && Array.prototype.slice.call(cell.children).some((node) => node.classList.contains('sns__cell-inner'))
+            if (innerCell) {
+              // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
+              const innerCellFirstChild = innerCell.childNodes[0];
+              const childrenLength = innerCell.childNodes.length;
+              const innerCellLastChild = innerCell.childNodes[childrenLength - 1];
+              let haveHitInnerCell = false;
+              let prevNode = innerCellLastChild.nextSibling;
+              Array.prototype.slice.call(cell.childNodes).forEach((node) => {
+                if (node === innerCell) {
+                  haveHitInnerCell = true;
+                } else {
+                  if (haveHitInnerCell) {
+                    innerCell.insertBefore(node, prevNode);
+                    prevNode = node.nextSibling;
+                  } else {
+                    innerCell.insertBefore(node, innerCellFirstChild);
+                  }
+                }
+              });
+              console.log('move elements into it');
+              // It does exist somewhere, move elements into it
+            } else {
+              // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
+              console.log('rebuild entirely');
+              ['padding', 'border'].forEach((property) => {
+                cell.style[property] = null;
+              });
+              requestAnimationFrame(() => {
+                buildInnerCell(cell);
+              });
+            }
+          }
+        });
+  
+        observer.observe(cell, {
+          childList: true,
+          attributes: true,
+          characterData: true,
+          subtree: true,
+        });
 
-          ['padding', 'border'].forEach((property) => {
-            ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
-              if (property === 'border') {
-                const borderWidth = cellStyles[`border${side}Width`];
-                newWrapper.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} / 2))`;
-
-                ['Width', 'Color', 'Style'].forEach((attr) => {
-                  const value = cellStyles[`${property}${side}${attr}`];
-                  newWrapper.style[`${property}${side}${attr}`] = value;
-                });
-                
-              } else {
-                newWrapper.style[`${property}${side}`] = cellStyles[`${property}${side}`];
-              }
-            });
-            cell.style[property] = '0';
-          });
-
-
-        } else {
-          ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
-            ['Width'].forEach((property) => {
-              const borderWidth = cellStyles[`border${side}${property}`];
-              if (!isFirefox && !isIEedge) {
-                cell.style[`margin${side}`] = `-${borderWidth}`;
-              } else {
-                // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
-                cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
-              }
-            });
-          });  
-        }        
       });
 
       // stickyElems = Array.prototype.slice.call(stickyElems).map((cell) => {
@@ -199,7 +264,9 @@ export default function(elems, options = {}) {
       let wheelEventTriggered = false;
 
       // Set initial position of elements to 0.
-      positionStickyElements(table, stickyElems, showShadow);
+      requestAnimationFrame(() => {
+        positionStickyElements(table, stickyElems, showShadow);
+      });
 
       wrapper.addEventListener('wheel', (event) => {
         wheelEventTriggered = true;
