@@ -118,7 +118,13 @@ function buildInnerCell(cell) {
         cellContents.appendChild(cell.firstChild.firstChild.firstChild);
       }
       innerCell.setAttribute('style', cell.firstChild.getAttribute('style'));
-      cell.firstChild.remove();
+      if ('removeNode' in cell.firstChild) {
+        // IE11 specific method.
+        cell.firstChild.removeNode();
+      } else {
+        // All other browsers ... technically not needed (since this code path only deals with IE11) but good to have for testing in other browsers.
+        cell.firstChild.remove();
+      }
       setStyles = false;
     }
   }
