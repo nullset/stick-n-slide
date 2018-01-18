@@ -53,8 +53,8 @@ table.sns {
         }
       }
       .sns__cell-inner {
-        height: 100%;
-        // background: rgba(0,255,0,0.3);
+        display: flex;
+        // background: rgba(0,255,0,0.2);
         position: relative;
       }
 

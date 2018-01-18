@@ -131,6 +131,35 @@ function buildInnerCell(cell) {
     });
     cell.style[property] = '0';
   });
+
+  innerCell.style.alignItems = verticalAlignment(cellStyles.verticalAlign);
+}
+
+// Convert regular `vertical-align` CSS into flexbox friendly alternative.
+function verticalAlignment(value) {
+  switch(value) {
+  case 'middle':
+    return 'center';
+  case 'top':
+    return 'start';
+  case 'bottom':
+    return 'end';
+  case 'baseline':
+    return 'baseline';
+  default:
+    return '';
+  }
+}
+
+function setInnerCellHeights(table) {
+  Array.prototype.slice.call(table.querySelectorAll('tr')).forEach((row) => {
+    const cell = row.firstElementChild;
+    if (cell) {
+      Array.prototype.slice.call(row.querySelectorAll('.sns__cell-inner')).forEach((innerCell) => {
+        innerCell.style.height = `${cell.getBoundingClientRect().height}px`;
+      });
+    }  
+  });
 }
 
 
@@ -202,12 +231,10 @@ export default function(elems, options = {}) {
           
           const firstChild = cell.children[0];
           if (cell.children.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
-            console.log('do nothing');
             // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
             return;
           } else {
             const innerCell = cell.querySelector('.sns__cell-inner');
-            console.log(innerCell);
             // cell.children.length > 0 && Array.prototype.slice.call(cell.children).some((node) => node.classList.contains('sns__cell-inner'))
             if (innerCell) {
               // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
@@ -228,8 +255,6 @@ export default function(elems, options = {}) {
                   }
                 }
               });
-              console.log('move elements into it');
-              // It does exist somewhere, move elements into it
             } else {
               // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
               console.log('rebuild entirely');
@@ -249,8 +274,8 @@ export default function(elems, options = {}) {
           characterData: true,
           subtree: true,
         });
-
       });
+      setInnerCellHeights(table);
 
       // stickyElems = Array.prototype.slice.call(stickyElems).map((cell) => {
       //   const elem = cell.querySelector('.sns__cell-inner');
