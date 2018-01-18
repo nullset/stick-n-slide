@@ -108,31 +108,45 @@ function buildInnerCell(cell) {
   cell.classList.add('blah');
   let innerCell = document.createElement('div');
   innerCell.setAttribute('class', 'sns__cell-inner');
+  let cellContents = document.createElement('div');
+  cellContents.setAttribute('class', 'sns__cell-contents');
+  let setStyles = true;
   while (cell.firstChild) {
-    innerCell.appendChild(cell.firstChild);
+    cellContents.appendChild(cell.firstChild);
+    if (cell.firstChild && cell.firstChild.classList && cell.firstChild.classList.contains('sns__cell-inner')) {
+      while (cell.firstChild.firstChild.firstChild) {
+        cellContents.appendChild(cell.firstChild.firstChild.firstChild);
+      }
+      innerCell.setAttribute('style', cell.firstChild.getAttribute('style'));
+      cell.firstChild.remove();
+      setStyles = false;
+    }
   }
+  innerCell.appendChild(cellContents);
   cell.innerHTML = '';
   cell.appendChild(innerCell);
-
-  ['padding', 'border'].forEach((property) => {
-    ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
-      if (property === 'border') {
-        const borderWidth = cellStyles[`border${side}Width`];
-        innerCell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} / 2))`;
-
-        ['Width', 'Color', 'Style'].forEach((attr) => {
-          const value = cellStyles[`${property}${side}${attr}`];
-          innerCell.style[`${property}${side}${attr}`] = value;
-        });
-        
-      } else {
-        innerCell.style[`${property}${side}`] = cellStyles[`${property}${side}`];
-      }
+  
+  if (setStyles) {
+    ['padding', 'border'].forEach((property) => {
+      ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+        if (property === 'border') {
+          const borderWidth = cellStyles[`border${side}Width`];
+          innerCell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} / 2))`;
+  
+          ['Width', 'Color', 'Style'].forEach((attr) => {
+            const value = cellStyles[`${property}${side}${attr}`];
+            innerCell.style[`${property}${side}${attr}`] = value;
+          });
+          
+        } else {
+          innerCell.style[`${property}${side}`] = cellStyles[`${property}${side}`];
+        }
+      });
+      cell.style[property] = '0';
     });
-    cell.style[property] = '0';
-  });
-
-  innerCell.style.alignItems = verticalAlignment(cellStyles.verticalAlign);
+  
+    innerCell.style.alignItems = verticalAlignment(cellStyles.verticalAlign);  
+  }
 }
 
 // Convert regular `vertical-align` CSS into flexbox friendly alternative.
@@ -235,26 +249,44 @@ export default function(elems, options = {}) {
             return;
           } else {
             const innerCell = cell.querySelector('.sns__cell-inner');
+            const cellContents = cell.querySelector('.sns__cell-contents');
             // cell.children.length > 0 && Array.prototype.slice.call(cell.children).some((node) => node.classList.contains('sns__cell-inner'))
             if (innerCell) {
-              // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
-              const innerCellFirstChild = innerCell.childNodes[0];
-              const childrenLength = innerCell.childNodes.length;
-              const innerCellLastChild = innerCell.childNodes[childrenLength - 1];
-              let haveHitInnerCell = false;
-              let prevNode = innerCellLastChild.nextSibling;
-              Array.prototype.slice.call(cell.childNodes).forEach((node) => {
-                if (node === innerCell) {
-                  haveHitInnerCell = true;
-                } else {
-                  if (haveHitInnerCell) {
-                    innerCell.insertBefore(node, prevNode);
-                    prevNode = node.nextSibling;
-                  } else {
-                    innerCell.insertBefore(node, innerCellFirstChild);
-                  }
-                }
-              });
+              // // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
+              // const contentsFirstChild = cellContents.childNodes[0];
+              // const childrenLength = cellContents.childNodes.length;
+              // const contentsLastChild = cellContents.childNodes[childrenLength - 1];
+              // let haveHitInnerCell = false;
+              // let nextNode = contentsLastChild.nextSibling;
+              // while (cell.firstChild && cell.firstChild !== innerCell) {
+              //   debugger;
+              //   const node = cell.firstChild;
+              //   // cellContents.appendChild(cell.firstChild);
+              //   if (node === innerCell) {
+              //     haveHitInnerCell = true;
+              //   } else {
+              //     if (haveHitInnerCell) {
+              //       cellContents.insertBefore(node, nextNode);
+              //       nextNode = node.nextSibling;
+              //     } else {
+              //       cellContents.insertBefore(node, contentsFirstChild);
+              //     }
+              //   }
+              // }
+              buildInnerCell(cell);
+            
+              // Array.prototype.slice.call(cell.childNodes).forEach((node) => {
+              //   if (node === innerCell) {
+              //     haveHitInnerCell = true;
+              //   } else {
+              //     if (haveHitInnerCell) {
+              //       innerCell.insertBefore(node, prevNode);
+              //       prevNode = node.nextSibling;
+              //     } else {
+              //       innerCell.insertBefore(node, contentsFirstChild);
+              //     }
+              //   }
+              // });
             } else {
               // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
               console.log('rebuild entirely');
