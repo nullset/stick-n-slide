@@ -120,7 +120,7 @@ function buildInnerCell(cell) {
       innerCell.setAttribute('style', cell.firstChild.getAttribute('style'));
       if ('removeNode' in cell.firstChild) {
         // IE11 specific method.
-        cell.firstChild.removeNode();
+        cell.firstChild.removeNode(true);
       } else {
         // All other browsers ... technically not needed (since this code path only deals with IE11) but good to have for testing in other browsers.
         cell.firstChild.remove();
@@ -250,7 +250,7 @@ export default function(elems, options = {}) {
           }
           
           const firstChild = cell.children[0];
-          if (cell.children.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
+          if (cell.childNodes.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
             // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
             return;
           } else {
