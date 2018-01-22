@@ -90,7 +90,10 @@ document.getElementById('changeContent').addEventListener('click', (event)=> {
 
 $(document).ready(function() {
   var $table = $('table');
-  
+  $table.find('b').on('click', function() {
+    alert();
+  });
+
   $table.find('thead th:nth-child(-n+3)').each((i, th) => {
     $(th).addClass('sns--is-stuck');
   });
@@ -104,10 +107,14 @@ $(document).ready(function() {
   $table.find('tbody > tr:nth-child(12) > *:nth-child(-n+2)').addClass('sns--is-stuck-x');
   $table.find('tbody > tr:nth-child(13) > *:nth-child(-n+1)').addClass('sns--is-stuck-x');
   
-  $table.find('b').on('click', function() {
-    alert();
-  });
 
   // $table.stickyTable();
   stickNSlide($table);
+
+  setTimeout(function() {
+    $('b').closest('td').each(function() {
+      var div = $('<div>blah</div>');
+      $(this).prepend(div);
+    });
+  }, 2000);
 });  

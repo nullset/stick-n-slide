@@ -118,6 +118,7 @@ function buildInnerCell(cell) {
         cellContents.appendChild(cell.firstChild.firstChild.firstChild);
       }
       innerCell.setAttribute('style', cell.firstChild.getAttribute('style'));
+      innerCell.style.height = '';
       if ('removeNode' in cell.firstChild) {
         // IE11 specific method.
         cell.firstChild.removeNode(true);
@@ -252,6 +253,9 @@ export default function(elems, options = {}) {
           const firstChild = cell.children[0];
           if (cell.childNodes.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
             // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
+            requestAnimationFrame(() => {
+              setInnerCellHeights(table);
+            });
             return;
           } else {
             const innerCell = cell.querySelector('.sns__cell-inner');
@@ -279,7 +283,10 @@ export default function(elems, options = {}) {
               //     }
               //   }
               // }
-              buildInnerCell(cell);
+              requestAnimationFrame(() => {
+                buildInnerCell(cell);
+                setInnerCellHeights(table);
+              });
             
               // Array.prototype.slice.call(cell.childNodes).forEach((node) => {
               //   if (node === innerCell) {
@@ -301,6 +308,7 @@ export default function(elems, options = {}) {
               });
               requestAnimationFrame(() => {
                 buildInnerCell(cell);
+                setInnerCellHeights(table);
               });
             }
           }
