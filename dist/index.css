@@ -54,7 +54,8 @@ table.sns {
       display: -webkit-box;
       display: -ms-flexbox;
       display: flex;
-      position: relative; }
+      position: relative;
+      height: inherit; }
     table.sns thead *[class*="sns--is-stuck"] input, table.sns thead *[class*="sns--is-stuck"] select, table.sns thead *[class*="sns--is-stuck"] textarea, table.sns thead *[class*="sns--is-stuck"] button, table.sns tbody *[class*="sns--is-stuck"] input, table.sns tbody *[class*="sns--is-stuck"] select, table.sns tbody *[class*="sns--is-stuck"] textarea, table.sns tbody *[class*="sns--is-stuck"] button {
       position: relative;
       z-index: 1; }

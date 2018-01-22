@@ -270,12 +270,17 @@ function verticalAlignment(value) {
 
 function setInnerCellHeights(table) {
   Array.prototype.slice.call(table.querySelectorAll('tr')).forEach(function (row) {
-    var cell = row.firstElementChild;
-    if (cell) {
-      Array.prototype.slice.call(row.querySelectorAll('.sns__cell-inner')).forEach(function (innerCell) {
-        innerCell.style.height = cell.getBoundingClientRect().height + 'px';
+    Array.prototype.slice.call(row.children).forEach(function (cell) {
+      cell.style.height = '';
+      requestAnimationFrame(function () {
+        cell.style.height = cell.getBoundingClientRect().height + 'px';
       });
-    }
+      // if (cell) {
+
+      // Array.prototype.slice.call(row.querySelectorAll('.sns__cell-inner')).forEach((innerCell) => {
+      //   // innerCell.style.height = `${cell.getBoundingClientRect().height}px`;
+      // });
+    });
   });
 }
 
@@ -419,7 +424,6 @@ function setInnerCellHeights(table) {
           subtree: true
         });
       });
-      setInnerCellHeights(table);
 
       // stickyElems = Array.prototype.slice.call(stickyElems).map((cell) => {
       //   const elem = cell.querySelector('.sns__cell-inner');
@@ -435,6 +439,7 @@ function setInnerCellHeights(table) {
       // Set initial position of elements to 0.
       requestAnimationFrame(function () {
         positionStickyElements(table, stickyElems, showShadow);
+        setInnerCellHeights(table);
       });
 
       wrapper.addEventListener('wheel', function (event) {
