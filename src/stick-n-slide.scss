@@ -33,7 +33,7 @@ table.sns {
         (as, from the rendering engine perspective, it is no longer a part of the table).
         We need to add these borders back via some css generated elements.
       */
-      &:not(.blah), .sns__cell-content {
+      &:not(.sns__placeholder-cell), .sns__cell-content {
         b {
           position: relative;
           z-index: 1;

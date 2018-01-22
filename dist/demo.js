@@ -346,7 +346,7 @@ function updateScrollPosition(table, stickyElems, wrapper, showShadow, callback)
 
 function buildInnerCell(cell) {
   var cellStyles = window.getComputedStyle(cell);
-  cell.classList.add('blah');
+  cell.classList.add('sns__placeholder-cell');
   var innerCell = document.createElement('div');
   innerCell.setAttribute('class', 'sns__cell-inner');
   var cellContents = document.createElement('div');
