@@ -175,6 +175,9 @@ document.getElementById('changeContent').addEventListener('click', function (eve
 
 __WEBPACK_IMPORTED_MODULE_1_jquery___default()(document).ready(function () {
   var $table = __WEBPACK_IMPORTED_MODULE_1_jquery___default()('table');
+  $table.find('b').on('click', function () {
+    alert();
+  });
 
   $table.find('thead th:nth-child(-n+3)').each(function (i, th) {
     __WEBPACK_IMPORTED_MODULE_1_jquery___default()(th).addClass('sns--is-stuck');
@@ -184,13 +187,20 @@ __WEBPACK_IMPORTED_MODULE_1_jquery___default()(document).ready(function () {
     __WEBPACK_IMPORTED_MODULE_1_jquery___default()(th).addClass('sns--is-stuck-y');
   });
 
-  $table.find('tbody tr:nth-child(n+1):nth-child(-n+11) *:nth-child(-n+3)').addClass('sns--is-stuck-x');
+  $table.find('tbody > tr:nth-child(n+1):nth-child(-n+11) > *:nth-child(-n+3)').addClass('sns--is-stuck-x');
 
-  $table.find('tbody tr:nth-child(12) *:nth-child(-n+2)').addClass('sns--is-stuck-x');
-  $table.find('tbody tr:nth-child(13) *:nth-child(-n+1)').addClass('sns--is-stuck-x');
+  $table.find('tbody > tr:nth-child(12) > *:nth-child(-n+2)').addClass('sns--is-stuck-x');
+  $table.find('tbody > tr:nth-child(13) > *:nth-child(-n+1)').addClass('sns--is-stuck-x');
 
   // $table.stickyTable();
   Object(__WEBPACK_IMPORTED_MODULE_0__index__["default"])($table);
+
+  setTimeout(function () {
+    __WEBPACK_IMPORTED_MODULE_1_jquery___default()('b').closest('td').each(function () {
+      var div = __WEBPACK_IMPORTED_MODULE_1_jquery___default()('<div>blah</div>');
+      __WEBPACK_IMPORTED_MODULE_1_jquery___default()(this).prepend(div);
+    });
+  }, 2000);
 });
 
 /***/ }),
@@ -334,6 +344,85 @@ function updateScrollPosition(table, stickyElems, wrapper, showShadow, callback)
   }
 }
 
+function buildInnerCell(cell) {
+  var cellStyles = window.getComputedStyle(cell);
+  cell.classList.add('blah');
+  var innerCell = document.createElement('div');
+  innerCell.setAttribute('class', 'sns__cell-inner');
+  var cellContents = document.createElement('div');
+  cellContents.setAttribute('class', 'sns__cell-contents');
+  var setStyles = true;
+  while (cell.firstChild) {
+    cellContents.appendChild(cell.firstChild);
+    if (cell.firstChild && cell.firstChild.classList && cell.firstChild.classList.contains('sns__cell-inner')) {
+      while (cell.firstChild.firstChild.firstChild) {
+        cellContents.appendChild(cell.firstChild.firstChild.firstChild);
+      }
+      innerCell.setAttribute('style', cell.firstChild.getAttribute('style'));
+      innerCell.style.height = '';
+      if ('removeNode' in cell.firstChild) {
+        // IE11 specific method.
+        cell.firstChild.removeNode(true);
+      } else {
+        // All other browsers ... technically not needed (since this code path only deals with IE11) but good to have for testing in other browsers.
+        cell.firstChild.remove();
+      }
+      setStyles = false;
+    }
+  }
+  innerCell.appendChild(cellContents);
+  cell.innerHTML = '';
+  cell.appendChild(innerCell);
+
+  if (setStyles) {
+    ['padding', 'border'].forEach(function (property) {
+      ['Top', 'Right', 'Bottom', 'Left'].forEach(function (side) {
+        if (property === 'border') {
+          var borderWidth = cellStyles['border' + side + 'Width'];
+          innerCell.style['margin' + altSide(side)] = 'calc(-1 * (' + borderWidth + ' / 2))';
+
+          ['Width', 'Color', 'Style'].forEach(function (attr) {
+            var value = cellStyles['' + property + side + attr];
+            innerCell.style['' + property + side + attr] = value;
+          });
+        } else {
+          innerCell.style['' + property + side] = cellStyles['' + property + side];
+        }
+      });
+      cell.style[property] = '0';
+    });
+
+    innerCell.style.alignItems = verticalAlignment(cellStyles.verticalAlign);
+  }
+}
+
+// Convert regular `vertical-align` CSS into flexbox friendly alternative.
+function verticalAlignment(value) {
+  switch (value) {
+    case 'middle':
+      return 'center';
+    case 'top':
+      return 'start';
+    case 'bottom':
+      return 'end';
+    case 'baseline':
+      return 'baseline';
+    default:
+      return '';
+  }
+}
+
+function setInnerCellHeights(table) {
+  Array.prototype.slice.call(table.querySelectorAll('tr')).forEach(function (row) {
+    var cell = row.firstElementChild;
+    if (cell) {
+      Array.prototype.slice.call(row.querySelectorAll('.sns__cell-inner')).forEach(function (innerCell) {
+        innerCell.style.height = cell.getBoundingClientRect().height + 'px';
+      });
+    }
+  });
+}
+
 /* harmony default export */ __webpack_exports__["default"] = (function (elems) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var showShadow = options.showShadow,
@@ -374,39 +463,123 @@ function updateScrollPosition(table, stickyElems, wrapper, showShadow, callback)
       });
 
       stickyElems.forEach(function (cell) {
-        var cellStyles = window.getComputedStyle(cell);
 
-        ['Top', 'Right', 'Bottom', 'Left'].forEach(function (side) {
-          ['Width'].forEach(function (property) {
-            var borderWidth = cellStyles['border' + side + property];
+        // Behavior for IE11.
+        // if (isIE && !isIEedge) {
+        buildInnerCell(cell);
 
-            // if (isFirefox) {
-            //   cell.style[`margin${side}`] = `calc(1 * (${borderWidth} + ${borderWidth}))`;
-            // } else if (isIE || isIEedge) {
-            //   cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
-            // } else {
-            //   cell.style[`margin${side}`] = `-${borderWidth}`;
-            // }
+        // Everything other than IE11.
+        // } else {
+        //   const cellStyles = window.getComputedStyle(cell);
+        //   ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+        //     ['Width'].forEach((property) => {
+        //       const borderWidth = cellStyles[`border${side}${property}`];
+        //       if (!isFirefox && !isIEedge) {
+        //         cell.style[`margin${side}`] = `-${borderWidth}`;
+        //       } else {
+        //         // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
+        //         cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
+        //       }
+        //     });
+        //   });  
+        // }        
 
-            // Use a !isFirefox because there's no reason to penalize every other browser for FF weirdness.
-            if (!isFirefox && !isIE && !isIEedge) {
-              cell.style['margin' + side] = '-' + borderWidth;
+        var observer = new MutationObserver(function (mutations) {
+          var mutation = mutations[0];
+
+          // If first mutation is only mutating the style, assume it is just a transform mutation to handle scrolling and do nothing.
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            return;
+          }
+
+          var firstChild = cell.children[0];
+          if (cell.childNodes.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
+            // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
+            requestAnimationFrame(function () {
+              setInnerCellHeights(table);
+            });
+            return;
+          } else {
+            var innerCell = cell.querySelector('.sns__cell-inner');
+            var cellContents = cell.querySelector('.sns__cell-contents');
+            // cell.children.length > 0 && Array.prototype.slice.call(cell.children).some((node) => node.classList.contains('sns__cell-inner'))
+            if (innerCell) {
+              // // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
+              // const contentsFirstChild = cellContents.childNodes[0];
+              // const childrenLength = cellContents.childNodes.length;
+              // const contentsLastChild = cellContents.childNodes[childrenLength - 1];
+              // let haveHitInnerCell = false;
+              // let nextNode = contentsLastChild.nextSibling;
+              // while (cell.firstChild && cell.firstChild !== innerCell) {
+              //   debugger;
+              //   const node = cell.firstChild;
+              //   // cellContents.appendChild(cell.firstChild);
+              //   if (node === innerCell) {
+              //     haveHitInnerCell = true;
+              //   } else {
+              //     if (haveHitInnerCell) {
+              //       cellContents.insertBefore(node, nextNode);
+              //       nextNode = node.nextSibling;
+              //     } else {
+              //       cellContents.insertBefore(node, contentsFirstChild);
+              //     }
+              //   }
+              // }
+              requestAnimationFrame(function () {
+                buildInnerCell(cell);
+                setInnerCellHeights(table);
+              });
+
+              // Array.prototype.slice.call(cell.childNodes).forEach((node) => {
+              //   if (node === innerCell) {
+              //     haveHitInnerCell = true;
+              //   } else {
+              //     if (haveHitInnerCell) {
+              //       innerCell.insertBefore(node, prevNode);
+              //       prevNode = node.nextSibling;
+              //     } else {
+              //       innerCell.insertBefore(node, contentsFirstChild);
+              //     }
+              //   }
+              // });
             } else {
-              // Fixes FF for 1 px, but nothing else :(
-              console.log('--- border', borderWidth);
-              cell.style['margin' + altSide(side)] = 'calc(-1 * (' + borderWidth + '))';
-              // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
+              // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
+              console.log('rebuild entirely');
+              ['padding', 'border'].forEach(function (property) {
+                cell.style[property] = null;
+              });
+              requestAnimationFrame(function () {
+                buildInnerCell(cell);
+                setInnerCellHeights(table);
+              });
             }
-          });
+          }
+        });
+
+        observer.observe(cell, {
+          childList: true,
+          attributes: true,
+          characterData: true,
+          subtree: true
         });
       });
+      setInnerCellHeights(table);
+
+      // stickyElems = Array.prototype.slice.call(stickyElems).map((cell) => {
+      //   const elem = cell.querySelector('.sns__cell-inner');
+      //   elem.classList = cell.classList;
+      //   elem.classList.remove('blah');
+      //   return elem;
+      // });
 
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
       var wheelEventTriggered = false;
 
       // Set initial position of elements to 0.
-      positionStickyElements(table, stickyElems, showShadow);
+      requestAnimationFrame(function () {
+        positionStickyElements(table, stickyElems, showShadow);
+      });
 
       wrapper.addEventListener('wheel', function (event) {
         wheelEventTriggered = true;

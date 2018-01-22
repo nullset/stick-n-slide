@@ -31,7 +31,10 @@ table.sns {
       */ }
     table.sns thead *[class*="sns--is-stuck"]:empty:after, table.sns tbody *[class*="sns--is-stuck"]:empty:after {
       content: "\200B"; }
-    table.sns thead *[class*="sns--is-stuck"]:before, table.sns tbody *[class*="sns--is-stuck"]:before {
+    table.sns thead *[class*="sns--is-stuck"]:not(.blah) b, table.sns thead *[class*="sns--is-stuck"] .sns__cell-content b, table.sns tbody *[class*="sns--is-stuck"]:not(.blah) b, table.sns tbody *[class*="sns--is-stuck"] .sns__cell-content b {
+      position: relative;
+      z-index: 1; }
+    table.sns thead *[class*="sns--is-stuck"]:not(.blah):before, table.sns thead *[class*="sns--is-stuck"] .sns__cell-content:before, table.sns tbody *[class*="sns--is-stuck"]:not(.blah):before, table.sns tbody *[class*="sns--is-stuck"] .sns__cell-content:before {
       content: "";
       position: absolute;
       border: inherit;
@@ -45,7 +48,13 @@ table.sns {
       transition: box-shadow .1s;
       transition: box-shadow .1s, -webkit-box-shadow .1s;
       -webkit-box-shadow: var(--x-shadow), var(--y-shadow);
-      box-shadow: var(--x-shadow), var(--y-shadow); }
+      box-shadow: var(--x-shadow), var(--y-shadow);
+      z-index: 0; }
+    table.sns thead *[class*="sns--is-stuck"] .sns__cell-inner, table.sns tbody *[class*="sns--is-stuck"] .sns__cell-inner {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      position: relative; }
     table.sns thead *[class*="sns--is-stuck"] input, table.sns thead *[class*="sns--is-stuck"] select, table.sns thead *[class*="sns--is-stuck"] textarea, table.sns thead *[class*="sns--is-stuck"] button, table.sns tbody *[class*="sns--is-stuck"] input, table.sns tbody *[class*="sns--is-stuck"] select, table.sns tbody *[class*="sns--is-stuck"] textarea, table.sns tbody *[class*="sns--is-stuck"] button {
       position: relative;
       z-index: 1; }
