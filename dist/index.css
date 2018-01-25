@@ -47,9 +47,11 @@ table.sns {
       transition: -webkit-box-shadow .1s;
       transition: box-shadow .1s;
       transition: box-shadow .1s, -webkit-box-shadow .1s;
-      -webkit-box-shadow: var(--x-shadow), var(--y-shadow);
-      box-shadow: var(--x-shadow), var(--y-shadow);
+      -webkit-box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);
+      box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);
       z-index: 0; }
+    table.sns thead *[class*="sns--is-stuck"] .sns__placeholder-cell, table.sns tbody *[class*="sns--is-stuck"] .sns__placeholder-cell {
+      position: relative; }
     table.sns thead *[class*="sns--is-stuck"] .sns__cell-inner, table.sns tbody *[class*="sns--is-stuck"] .sns__cell-inner {
       display: -webkit-box;
       display: -ms-flexbox;

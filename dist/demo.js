@@ -419,11 +419,6 @@ function setInnerCellHeights(table) {
       requestAnimationFrame(function () {
         cell.style.height = cell.getBoundingClientRect().height + 'px';
       });
-      // if (cell) {
-
-      // Array.prototype.slice.call(row.querySelectorAll('.sns__cell-inner')).forEach((innerCell) => {
-      //   // innerCell.style.height = `${cell.getBoundingClientRect().height}px`;
-      // });
     });
   });
 }
@@ -469,25 +464,24 @@ function setInnerCellHeights(table) {
 
       stickyElems.forEach(function (cell) {
 
-        // Behavior for IE11.
-        // if (isIE && !isIEedge) {
-        buildInnerCell(cell);
-
-        // Everything other than IE11.
-        // } else {
-        //   const cellStyles = window.getComputedStyle(cell);
-        //   ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
-        //     ['Width'].forEach((property) => {
-        //       const borderWidth = cellStyles[`border${side}${property}`];
-        //       if (!isFirefox && !isIEedge) {
-        //         cell.style[`margin${side}`] = `-${borderWidth}`;
-        //       } else {
-        //         // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
-        //         cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
-        //       }
-        //     });
-        //   });  
-        // }        
+        if (!isIE && !isIEedge) {
+          // Behavior for IE11.
+          buildInnerCell(cell);
+        } else {
+          // Everything other than IE11.
+          var cellStyles = window.getComputedStyle(cell);
+          ['Top', 'Right', 'Bottom', 'Left'].forEach(function (side) {
+            ['Width'].forEach(function (property) {
+              var borderWidth = cellStyles['border' + side + property];
+              if (!isFirefox && !isIEedge) {
+                cell.style['margin' + side] = '-' + borderWidth;
+              } else {
+                // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
+                cell.style['margin' + altSide(side)] = 'calc(-1 * (' + borderWidth + ' + ' + borderWidth + '))';
+              }
+            });
+          });
+        }
 
         var observer = new MutationObserver(function (mutations) {
           var mutation = mutations[0];

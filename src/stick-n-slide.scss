@@ -52,6 +52,9 @@ table.sns {
           z-index: 0;
         }
       }
+      .sns__placeholder-cell {
+        position: relative;
+      }
       .sns__cell-inner {
         display: flex;
         // background: rgba(0,255,0,0.2);
