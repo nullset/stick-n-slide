@@ -221,7 +221,7 @@ export default function(elems, options = {}) {
 
       stickyElems.forEach((cell) => {
 
-        if (!isIE && !isIEedge) {
+        if (isIE && !isIEedge) {
           // Behavior for IE11.
           buildInnerCell(cell);
         } else {

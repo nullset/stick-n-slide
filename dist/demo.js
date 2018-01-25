@@ -464,7 +464,7 @@ function setInnerCellHeights(table) {
 
       stickyElems.forEach(function (cell) {
 
-        if (!isIE && !isIEedge) {
+        if (isIE && !isIEedge) {
           // Behavior for IE11.
           buildInnerCell(cell);
         } else {
