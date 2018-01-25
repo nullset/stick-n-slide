@@ -188,7 +188,6 @@ function setInnerCellHeights(table) {
   });
 }
 
-
 export default function(elems, options = {}) {
   const { showShadow, callback } = options;
 
@@ -376,6 +375,14 @@ export default function(elems, options = {}) {
 
     }
     return;
+  });
+
+  window.addEventListener('resize', () => {
+    requestAnimationFrame(() => {
+      elems.forEach((table) => {
+        setInnerCellHeights(table);
+      });
+    });
   });
 
 }

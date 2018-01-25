@@ -623,6 +623,14 @@ function setInnerCellHeights(table) {
     }
     return;
   });
+
+  window.addEventListener('resize', function () {
+    requestAnimationFrame(function () {
+      elems.forEach(function (table) {
+        setInnerCellHeights(table);
+      });
+    });
+  });
 });
 
 /***/ }),
