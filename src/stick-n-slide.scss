@@ -48,7 +48,7 @@ table.sns {
           left: 0;
           margin: inherit;
           transition: box-shadow .1s;
-          box-shadow: var(--x-shadow), var(--y-shadow);
+          box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);
           z-index: 0;
         }
       }
