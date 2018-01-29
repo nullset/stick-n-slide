@@ -230,12 +230,7 @@ export default function(elems, options = {}) {
           ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
             ['Width'].forEach((property) => {
               const borderWidth = cellStyles[`border${side}${property}`];
-              if (!isFirefox && !isIEedge) {
-                cell.style[`margin${side}`] = `-${borderWidth}`;
-              } else {
-                // cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth}))`;
-                cell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} + ${borderWidth}))`;
-              }
+              cell.style[`margin${side}`] = `-${borderWidth}`;
             });
           });  
         }        
