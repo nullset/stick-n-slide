@@ -111,10 +111,10 @@ $(document).ready(function() {
   // $table.stickyTable();
   stickNSlide($table);
 
-  setTimeout(function() {
-    $('b').closest('td').each(function() {
-      var div = $('<div>blah</div>');
-      $(this).prepend(div);
-    });
-  }, 2000);
+  // setTimeout(function() {
+  //   $('b').closest('td').each(function() {
+  //     var div = $('<div>blah</div>');
+  //     $(this).prepend(div);
+  //   });
+  // }, 5000);
 });  
