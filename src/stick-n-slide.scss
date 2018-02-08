@@ -68,7 +68,7 @@ table.sns {
         can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering
         which fixes the issue.
       */
-      input, select, textarea, button {
+      > * {
         position: relative;
         z-index: 1;
       }

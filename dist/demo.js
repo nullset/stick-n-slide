@@ -467,6 +467,52 @@ function setInnerCellHeights(table) {
         if (isIE && !isIEedge) {
           // Behavior for IE11.
           buildInnerCell(cell);
+
+          var observer = new MutationObserver(function (mutations) {
+            var mutation = mutations[0];
+
+            // If first mutation is only mutating the style, assume it is just a transform mutation to handle scrolling and do nothing.
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+              return;
+            }
+
+            var firstChild = cell.children[0];
+            if (cell.childNodes.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
+              // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
+              requestAnimationFrame(function () {
+                setInnerCellHeights(table);
+              });
+              return;
+            } else {
+              var innerCell = cell.querySelector('.sns__cell-inner');
+              var cellContents = cell.querySelector('.sns__cell-contents');
+              // cell.children.length > 0 && Array.prototype.slice.call(cell.children).some((node) => node.classList.contains('sns__cell-inner'))
+              if (innerCell) {
+                // // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
+                requestAnimationFrame(function () {
+                  buildInnerCell(cell);
+                  setInnerCellHeights(table);
+                });
+              } else {
+                // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
+                console.log('rebuild entirely');
+                ['padding', 'border'].forEach(function (property) {
+                  cell.style[property] = null;
+                });
+                requestAnimationFrame(function () {
+                  buildInnerCell(cell);
+                  setInnerCellHeights(table);
+                });
+              }
+            }
+          });
+
+          observer.observe(cell, {
+            childList: true,
+            attributes: true,
+            characterData: true,
+            subtree: true
+          });
         } else {
           // Everything other than IE11.
           var cellStyles = window.getComputedStyle(cell);
@@ -477,85 +523,6 @@ function setInnerCellHeights(table) {
             });
           });
         }
-
-        var observer = new MutationObserver(function (mutations) {
-          var mutation = mutations[0];
-
-          // If first mutation is only mutating the style, assume it is just a transform mutation to handle scrolling and do nothing.
-          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-            return;
-          }
-
-          var firstChild = cell.children[0];
-          if (cell.childNodes.length === 1 && firstChild && firstChild.classList.contains('sns__cell-inner')) {
-            // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
-            requestAnimationFrame(function () {
-              setInnerCellHeights(table);
-            });
-            return;
-          } else {
-            var innerCell = cell.querySelector('.sns__cell-inner');
-            var cellContents = cell.querySelector('.sns__cell-contents');
-            // cell.children.length > 0 && Array.prototype.slice.call(cell.children).some((node) => node.classList.contains('sns__cell-inner'))
-            if (innerCell) {
-              // // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
-              // const contentsFirstChild = cellContents.childNodes[0];
-              // const childrenLength = cellContents.childNodes.length;
-              // const contentsLastChild = cellContents.childNodes[childrenLength - 1];
-              // let haveHitInnerCell = false;
-              // let nextNode = contentsLastChild.nextSibling;
-              // while (cell.firstChild && cell.firstChild !== innerCell) {
-              //   debugger;
-              //   const node = cell.firstChild;
-              //   // cellContents.appendChild(cell.firstChild);
-              //   if (node === innerCell) {
-              //     haveHitInnerCell = true;
-              //   } else {
-              //     if (haveHitInnerCell) {
-              //       cellContents.insertBefore(node, nextNode);
-              //       nextNode = node.nextSibling;
-              //     } else {
-              //       cellContents.insertBefore(node, contentsFirstChild);
-              //     }
-              //   }
-              // }
-              requestAnimationFrame(function () {
-                buildInnerCell(cell);
-                setInnerCellHeights(table);
-              });
-
-              // Array.prototype.slice.call(cell.childNodes).forEach((node) => {
-              //   if (node === innerCell) {
-              //     haveHitInnerCell = true;
-              //   } else {
-              //     if (haveHitInnerCell) {
-              //       innerCell.insertBefore(node, prevNode);
-              //       prevNode = node.nextSibling;
-              //     } else {
-              //       innerCell.insertBefore(node, contentsFirstChild);
-              //     }
-              //   }
-              // });
-            } else {
-              // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
-              console.log('rebuild entirely');
-              ['padding', 'border'].forEach(function (property) {
-                cell.style[property] = null;
-              });
-              requestAnimationFrame(function () {
-                buildInnerCell(cell);
-                setInnerCellHeights(table);
-              });
-            }
-          }
-        });
-
-        observer.observe(cell, {
-          childList: true,
-          attributes: true,
-          characterData: true,
-          subtree: true
-        });
       });
 
       // stickyElems = Array.prototype.slice.call(stickyElems).map((cell) => {
