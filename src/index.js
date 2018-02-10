@@ -1,20 +1,73 @@
 import './stick-n-slide.scss';
 
+const observeConfig = {
+  childList: true,
+  // attributes: true,
+  // characterData: true,
+  subtree: true,
+};
+
 function handleMutations(mutations, observer) {
   observer.disconnect(); // Prevent any further updates to the DOM from making the observer thrash.
+
+
+  const table = closest(mutations[0].target, 'sns');
+
+  // const cells = table.querySelectorAll('.sns__placeholder-cell');
+  // Array.prototype.slice.call(cells).forEach((cell) => {
+  //   buildInnerCell(cell);
+  // });
+
   mutations.forEach((m) => {
-    console.log(m);
+    // console.log(m);
     if (m.type === 'childList') {
-      m.removedNodes.forEach((removedNode) => {
+      Array.prototype.slice.call(m.removedNodes).forEach((removedNode) => {
         if (removedNode.classList) {
-          // 1) Rebuild placeholder-cell
-          if (removedNode.classList.contains('sns__cell-inner')) {
+          if (m.target.tagName == 'TR') {
+            // 0) Rebuild entire table TH/TD
+            Array.prototype.slice.call(m.removedNodes).forEach((removedNode, i) => {
+              const addedNode = m.addedNodes[i];
+
+              // Merge DOM attributes
+              const oldAttrs = removedNode.attributes;
+              for (let i = oldAttrs.length - 1; i >= 0; i--) {
+                const attrName = oldAttrs[i].name;
+                const attrValue = oldAttrs[i].value;
+                if (attrName === 'style') {
+                  const oldStyle = (removedNode.getAttribute('style') || '').replace(/;$/, '');
+                  addedNode.setAttribute('style', `${oldStyle}; ${addedNode.getAttribute('style')}`);
+                } else if (attrName === 'class') {
+                  Array.prototype.slice.call(removedNode.classList).forEach((className) => {
+                    addedNode.classList.add(className);
+                  });
+                } else {
+                  if (addedNode.getAttribute(attrName) === null)  {
+                    addedNode.setAttribute(attrName, attrValue);
+                  }
+                }
+              }
+
+              // Build up inner cell and contents
+              const innerCell = removedNode.firstChild;
+              const contents = innerCell.firstChild;
+              while (contents.firstChild) {
+                contents.removeChild(contents.firstChild);
+              }
+
+              while(addedNode.firstChild) {
+                contents.appendChild(addedNode.firstChild);
+              }
+
+              addedNode.appendChild(innerCell);
+            });
+      
+          } else if (removedNode.classList.contains('sns__cell-inner')) {
             // 1.1 - From scratch
             m.target.innerCellStyle = removedNode.getAttribute('style');
           }
         }
       });
-      m.addedNodes.forEach((addedNode) => {
+      Array.prototype.slice.call(m.addedNodes).forEach((addedNode) => {
         // 1) Rebuild placeholder-cell
         if (m.target.classList.contains('sns__placeholder-cell')) {
           if (m.target.innerCellStyle) {
@@ -85,6 +138,11 @@ function handleMutations(mutations, observer) {
         }
       });
     }
+  });
+
+  setInnerCellHeights(table);
+  requestAnimationFrame(() => {
+    observer.observe(table, observeConfig);
   });
 }
 
@@ -434,12 +492,7 @@ export default function(elems, options = {}) {
         // ---------------------------
         
         requestAnimationFrame(() => {
-          observer.observe(table, {
-            childList: true,
-            attributes: true,
-            characterData: true,
-            subtree: true,
-          });          
+          observer.observe(table, observeConfig);          
             
         });
 
