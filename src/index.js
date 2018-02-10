@@ -9,14 +9,16 @@ function handleMutations(mutations, observer) {
         if (removedNode.classList) {
           // 1) Rebuild placeholder-cell
           if (removedNode.classList.contains('sns__cell-inner')) {
+            // 1.1 - From scratch
             m.target.innerCellStyle = removedNode.getAttribute('style');
           }
         }
       });
       m.addedNodes.forEach((addedNode) => {
+        // 1) Rebuild placeholder-cell
         if (m.target.classList.contains('sns__placeholder-cell')) {
-          // 1) Rebuild placeholder-cell
           if (m.target.innerCellStyle) {
+            // 1.1 - From scratch
             const innerCell = document.createElement('div');
             innerCell.setAttribute('class', 'sns__cell-inner');
             innerCell.setAttribute('style', m.target.innerCellStyle);
@@ -29,7 +31,7 @@ function handleMutations(mutations, observer) {
             innerCell.appendChild(contents);
             m.target.appendChild(innerCell);
           } else {
-            // 1.5) Move direct child of placeholder-cell inside cell-contents
+            // 1.2 - When a direct descendent of placeholder-cell has been created
             const innerCell = document.createElement('div');
             innerCell.setAttribute('class', 'sns__cell-inner');
 
@@ -56,23 +58,33 @@ function handleMutations(mutations, observer) {
           }
         }
 
-
-
         // 2) Rebuild cell-inner
         if (m.target.classList.contains('sns__cell-inner')) {
-          debugger
           const contents = document.createElement('div');
           contents.classList.add('sns__cell-contents');
-          contents.appendChild(addedNode);
-          m.target.appendChild(contents);
-        }
 
+          if (!Array.prototype.slice.call(m.target.children).find((node) => node.classList.contains('sns__cell-contents'))) {
+            // 2.1 - Build from scratch
+            contents.appendChild(addedNode);
+            m.target.appendChild(contents);  
+          } else {
+            // 2.2 - When a direct descendent of cell-inner has been created
+            while (m.target.firstChild) {
+              const child = m.target.firstChild;
+              if (child.classList && child.classList.contains('sns__cell-contents')) {
+                while (child.firstChild) {
+                  contents.appendChild(child.firstChild);
+                }
+                m.target.removeChild(child);
+              } else {
+                contents.appendChild(child);
+              }
+            }
+            m.target.appendChild(contents);
+          }
+        }
       });
     }
-    // if (m.type === 'childList' && (m.target.classList.contains('sns__placeholder-cell')) || m.target.classList.contains('sns__cell-inner') || m.target.classList.contains('sns__cell-contents')) {
-    //   console.log(m.target.classList)
-    //   buildInnerCell(m.target);
-    // }
   });
 }
 
