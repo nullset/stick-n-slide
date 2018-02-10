@@ -1,5 +1,81 @@
 import './stick-n-slide.scss';
 
+function handleMutations(mutations, observer) {
+  observer.disconnect(); // Prevent any further updates to the DOM from making the observer thrash.
+  mutations.forEach((m) => {
+    console.log(m);
+    if (m.type === 'childList') {
+      m.removedNodes.forEach((removedNode) => {
+        if (removedNode.classList) {
+          // 1) Rebuild placeholder-cell
+          if (removedNode.classList.contains('sns__cell-inner')) {
+            m.target.innerCellStyle = removedNode.getAttribute('style');
+          }
+        }
+      });
+      m.addedNodes.forEach((addedNode) => {
+        if (m.target.classList.contains('sns__placeholder-cell')) {
+          // 1) Rebuild placeholder-cell
+          if (m.target.innerCellStyle) {
+            const innerCell = document.createElement('div');
+            innerCell.setAttribute('class', 'sns__cell-inner');
+            innerCell.setAttribute('style', m.target.innerCellStyle);
+            delete m.target.innerCellStyle;
+  
+            const contents = document.createElement('div');
+            contents.classList.add('sns__cell-contents');
+            contents.appendChild(addedNode);
+            
+            innerCell.appendChild(contents);
+            m.target.appendChild(innerCell);
+          } else {
+            // 1.5) Move direct child of placeholder-cell inside cell-contents
+            const innerCell = document.createElement('div');
+            innerCell.setAttribute('class', 'sns__cell-inner');
+
+            const contents = document.createElement('div');
+            contents.classList.add('sns__cell-contents');
+
+            while (m.target.firstChild) {
+              const child = m.target.firstChild;
+              if (child.classList && child.classList.contains('sns__cell-inner')) {
+                innerCell.setAttribute('style', m.target.firstChild.getAttribute('style'));
+                while (child.firstChild.firstChild) {
+                  contents.appendChild(child.firstChild.firstChild);
+                }
+                m.target.removeChild(child);
+              } else {
+                contents.appendChild(child);
+              }
+            }
+
+            innerCell.appendChild(contents);
+
+            m.target.appendChild(innerCell);
+
+          }
+        }
+
+
+
+        // 2) Rebuild cell-inner
+        if (m.target.classList.contains('sns__cell-inner')) {
+          debugger
+          const contents = document.createElement('div');
+          contents.classList.add('sns__cell-contents');
+          contents.appendChild(addedNode);
+          m.target.appendChild(contents);
+        }
+
+      });
+    }
+    // if (m.type === 'childList' && (m.target.classList.contains('sns__placeholder-cell')) || m.target.classList.contains('sns__cell-inner') || m.target.classList.contains('sns__cell-contents')) {
+    //   console.log(m.target.classList)
+    //   buildInnerCell(m.target);
+    // }
+  });
+}
+
 function closest(elem, classMatcher) {
   if (elem.classList) {
     if (elem.classList.contains(classMatcher)) {
@@ -217,8 +293,40 @@ export default function(elems, options = {}) {
 
   elems.forEach((table) => {
     if (!table.StickNSlide) {
-      table.StickNSlide = true;
+      table.StickNSlide = {};
       const wrapper = table.parentElement;
+
+      wrapper.addEventListener('wheel', (event) => {
+        wheelEventTriggered = true;
+        const { deltaX, deltaY } = event;
+        const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
+        const { width, height } = wrapper.getBoundingClientRect();
+
+        const handleWheel = wheelHandler.bind(null, { table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback });
+
+        if (isIE || isIEedge) {
+          event.preventDefault();
+          event.stopPropagation();
+          handleWheel();
+        } else if ( 
+          ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
+          ||
+          ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
+        ) {
+          event.preventDefault();
+          handleWheel();
+        }
+      }, {capture: true});
+
+      wrapper.addEventListener('scroll', () => {
+        if (wheelEventTriggered) {
+          wheelEventTriggered = false;
+        } else {
+          scrollHandler(table, stickyElems, wrapper, showShadow, callback);
+        }
+      });
+      
+      // --------------------      
 
       let stickyElems = [];
       ['sns--is-stuck', 'sns--is-stuck-x', 'sns--is-stuck-y'].forEach((className) => {
@@ -308,185 +416,190 @@ export default function(elems, options = {}) {
         positionStickyElements(table, stickyElems, showShadow);
         setInnerCellHeights(table);
 
-        let observer = new MutationObserver((mutations) => {
-          // const cells = table.querySelectorAll('.sns__placeholder-cell');
-          // cells.forEach((cell) => {
-          //   console.log('start')
-          // //   if (cell.children.length === 1) {
-          // //     const childCell = cell.children[0];
-          // //     if (childCell.classList.contains('sns__cell-inner')) {
-          // //       if (childCell.children.length === 1) {
-          // //         const grandChildCell = childCell.children[0];
-          // //         if (grandChildCell.classList.contains('sns__cell-contents')) {
-          // //           console.log('do nothing, is in content cell');
-          // //           return;
-          // //         } else {
-          // //           console.log('rebuild content');
-          // //           // buildInnerCell(cell);
-          // //         }
-          // //       }
-          // //     }
-          // //   } else {
-
-          //   // }
-          // });
-
-          // ----------------------------
-
-          mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style' && (mutation.target.tagName.toUpperCase() === 'TH' || mutation.target.tagName.toUpperCase() === 'TD')) {
-              return;
-            } else if (mutation.type === 'characterData') {
-              return;
-            // } else if (mutation.type === 'childList' && mutation.target.classList.contains('sns__cell-contents')) {
-            //   return;
-            } else {
-              let contentCell = closest(mutation.target, 'sns__cell-contents');
-              if (contentCell) {
-                // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
-                console.log('Do nothing');
-                return;
-              }
-
-              // if (mutation.target.classList.contains('sns__placeholder-cell')) {
-              //   const cellInnerRemoved = Array.prototype.slice.call(mutation.removedNodes).find((x) => x.classList.contains('sns__cell-inner'));
-              //   let cellInner;
-              //   debugger;
-              //   if (cellInnerRemoved) {
-              //     cellInner = document.createElement('div');
-              //     cellInner.classList.add('sns__cell-inner');
-              //     while (mutation.target.firstChild) {
-              //       cellInner.appendChild(mutation.target.firstChild);
-              //     }
-              //     mutation.target.appendChild(cellInner);
-              //   } else {
-              //     ''
-              //   }
-              // }
-
-              if (mutation.target.classList.contains('sns__cell-inner')) {
-                let contentCell = mutation.target.querySelector('.sns__cell-contents');
-                if (!contentCell) {
-                  contentCell = document.createElement('div');
-                  contentCell.classList.add('sns__cell-contents');
-                  mutation.target.appendChild(contentCell);
-                }
-                while (mutation.target.childNodes.length > 0 && mutation.target.firstChild !== contentCell) {
-                  contentCell.appendChild(mutation.target.firstChild);
-                }
-                // } else {
-                //   contentCell = document.createElement('div');
-                //   contentCell.classList.add('sns__cell-contents');
-                //   while (mutation.target.firstChild) {
-                //     contentCell.appendChild(mutation.target.firstChild);
-                //   }
-                //   mutation.target.appendChild(contentCell);
-                //   debugger;
-                // }
-              } else {
-                let innerCell = mutation.target.querySelector('.sns__cell-inner');
-                if (!innerCell) {
-                  const oldInnerCell = Array.prototype.slice.call(mutation.removedNodes).find((x) => x.classList.contains('sns__cell-inner'));
-
-                  innerCell = document.createElement('div');
-                  innerCell.classList.add('sns__cell-inner');
-                  innerCell.setAttribute('style', oldInnerCell.getAttribute('style'));
-                  mutation.target.appendChild(innerCell);
-                }
-                while (mutation.target.childNodes.length > 0 && mutation.target.firstChild !== innerCell) {
-                  innerCell.appendChild(mutation.target.firstChild);
-                }                            
-              }
-
-              // let innerCell = closest(mutation.target, 'sns__cell-inner');
-              // let tableCell = closest(mutation.target, 'sns__placeholder-cell');
-
-              // if (tableCell.children.length === 0) {
-              //   if (tableCell.children[0] === innerCell) {
-              //     debugger
-              //   } else {
-              //     debugger
-              //   }
-              // } else {
-              //   if (innerCell) {
-              //     debugger;
-              //     if (innerCell.children.length === 1) {
-              //       if (innerCell.children[0] === contentCell) {
-              //         console.log('do nothing 2');
-              //       } else {
-              //         buildInnerCell(tableCell);
-              //       }
-              //     }
-              //   } else {
-              //     debugger;
-              //   }
-              // }
-              
-              // debugger
-              // if (innerCell && tableCell) {
-              //   // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
-              //   console.log('Move inside cell-inner');
-              //   requestAnimationFrame(() => {
-              //     buildInnerCell(tableCell);
-              //     setInnerCellHeights(table);
-              //   });  
-              // } else {
-              //   // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
-              //   console.log('rebuild entirely');
-              //   ['padding', 'border'].forEach((property) => {
-              //     tableCell.style[property] = null;
-              //   });
-              //   requestAnimationFrame(() => {
-              //     buildInnerCell(tableCell);
-              //     setInnerCellHeights(table);
-              //   });
-
-              // }
-              
-
-
-              // debugger;
-            }
-          });
+        // ----------------------------
+        const elem = table;
+        let observer = new MutationObserver(handleMutations);
+        // ---------------------------
+        
+        requestAnimationFrame(() => {
+          observer.observe(table, {
+            childList: true,
+            attributes: true,
+            characterData: true,
+            subtree: true,
+          });          
+            
         });
-        observer.observe(table, {
-          childList: true,
-          attributes: true,
-          characterData: true,
-          subtree: true,
-        });
+
+        // let observer = new MutationObserver((mutations) => {
+        //   // const cells = table.querySelectorAll('.sns__placeholder-cell');
+        //   // cells.forEach((cell) => {
+        //   //   console.log('start')
+        //   // //   if (cell.children.length === 1) {
+        //   // //     const childCell = cell.children[0];
+        //   // //     if (childCell.classList.contains('sns__cell-inner')) {
+        //   // //       if (childCell.children.length === 1) {
+        //   // //         const grandChildCell = childCell.children[0];
+        //   // //         if (grandChildCell.classList.contains('sns__cell-contents')) {
+        //   // //           console.log('do nothing, is in content cell');
+        //   // //           return;
+        //   // //         } else {
+        //   // //           console.log('rebuild content');
+        //   // //           // buildInnerCell(cell);
+        //   // //         }
+        //   // //       }
+        //   // //     }
+        //   // //   } else {
+
+        //   //   // }
+        //   // });
+
+        //   // ----------------------------
+
+        //   mutations.forEach((mutation) => {
+        //     if (mutation.type === 'attributes' && mutation.attributeName === 'style' && (mutation.target.tagName.toUpperCase() === 'TH' || mutation.target.tagName.toUpperCase() === 'TD')) {
+        //       return;
+        //     } else if (mutation.type === 'characterData') {
+        //       return;
+        //     // } else if (mutation.type === 'childList' && mutation.target.classList.contains('sns__cell-contents')) {
+        //     //   return;
+        //     } else {
+        //       let contentCell = closest(mutation.target, 'sns__cell-contents');
+        //       if (contentCell) {
+        //         // Mutation has only changed what is inside the .sns__cell-inner <div> so no rebuilding is necessary.
+        //         console.log('Do nothing');
+        //         return;
+        //       }
+
+        //       // if (mutation.target.classList.contains('sns__placeholder-cell')) {
+        //       //   const cellInnerRemoved = Array.prototype.slice.call(mutation.removedNodes).find((x) => x.classList.contains('sns__cell-inner'));
+        //       //   let cellInner;
+        //       //   debugger;
+        //       //   if (cellInnerRemoved) {
+        //       //     cellInner = document.createElement('div');
+        //       //     cellInner.classList.add('sns__cell-inner');
+        //       //     while (mutation.target.firstChild) {
+        //       //       cellInner.appendChild(mutation.target.firstChild);
+        //       //     }
+        //       //     mutation.target.appendChild(cellInner);
+        //       //   } else {
+        //       //     ''
+        //       //   }
+        //       // }
+
+        //       if (mutation.target.classList.contains('sns__cell-inner')) {
+        //         let contentCell = mutation.target.querySelector('.sns__cell-contents');
+        //         if (!contentCell) {
+        //           contentCell = document.createElement('div');
+        //           contentCell.classList.add('sns__cell-contents');
+        //           mutation.target.appendChild(contentCell);
+        //         }
+        //         while (mutation.target.childNodes.length > 0 && mutation.target.firstChild !== contentCell) {
+        //           contentCell.appendChild(mutation.target.firstChild);
+        //         }
+        //         // } else {
+        //         //   contentCell = document.createElement('div');
+        //         //   contentCell.classList.add('sns__cell-contents');
+        //         //   while (mutation.target.firstChild) {
+        //         //     contentCell.appendChild(mutation.target.firstChild);
+        //         //   }
+        //         //   mutation.target.appendChild(contentCell);
+        //         //   debugger;
+        //         // }
+        //       } else {
+        //         let innerCell = mutation.target.querySelector('.sns__cell-inner');
+        //         let contentCell = mutation.target.querySelector('.sns__cell-contents');
+        //         if (!innerCell) {
+        //           const oldInnerCell = Array.prototype.slice.call(mutation.removedNodes).find((x) => x.classList.contains('sns__cell-inner'));
+
+        //           innerCell = document.createElement('div');
+        //           innerCell.classList.add('sns__cell-inner');
+        //           innerCell.setAttribute('style', oldInnerCell.getAttribute('style'));
+
+        //           contentCell = document.createElement('div');
+        //           contentCell.classList.add('sns__cell-contents');
+        //           innerCell.appendChild(contentCell);
+
+        //           mutation.target.appendChild(innerCell);
+        //         }
+
+        //         const childNodes = Array.prototype.slice.call(mutation.target.childNodes);
+        //         const innerCellPosition = childNodes.indexOf(innerCell);
+                
+        //         // while (mutation.target.childNodes.length > 1 && mutation.target.firstChild !== innerCell) {
+        //         childNodes.forEach((node, position) => {
+        //           if (node === innerCell) {
+        //             return;
+        //           }
+        //           if (position < innerCellPosition) {
+        //             debugger;
+        //             contentCell.insertBefore(node, contentCell.childNodes[innerCellPosition - 1]);
+        //           } else {
+        //             debugger;
+        //             contentCell.appendChild(node);
+        //           }
+        //         })                           
+        //       }
+
+        //       // let innerCell = closest(mutation.target, 'sns__cell-inner');
+        //       // let tableCell = closest(mutation.target, 'sns__placeholder-cell');
+
+        //       // if (tableCell.children.length === 0) {
+        //       //   if (tableCell.children[0] === innerCell) {
+        //       //     debugger
+        //       //   } else {
+        //       //     debugger
+        //       //   }
+        //       // } else {
+        //       //   if (innerCell) {
+        //       //     debugger;
+        //       //     if (innerCell.children.length === 1) {
+        //       //       if (innerCell.children[0] === contentCell) {
+        //       //         console.log('do nothing 2');
+        //       //       } else {
+        //       //         buildInnerCell(tableCell);
+        //       //       }
+        //       //     }
+        //       //   } else {
+        //       //     debugger;
+        //       //   }
+        //       // }
+              
+        //       // debugger
+        //       // if (innerCell && tableCell) {
+        //       //   // Mutation has added child nodes along side the .sns__cell-inner <div>, so move these new nodes inside the <div> in the proper location.
+        //       //   console.log('Move inside cell-inner');
+        //       //   requestAnimationFrame(() => {
+        //       //     buildInnerCell(tableCell);
+        //       //     setInnerCellHeights(table);
+        //       //   });  
+        //       // } else {
+        //       //   // Mutation has removed the .sns__cell-inner <div> entirely. Rebuild the inner div using the contents of the cell.
+        //       //   console.log('rebuild entirely');
+        //       //   ['padding', 'border'].forEach((property) => {
+        //       //     tableCell.style[property] = null;
+        //       //   });
+        //       //   requestAnimationFrame(() => {
+        //       //     buildInnerCell(tableCell);
+        //       //     setInnerCellHeights(table);
+        //       //   });
+
+        //       // }
+              
+
+
+        //       // debugger;
+        //     }
+        //   });
+        // });
+        // observer.observe(table, {
+        //   childList: true,
+        //   attributes: true,
+        //   characterData: true,
+        //   subtree: true,
+        // });
       });
 
-      wrapper.addEventListener('wheel', (event) => {
-        wheelEventTriggered = true;
-        const { deltaX, deltaY } = event;
-        const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
-        const { width, height } = wrapper.getBoundingClientRect();
-
-        const handleWheel = wheelHandler.bind(null, { table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback });
-
-        if (isIE || isIEedge) {
-          event.preventDefault();
-          event.stopPropagation();
-          handleWheel();
-        } else if ( 
-          ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
-          ||
-          ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
-        ) {
-          event.preventDefault();
-          handleWheel();
-        }
-      }, {capture: true});
-
-      wrapper.addEventListener('scroll', () => {
-        if (wheelEventTriggered) {
-          wheelEventTriggered = false;
-        } else {
-          scrollHandler(table, stickyElems, wrapper, showShadow, callback);
-        }
-      });
-      
     }
     return;
   });
