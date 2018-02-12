@@ -393,10 +393,7 @@ export default function(elems, options = {}) {
       
       // --------------------      
 
-      let stickyElems = [];
-      ['sns--is-stuck', 'sns--is-stuck-x', 'sns--is-stuck-y'].forEach((className) => {
-        stickyElems = stickyElems.concat(Array.from(table.querySelectorAll(`.${className}`)));
-      });
+      const stickyElems = Array.from(table.querySelectorAll(`.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x`));
 
       wrapper.style.position = 'relative';
       table.classList.add('sns');

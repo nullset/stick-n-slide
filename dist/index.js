@@ -496,10 +496,7 @@ function setInnerCellHeights(table) {
 
       // --------------------      
 
-      var stickyElems = [];
-      ['sns--is-stuck', 'sns--is-stuck-x', 'sns--is-stuck-y'].forEach(function (className) {
-        stickyElems = stickyElems.concat(Array.from(table.querySelectorAll('.' + className)));
-      });
+      var stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
 
       wrapper.style.position = 'relative';
       table.classList.add('sns');
