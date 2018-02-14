@@ -570,12 +570,13 @@ function verticalAlignment(value) {
 }
 
 function setInnerCellHeights(table) {
-  Array.prototype.slice.call(table.querySelectorAll('tr')).forEach(function (row) {
-    Array.prototype.slice.call(row.children).forEach(function (cell) {
-      cell.style.height = '';
-      requestAnimationFrame(function () {
-        cell.style.height = cell.getBoundingClientRect().height + 'px';
-      });
+  var stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
+  stickyElems.forEach(function (cell) {
+    cell.style.height = '';
+  });
+  requestAnimationFrame(function () {
+    stickyElems.forEach(function (cell) {
+      cell.style.height = cell.getBoundingClientRect().height + 'px';
     });
   });
 }
@@ -590,6 +591,10 @@ function setInnerCellHeights(table) {
   var isFirefox = userAgent.indexOf('firefox') > -1;
   var isIE = userAgent.indexOf('trident') > -1;
   var isIEedge = userAgent.indexOf('edge') > -1;
+
+  function isIE11() {
+    return isIE && !isIEedge;
+  }
 
   // Convert a jQuery object to an array, or convert a single element to an array.
   if (typeof elems.toArray === 'function') {
@@ -654,7 +659,7 @@ function setInnerCellHeights(table) {
 
       stickyElems.forEach(function (cell) {
 
-        if (isIE && !isIEedge) {
+        if (isIE11()) {
           // Behavior for IE11.
           buildInnerCell(cell);
         } else {
@@ -676,7 +681,9 @@ function setInnerCellHeights(table) {
       // Set initial position of elements to 0.
       requestAnimationFrame(function () {
         positionStickyElements(table, stickyElems, showShadow);
-        setInnerCellHeights(table);
+        if (isIE11()) {
+          setInnerCellHeights(table);
+        }
 
         // ----------------------------
         // Handle IE11 mutations to the table cells.
@@ -695,7 +702,9 @@ function setInnerCellHeights(table) {
   window.addEventListener('resize', function () {
     requestAnimationFrame(function () {
       elems.forEach(function (table) {
-        setInnerCellHeights(table);
+        if (isIE11()) {
+          setInnerCellHeights(table);
+        }
       });
     });
   });

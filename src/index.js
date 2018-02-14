@@ -330,14 +330,16 @@ function verticalAlignment(value) {
 }
 
 function setInnerCellHeights(table) {
-  Array.prototype.slice.call(table.querySelectorAll('tr')).forEach((row) => {
-    Array.prototype.slice.call(row.children).forEach((cell) => {
-      cell.style.height = '';
-      requestAnimationFrame(() => {
-        cell.style.height = `${cell.getBoundingClientRect().height}px`;
-      });
+  const stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
+  stickyElems.forEach((cell) => {
+    cell.style.height = '';
+  });
+  requestAnimationFrame(() => {
+    stickyElems.forEach((cell) => {
+      cell.style.height = `${cell.getBoundingClientRect().height}px`;
     });
   });
+
 }
 
 export default function(elems, options = {}) {
@@ -347,6 +349,10 @@ export default function(elems, options = {}) {
   const isFirefox = userAgent.indexOf('firefox') > -1;
   const isIE = userAgent.indexOf('trident') > -1;
   const isIEedge = userAgent.indexOf('edge') > -1;
+
+  function isIE11() {
+    return isIE && !isIEedge;
+  }
 
 
   // Convert a jQuery object to an array, or convert a single element to an array.
@@ -393,7 +399,7 @@ export default function(elems, options = {}) {
       
       // --------------------      
 
-      const stickyElems = Array.from(table.querySelectorAll(`.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x`));
+      const stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
 
       wrapper.style.position = 'relative';
       table.classList.add('sns');
@@ -407,7 +413,7 @@ export default function(elems, options = {}) {
 
       stickyElems.forEach((cell) => {
 
-        if (isIE && !isIEedge) {
+        if (isIE11()) {
           // Behavior for IE11.
           buildInnerCell(cell);
         } else {
@@ -429,7 +435,9 @@ export default function(elems, options = {}) {
       // Set initial position of elements to 0.
       requestAnimationFrame(() => {
         positionStickyElements(table, stickyElems, showShadow);
-        setInnerCellHeights(table);
+        if (isIE11()) {
+          setInnerCellHeights(table);
+        }
 
         // ----------------------------
         // Handle IE11 mutations to the table cells.
@@ -450,7 +458,9 @@ export default function(elems, options = {}) {
   window.addEventListener('resize', () => {
     requestAnimationFrame(() => {
       elems.forEach((table) => {
-        setInnerCellHeights(table);
+        if (isIE11()) {
+          setInnerCellHeights(table);
+        }
       });
     });
   });
