@@ -13,75 +13,73 @@ table.sns {
     }
   }
 
-  thead, tbody {
-    *[class*="sns--is-stuck"] {
-      position: relative;
-      transition: box-shadow 0.1s;
+  *[class*="sns--is-stuck"], *[class*="sns--is-stuck"] th, *[class*="sns--is-stuck"] td {
+    position: relative;
+    transition: box-shadow 0.1s;
 
-      /*
-        Add a zero-width space character to any empty stuck element. This prevents an issue in IE where
-        cells with no content are collapsed.
-      */
-      &:empty {
-        &:after {
-          content: "\200B";
-        }
+    /*
+      Add a zero-width space character to any empty stuck element. This prevents an issue in IE where
+      cells with no content are collapsed.
+    */
+    &:empty {
+      &:after {
+        content: "\200B";
       }
-      
-      /*
-        Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
-        (as, from the rendering engine perspective, it is no longer a part of the table).
-        We need to add these borders back via some css generated elements.
-      */
-      &:not(.sns__placeholder-cell), .sns__cell-content {
-        b {
-          position: relative;
-          z-index: 1;
-        }
-        &:before {
-          content: "";
-          position: absolute;
-          border: inherit;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          margin: inherit;
-          transition: box-shadow .1s;
-          box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);
-          z-index: 0;
-        }
-      }
-      .sns__placeholder-cell {
-        position: relative;
-      }
-      .sns__cell-inner {
-        display: flex;
-        // background: rgba(0,255,0,0.2);
-        position: relative;
-        height: inherit;
-      }
-
-      /*
-        Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.
-        Because of this, clicking on these elements once they have been "translated" via translate()
-        can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering
-        which fixes the issue.
-      */
-      > * {
+    }
+    
+    /*
+      Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
+      (as, from the rendering engine perspective, it is no longer a part of the table).
+      We need to add these borders back via some css generated elements.
+    */
+    &:not(.sns__placeholder-cell), .sns__cell-content {
+      b {
         position: relative;
         z-index: 1;
       }
+      &:before {
+        content: "";
+        position: absolute;
+        border: inherit;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: inherit;
+        transition: box-shadow .1s;
+        box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);
+        z-index: 0;
+      }
     }
-    *.sns--is-stuck {
-      z-index: 100;
+    .sns__placeholder-cell {
+      position: relative;
     }
-    *.sns--is-stuck-x {
-      z-index: 90;
+    .sns__cell-inner {
+      display: flex;
+      // background: rgba(0,255,0,0.2);
+      position: relative;
+      height: inherit;
     }
-    *.sns--is-stuck-y {
-      z-index: 80;
+
+    /*
+      Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.
+      Because of this, clicking on these elements once they have been "translated" via translate()
+      can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering
+      which fixes the issue.
+    */
+    > * {
+      position: relative;
+      z-index: 1;
     }
+  }
+  *.sns--is-stuck, *.sns--is-stuck th, *.sns--is-stuck td {
+    z-index: 100;
+  }
+  *.sns--is-stuck-x, *.sns--is-stuck-x th, *.sns--is-stuck-x td {
+    z-index: 90;
+  }
+  *.sns--is-stuck-y, *.sns--is-stuck-y th, *.sns--is-stuck-y td {
+    z-index: 80;
   }
 }
 

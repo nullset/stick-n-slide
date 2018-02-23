@@ -94,21 +94,21 @@ $(document).ready(function() {
     alert();
   });
 
-  $table.find('thead th:nth-child(-n+3)').each((i, th) => {
-    $(th).addClass('sns--is-stuck');
-  });
+  // $table.find('thead th:nth-child(-n+3)').each((i, th) => {
+  //   $(th).addClass('sns--is-stuck');
+  // });
   
-  $table.find('thead th:nth-child(n+4)').each((i, th) => {
-    $(th).addClass('sns--is-stuck-y');
-  });
+  // $table.find('thead th:nth-child(n+4)').each((i, th) => {
+  //   $(th).addClass('sns--is-stuck-y');
+  // });
   
-  $table.find('tbody > tr:nth-child(n+1):nth-child(-n+11) > *:nth-child(-n+3)').addClass('sns--is-stuck-x');
+  // $table.find('tbody > tr:nth-child(n+1):nth-child(-n+11) > *:nth-child(-n+3)').addClass('sns--is-stuck-x');
   
-  $table.find('tbody > tr:nth-child(12) > *:nth-child(-n+2)').addClass('sns--is-stuck-x');
-  $table.find('tbody > tr:nth-child(13) > *:nth-child(-n+1)').addClass('sns--is-stuck-x');
+  // $table.find('tbody > tr:nth-child(12) > *:nth-child(-n+2)').addClass('sns--is-stuck-x');
+  // $table.find('tbody > tr:nth-child(13) > *:nth-child(-n+1)').addClass('sns--is-stuck-x');
   
-
-  // $table.stickyTable();
+  $table.find('thead').addClass('sns--is-stuck-y');
+  
   stickNSlide($table);
 
   // setTimeout(function() {

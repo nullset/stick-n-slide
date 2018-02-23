@@ -17,7 +17,7 @@ function handleMutations(mutations, observer) {
     if (m.type === 'childList') {
       Array.prototype.slice.call(m.removedNodes).forEach((removedNode) => {
         if (removedNode.classList) {
-          if (m.target.tagName == 'TR') {
+          if (m.target.tagName === 'TR') {
             // 0) Rebuild entire table TH/TD
             Array.prototype.slice.call(m.removedNodes).forEach((removedNode, i) => {
               const addedNode = m.addedNodes[i];
@@ -313,6 +313,28 @@ function buildInnerCell(cell) {
   }
 }
 
+function processCell(cell, isIE11) {
+  if (cell.tagName !== 'TH' && cell.tagName !== 'TD') {
+    Array.from(cell.querySelectorAll('th, td')).forEach((subCell) => {
+      processCell(subCell, isIE11);
+    });
+  } else {
+    if (isIE11()) {
+      // Behavior for IE11.
+      buildInnerCell(cell);
+    } else {
+      // Everything other than IE11.
+      const cellStyles = window.getComputedStyle(cell);
+      ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+        ['Width'].forEach((property) => {
+          const borderWidth = cellStyles[`border${side}${property}`];
+          cell.style[`margin${side}`] = `-${borderWidth}`;
+        });
+      });  
+    }  
+  }
+}
+
 // Convert regular `vertical-align` CSS into flexbox friendly alternative.
 function verticalAlignment(value) {
   switch(value) {
@@ -411,21 +433,9 @@ export default function(elems, options = {}) {
         }
       });
 
+      
       stickyElems.forEach((cell) => {
-
-        if (isIE11()) {
-          // Behavior for IE11.
-          buildInnerCell(cell);
-        } else {
-          // Everything other than IE11.
-          const cellStyles = window.getComputedStyle(cell);
-          ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
-            ['Width'].forEach((property) => {
-              const borderWidth = cellStyles[`border${side}${property}`];
-              cell.style[`margin${side}`] = `-${borderWidth}`;
-            });
-          });  
-        }        
+        processCell(cell, isIE11);
       });
 
       // Variable that tracks whether "wheel" event was called.
