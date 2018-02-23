@@ -13,124 +13,125 @@ function handleMutations(mutations, observer) {
   const table = closest(mutations[0].target, 'sns');
 
   mutations.forEach((m) => {
-    // console.log(m);
-    if (m.type === 'childList') {
-      Array.prototype.slice.call(m.removedNodes).forEach((removedNode) => {
-        if (removedNode.classList) {
-          if (m.target.tagName == 'TR') {
-            // 0) Rebuild entire table TH/TD
-            Array.prototype.slice.call(m.removedNodes).forEach((removedNode, i) => {
-              const addedNode = m.addedNodes[i];
-
-              // Merge DOM attributes
-              const oldAttrs = removedNode.attributes;
-              for (let i = oldAttrs.length - 1; i >= 0; i--) {
-                const attrName = oldAttrs[i].name;
-                const attrValue = oldAttrs[i].value;
-                if (attrName === 'style') {
-                  const oldStyle = (removedNode.getAttribute('style') || '').replace(/;$/, '');
-                  addedNode.setAttribute('style', `${oldStyle}; ${addedNode.getAttribute('style')}`);
-                } else if (attrName === 'class') {
-                  Array.prototype.slice.call(removedNode.classList).forEach((className) => {
-                    addedNode.classList.add(className);
-                  });
-                } else {
-                  if (addedNode.getAttribute(attrName) === null)  {
-                    addedNode.setAttribute(attrName, attrValue);
+    if (!table.classList.contains('sns--pause-mutation')) {
+      if (m.type === 'childList') {
+        Array.prototype.slice.call(m.removedNodes).forEach((removedNode) => {
+          if (removedNode.classList) {
+            if (m.target.tagName == 'TR') {
+              // 0) Rebuild entire table TH/TD
+              Array.prototype.slice.call(m.removedNodes).forEach((removedNode, i) => {
+                const addedNode = m.addedNodes[i];
+  
+                // Merge DOM attributes
+                const oldAttrs = removedNode.attributes;
+                for (let i = oldAttrs.length - 1; i >= 0; i--) {
+                  const attrName = oldAttrs[i].name;
+                  const attrValue = oldAttrs[i].value;
+                  if (attrName === 'style') {
+                    const oldStyle = (removedNode.getAttribute('style') || '').replace(/;$/, '');
+                    addedNode.setAttribute('style', `${oldStyle}; ${addedNode.getAttribute('style')}`);
+                  } else if (attrName === 'class') {
+                    Array.prototype.slice.call(removedNode.classList).forEach((className) => {
+                      addedNode.classList.add(className);
+                    });
+                  } else {
+                    if (addedNode.getAttribute(attrName) === null)  {
+                      addedNode.setAttribute(attrName, attrValue);
+                    }
                   }
                 }
-              }
-
-              // Build up inner cell and contents
-              const innerCell = removedNode.firstChild;
-              const contents = innerCell.firstChild;
-              while (contents.firstChild) {
-                contents.removeChild(contents.firstChild);
-              }
-
-              while(addedNode.firstChild) {
-                contents.appendChild(addedNode.firstChild);
-              }
-
-              addedNode.appendChild(innerCell);
-            });
-      
-          } else if (removedNode.classList.contains('sns__cell-inner')) {
-            // 1.1 - From scratch
-            m.target.innerCellStyle = removedNode.getAttribute('style');
-          }
-        }
-      });
-      Array.prototype.slice.call(m.addedNodes).forEach((addedNode) => {
-        // 1) Rebuild placeholder-cell
-        if (m.target.classList.contains('sns__placeholder-cell')) {
-          if (m.target.innerCellStyle) {
-            // 1.1 - From scratch
-            const innerCell = document.createElement('div');
-            innerCell.setAttribute('class', 'sns__cell-inner');
-            innerCell.setAttribute('style', m.target.innerCellStyle);
-            delete m.target.innerCellStyle;
   
+                // Build up inner cell and contents
+                const innerCell = removedNode.firstChild;
+                const contents = innerCell.firstChild;
+                while (contents.firstChild) {
+                  contents.removeChild(contents.firstChild);
+                }
+  
+                while(addedNode.firstChild) {
+                  contents.appendChild(addedNode.firstChild);
+                }
+  
+                addedNode.appendChild(innerCell);
+              });
+        
+            } else if (removedNode.classList.contains('sns__cell-inner')) {
+              // 1.1 - From scratch
+              m.target.innerCellStyle = removedNode.getAttribute('style');
+            }
+          }
+        });
+        Array.prototype.slice.call(m.addedNodes).forEach((addedNode) => {
+          // 1) Rebuild placeholder-cell
+          if (m.target.classList.contains('sns__placeholder-cell')) {
+            if (m.target.innerCellStyle) {
+              // 1.1 - From scratch
+              const innerCell = document.createElement('div');
+              innerCell.setAttribute('class', 'sns__cell-inner');
+              innerCell.setAttribute('style', m.target.innerCellStyle);
+              delete m.target.innerCellStyle;
+    
+              const contents = document.createElement('div');
+              contents.classList.add('sns__cell-contents');
+              contents.appendChild(addedNode);
+              
+              innerCell.appendChild(contents);
+              m.target.appendChild(innerCell);
+            } else {
+              // 1.2 - When a direct descendent of placeholder-cell has been created
+              const innerCell = document.createElement('div');
+              innerCell.setAttribute('class', 'sns__cell-inner');
+  
+              const contents = document.createElement('div');
+              contents.classList.add('sns__cell-contents');
+  
+              while (m.target.firstChild) {
+                const child = m.target.firstChild;
+                if (child.classList && child.classList.contains('sns__cell-inner')) {
+                  innerCell.setAttribute('style', m.target.firstChild.getAttribute('style'));
+                  while (child.firstChild.firstChild) {
+                    contents.appendChild(child.firstChild.firstChild);
+                  }
+                  m.target.removeChild(child);
+                } else {
+                  contents.appendChild(child);
+                }
+              }
+  
+              innerCell.appendChild(contents);
+  
+              m.target.appendChild(innerCell);
+  
+            }
+          }
+  
+          // 2) Rebuild cell-inner
+          if (m.target.classList.contains('sns__cell-inner')) {
             const contents = document.createElement('div');
             contents.classList.add('sns__cell-contents');
-            contents.appendChild(addedNode);
-            
-            innerCell.appendChild(contents);
-            m.target.appendChild(innerCell);
-          } else {
-            // 1.2 - When a direct descendent of placeholder-cell has been created
-            const innerCell = document.createElement('div');
-            innerCell.setAttribute('class', 'sns__cell-inner');
-
-            const contents = document.createElement('div');
-            contents.classList.add('sns__cell-contents');
-
-            while (m.target.firstChild) {
-              const child = m.target.firstChild;
-              if (child.classList && child.classList.contains('sns__cell-inner')) {
-                innerCell.setAttribute('style', m.target.firstChild.getAttribute('style'));
-                while (child.firstChild.firstChild) {
-                  contents.appendChild(child.firstChild.firstChild);
+  
+            if (!Array.prototype.slice.call(m.target.children).find((node) => node.classList.contains('sns__cell-contents'))) {
+              // 2.1 - Build from scratch
+              contents.appendChild(addedNode);
+              m.target.appendChild(contents);  
+            } else {
+              // 2.2 - When a direct descendent of cell-inner has been created
+              while (m.target.firstChild) {
+                const child = m.target.firstChild;
+                if (child.classList && child.classList.contains('sns__cell-contents')) {
+                  while (child.firstChild) {
+                    contents.appendChild(child.firstChild);
+                  }
+                  m.target.removeChild(child);
+                } else {
+                  contents.appendChild(child);
                 }
-                m.target.removeChild(child);
-              } else {
-                contents.appendChild(child);
               }
+              m.target.appendChild(contents);
             }
-
-            innerCell.appendChild(contents);
-
-            m.target.appendChild(innerCell);
-
           }
-        }
-
-        // 2) Rebuild cell-inner
-        if (m.target.classList.contains('sns__cell-inner')) {
-          const contents = document.createElement('div');
-          contents.classList.add('sns__cell-contents');
-
-          if (!Array.prototype.slice.call(m.target.children).find((node) => node.classList.contains('sns__cell-contents'))) {
-            // 2.1 - Build from scratch
-            contents.appendChild(addedNode);
-            m.target.appendChild(contents);  
-          } else {
-            // 2.2 - When a direct descendent of cell-inner has been created
-            while (m.target.firstChild) {
-              const child = m.target.firstChild;
-              if (child.classList && child.classList.contains('sns__cell-contents')) {
-                while (child.firstChild) {
-                  contents.appendChild(child.firstChild);
-                }
-                m.target.removeChild(child);
-              } else {
-                contents.appendChild(child);
-              }
-            }
-            m.target.appendChild(contents);
-          }
-        }
-      });
+        });
+      }  
     }
   });
 

@@ -97,124 +97,125 @@ function handleMutations(mutations, observer) {
   var table = closest(mutations[0].target, 'sns');
 
   mutations.forEach(function (m) {
-    // console.log(m);
-    if (m.type === 'childList') {
-      Array.prototype.slice.call(m.removedNodes).forEach(function (removedNode) {
-        if (removedNode.classList) {
-          if (m.target.tagName == 'TR') {
-            // 0) Rebuild entire table TH/TD
-            Array.prototype.slice.call(m.removedNodes).forEach(function (removedNode, i) {
-              var addedNode = m.addedNodes[i];
+    if (!table.classList.contains('sns--pause-mutation')) {
+      if (m.type === 'childList') {
+        Array.prototype.slice.call(m.removedNodes).forEach(function (removedNode) {
+          if (removedNode.classList) {
+            if (m.target.tagName == 'TR') {
+              // 0) Rebuild entire table TH/TD
+              Array.prototype.slice.call(m.removedNodes).forEach(function (removedNode, i) {
+                var addedNode = m.addedNodes[i];
 
-              // Merge DOM attributes
-              var oldAttrs = removedNode.attributes;
-              for (var _i = oldAttrs.length - 1; _i >= 0; _i--) {
-                var attrName = oldAttrs[_i].name;
-                var attrValue = oldAttrs[_i].value;
-                if (attrName === 'style') {
-                  var oldStyle = (removedNode.getAttribute('style') || '').replace(/;$/, '');
-                  addedNode.setAttribute('style', oldStyle + '; ' + addedNode.getAttribute('style'));
-                } else if (attrName === 'class') {
-                  Array.prototype.slice.call(removedNode.classList).forEach(function (className) {
-                    addedNode.classList.add(className);
-                  });
-                } else {
-                  if (addedNode.getAttribute(attrName) === null) {
-                    addedNode.setAttribute(attrName, attrValue);
+                // Merge DOM attributes
+                var oldAttrs = removedNode.attributes;
+                for (var _i = oldAttrs.length - 1; _i >= 0; _i--) {
+                  var attrName = oldAttrs[_i].name;
+                  var attrValue = oldAttrs[_i].value;
+                  if (attrName === 'style') {
+                    var oldStyle = (removedNode.getAttribute('style') || '').replace(/;$/, '');
+                    addedNode.setAttribute('style', oldStyle + '; ' + addedNode.getAttribute('style'));
+                  } else if (attrName === 'class') {
+                    Array.prototype.slice.call(removedNode.classList).forEach(function (className) {
+                      addedNode.classList.add(className);
+                    });
+                  } else {
+                    if (addedNode.getAttribute(attrName) === null) {
+                      addedNode.setAttribute(attrName, attrValue);
+                    }
                   }
                 }
-              }
 
-              // Build up inner cell and contents
-              var innerCell = removedNode.firstChild;
-              var contents = innerCell.firstChild;
-              while (contents.firstChild) {
-                contents.removeChild(contents.firstChild);
-              }
-
-              while (addedNode.firstChild) {
-                contents.appendChild(addedNode.firstChild);
-              }
-
-              addedNode.appendChild(innerCell);
-            });
-          } else if (removedNode.classList.contains('sns__cell-inner')) {
-            // 1.1 - From scratch
-            m.target.innerCellStyle = removedNode.getAttribute('style');
-          }
-        }
-      });
-      Array.prototype.slice.call(m.addedNodes).forEach(function (addedNode) {
-        // 1) Rebuild placeholder-cell
-        if (m.target.classList.contains('sns__placeholder-cell')) {
-          if (m.target.innerCellStyle) {
-            // 1.1 - From scratch
-            var innerCell = document.createElement('div');
-            innerCell.setAttribute('class', 'sns__cell-inner');
-            innerCell.setAttribute('style', m.target.innerCellStyle);
-            delete m.target.innerCellStyle;
-
-            var contents = document.createElement('div');
-            contents.classList.add('sns__cell-contents');
-            contents.appendChild(addedNode);
-
-            innerCell.appendChild(contents);
-            m.target.appendChild(innerCell);
-          } else {
-            // 1.2 - When a direct descendent of placeholder-cell has been created
-            var _innerCell = document.createElement('div');
-            _innerCell.setAttribute('class', 'sns__cell-inner');
-
-            var _contents = document.createElement('div');
-            _contents.classList.add('sns__cell-contents');
-
-            while (m.target.firstChild) {
-              var child = m.target.firstChild;
-              if (child.classList && child.classList.contains('sns__cell-inner')) {
-                _innerCell.setAttribute('style', m.target.firstChild.getAttribute('style'));
-                while (child.firstChild.firstChild) {
-                  _contents.appendChild(child.firstChild.firstChild);
+                // Build up inner cell and contents
+                var innerCell = removedNode.firstChild;
+                var contents = innerCell.firstChild;
+                while (contents.firstChild) {
+                  contents.removeChild(contents.firstChild);
                 }
-                m.target.removeChild(child);
-              } else {
-                _contents.appendChild(child);
-              }
-            }
 
-            _innerCell.appendChild(_contents);
-
-            m.target.appendChild(_innerCell);
-          }
-        }
-
-        // 2) Rebuild cell-inner
-        if (m.target.classList.contains('sns__cell-inner')) {
-          var _contents2 = document.createElement('div');
-          _contents2.classList.add('sns__cell-contents');
-
-          if (!Array.prototype.slice.call(m.target.children).find(function (node) {
-            return node.classList.contains('sns__cell-contents');
-          })) {
-            // 2.1 - Build from scratch
-            _contents2.appendChild(addedNode);
-            m.target.appendChild(_contents2);
-          } else {
-            // 2.2 - When a direct descendent of cell-inner has been created
-            while (m.target.firstChild) {
-              var _child = m.target.firstChild;
-              if (_child.classList && _child.classList.contains('sns__cell-contents')) {
-                while (_child.firstChild) {
-                  _contents2.appendChild(_child.firstChild);
+                while (addedNode.firstChild) {
+                  contents.appendChild(addedNode.firstChild);
                 }
-                m.target.removeChild(_child);
-              } else {
-                _contents2.appendChild(_child);
-              }
+
+                addedNode.appendChild(innerCell);
+              });
+            } else if (removedNode.classList.contains('sns__cell-inner')) {
+              // 1.1 - From scratch
+              m.target.innerCellStyle = removedNode.getAttribute('style');
             }
-            m.target.appendChild(_contents2);
           }
-        }
-      });
+        });
+        Array.prototype.slice.call(m.addedNodes).forEach(function (addedNode) {
+          // 1) Rebuild placeholder-cell
+          if (m.target.classList.contains('sns__placeholder-cell')) {
+            if (m.target.innerCellStyle) {
+              // 1.1 - From scratch
+              var innerCell = document.createElement('div');
+              innerCell.setAttribute('class', 'sns__cell-inner');
+              innerCell.setAttribute('style', m.target.innerCellStyle);
+              delete m.target.innerCellStyle;
+
+              var contents = document.createElement('div');
+              contents.classList.add('sns__cell-contents');
+              contents.appendChild(addedNode);
+
+              innerCell.appendChild(contents);
+              m.target.appendChild(innerCell);
+            } else {
+              // 1.2 - When a direct descendent of placeholder-cell has been created
+              var _innerCell = document.createElement('div');
+              _innerCell.setAttribute('class', 'sns__cell-inner');
+
+              var _contents = document.createElement('div');
+              _contents.classList.add('sns__cell-contents');
+
+              while (m.target.firstChild) {
+                var child = m.target.firstChild;
+                if (child.classList && child.classList.contains('sns__cell-inner')) {
+                  _innerCell.setAttribute('style', m.target.firstChild.getAttribute('style'));
+                  while (child.firstChild.firstChild) {
+                    _contents.appendChild(child.firstChild.firstChild);
+                  }
+                  m.target.removeChild(child);
+                } else {
+                  _contents.appendChild(child);
+                }
+              }
+
+              _innerCell.appendChild(_contents);
+
+              m.target.appendChild(_innerCell);
+            }
+          }
+
+          // 2) Rebuild cell-inner
+          if (m.target.classList.contains('sns__cell-inner')) {
+            var _contents2 = document.createElement('div');
+            _contents2.classList.add('sns__cell-contents');
+
+            if (!Array.prototype.slice.call(m.target.children).find(function (node) {
+              return node.classList.contains('sns__cell-contents');
+            })) {
+              // 2.1 - Build from scratch
+              _contents2.appendChild(addedNode);
+              m.target.appendChild(_contents2);
+            } else {
+              // 2.2 - When a direct descendent of cell-inner has been created
+              while (m.target.firstChild) {
+                var _child = m.target.firstChild;
+                if (_child.classList && _child.classList.contains('sns__cell-contents')) {
+                  while (_child.firstChild) {
+                    _contents2.appendChild(_child.firstChild);
+                  }
+                  m.target.removeChild(_child);
+                } else {
+                  _contents2.appendChild(_child);
+                }
+              }
+              m.target.appendChild(_contents2);
+            }
+          }
+        });
+      }
     }
   });
 
