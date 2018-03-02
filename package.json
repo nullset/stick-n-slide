@@ -38,6 +38,7 @@
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0"
+    "babel-polyfill": "^6.26.0",
+    "normalize-wheel": "^1.0.1"
   }
 }

@@ -1,3 +1,4 @@
+import normalizeWheel from 'normalize-wheel';
 import './stick-n-slide.scss';
 
 const observeConfig = {
@@ -171,11 +172,11 @@ function altSide(side) {
   }
 }
 
-function wheelHandler({ table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback }) {
+function wheelHandler({ table, wrapper, stickyElems, pixelX, pixelY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback }) {
   const maxWidth = scrollWidth - clientWidth;
   const maxHeight = scrollHeight - clientHeight;
-  let newX = scrollLeft + deltaX;
-  let newY = scrollTop + deltaY;
+  let newX = scrollLeft + pixelX;
+  let newY = scrollTop + pixelY;
   if (newX >= maxWidth) {
     newX = maxWidth;
   }
@@ -369,21 +370,22 @@ export default function(elems, options = {}) {
       const wrapper = table.parentElement;
 
       wrapper.addEventListener('wheel', (event) => {
+        const normalized = normalizeWheel(event);
         wheelEventTriggered = true;
-        const { deltaX, deltaY } = event;
+        const { pixelX, pixelY } = normalized;
         const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
         const { width, height } = wrapper.getBoundingClientRect();
 
-        const handleWheel = wheelHandler.bind(null, { table, wrapper, stickyElems, deltaX, deltaY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback });
+        const handleWheel = wheelHandler.bind(null, { table, wrapper, stickyElems, pixelX, pixelY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback });
 
         if (isIE || isIEedge) {
           event.preventDefault();
           event.stopPropagation();
           handleWheel();
         } else if ( 
-          ((scrollTop === 0 && deltaY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
+          ((scrollTop === 0 && pixelY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
           ||
-          ((scrollLeft === 0 && deltaX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
+          ((scrollLeft === 0 && pixelX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
         ) {
           event.preventDefault();
           handleWheel();
