@@ -172,7 +172,7 @@ function altSide(side) {
   }
 }
 
-function wheelHandler({ table, wrapper, stickyElems, pixelX, pixelY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback }) {
+function wheelHandler({ table, wrapper, stickyElems, pixelX, pixelY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback, isIE11 }) {
   const maxWidth = scrollWidth - clientWidth;
   const maxHeight = scrollHeight - clientHeight;
   let newX = scrollLeft + pixelX;
@@ -189,9 +189,22 @@ function wheelHandler({ table, wrapper, stickyElems, pixelX, pixelY, scrollLeft,
   if (newY <= 0) {
     newY = 0;
   }
-  positionStickyElements(table, stickyElems, showShadow, newX, newY);
-  wrapper.scrollLeft = newX;
-  wrapper.scrollTop = newY;
+  newX = Math.round(newX);
+  newY = Math.round(newY);
+
+  if (isIE11) {
+    positionStickyElements(table, stickyElems, showShadow, newX, newY);
+    wrapper.scrollLeft = newX;
+    wrapper.scrollTop = newY;
+  } else {
+    wrapper.scrollLeft = newX;
+    wrapper.scrollTop = newY;
+
+    // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but 
+    // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
+    // and then use that same scroll value as the left/top offset for the stuck elements.
+    positionStickyElements(table, stickyElems, showShadow, wrapper.scrollLeft, wrapper.scrollTop);
+  }
   if (callback) {
     callback(newX, newY);
   }
@@ -376,19 +389,21 @@ export default function(elems, options = {}) {
         const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
         const { width, height } = wrapper.getBoundingClientRect();
 
-        const handleWheel = wheelHandler.bind(null, { table, wrapper, stickyElems, pixelX, pixelY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback });
+        const opts = {
+          table, wrapper, stickyElems, pixelX, pixelY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback, isIE11: isIE11(),
+        }
 
         if (isIE || isIEedge) {
           event.preventDefault();
           event.stopPropagation();
-          handleWheel();
+          wheelHandler(opts);
         } else if ( 
           ((scrollTop === 0 && pixelY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
           ||
           ((scrollLeft === 0 && pixelX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
         ) {
           event.preventDefault();
-          handleWheel();
+          wheelHandler(opts);
         }
       }, {capture: true});
 
@@ -437,7 +452,7 @@ export default function(elems, options = {}) {
 
       // Set initial position of elements to 0.
       requestAnimationFrame(() => {
-        positionStickyElements(table, stickyElems, showShadow);
+        positionStickyElements(table, stickyElems, showShadow, isIE11);
         if (isIE11()) {
           setInnerCellHeights(table);
         }

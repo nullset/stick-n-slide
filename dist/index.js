@@ -271,7 +271,8 @@ function wheelHandler(_ref) {
       clientWidth = _ref.clientWidth,
       clientHeight = _ref.clientHeight,
       showShadow = _ref.showShadow,
-      callback = _ref.callback;
+      callback = _ref.callback,
+      isIE11 = _ref.isIE11;
 
   var maxWidth = scrollWidth - clientWidth;
   var maxHeight = scrollHeight - clientHeight;
@@ -289,9 +290,22 @@ function wheelHandler(_ref) {
   if (newY <= 0) {
     newY = 0;
   }
-  positionStickyElements(table, stickyElems, showShadow, newX, newY);
-  wrapper.scrollLeft = newX;
-  wrapper.scrollTop = newY;
+  newX = Math.round(newX);
+  newY = Math.round(newY);
+
+  if (isIE11) {
+    positionStickyElements(table, stickyElems, showShadow, newX, newY);
+    wrapper.scrollLeft = newX;
+    wrapper.scrollTop = newY;
+  } else {
+    wrapper.scrollLeft = newX;
+    wrapper.scrollTop = newY;
+
+    // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but 
+    // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
+    // and then use that same scroll value as the left/top offset for the stuck elements.
+    positionStickyElements(table, stickyElems, showShadow, wrapper.scrollLeft, wrapper.scrollTop);
+  }
   if (callback) {
     callback(newX, newY);
   }
@@ -484,15 +498,17 @@ function setInnerCellHeights(table) {
             width = _wrapper$getBoundingC.width,
             height = _wrapper$getBoundingC.height;
 
-        var handleWheel = wheelHandler.bind(null, { table: table, wrapper: wrapper, stickyElems: stickyElems, pixelX: pixelX, pixelY: pixelY, scrollLeft: scrollLeft, scrollTop: scrollTop, scrollWidth: scrollWidth, scrollHeight: scrollHeight, clientWidth: clientWidth, clientHeight: clientHeight, showShadow: showShadow, callback: callback });
+        var opts = {
+          table: table, wrapper: wrapper, stickyElems: stickyElems, pixelX: pixelX, pixelY: pixelY, scrollLeft: scrollLeft, scrollTop: scrollTop, scrollWidth: scrollWidth, scrollHeight: scrollHeight, clientWidth: clientWidth, clientHeight: clientHeight, showShadow: showShadow, callback: callback, isIE11: isIE11()
+        };
 
         if (isIE || isIEedge) {
           event.preventDefault();
           event.stopPropagation();
-          handleWheel();
+          wheelHandler(opts);
         } else if (scrollTop === 0 && pixelY > 0 || scrollTop > 0 && scrollHeight - scrollTop - height > 0 || scrollLeft === 0 && pixelX > 0 || scrollLeft > 0 && scrollWidth - scrollLeft - width > 0) {
           event.preventDefault();
-          handleWheel();
+          wheelHandler(opts);
         }
       }, { capture: true });
 
@@ -541,7 +557,7 @@ function setInnerCellHeights(table) {
 
       // Set initial position of elements to 0.
       requestAnimationFrame(function () {
-        positionStickyElements(table, stickyElems, showShadow);
+        positionStickyElements(table, stickyElems, showShadow, isIE11);
         if (isIE11()) {
           setInnerCellHeights(table);
         }
