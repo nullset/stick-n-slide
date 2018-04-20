@@ -189,8 +189,6 @@ function wheelHandler({ table, wrapper, stickyElems, pixelX, pixelY, scrollLeft,
   if (newY <= 0) {
     newY = 0;
   }
-  newX = Math.round(newX);
-  newY = Math.round(newY);
 
   if (isIE11) {
     positionStickyElements(table, stickyElems, showShadow, newX, newY);
@@ -387,7 +385,6 @@ export default function(elems, options = {}) {
         wheelEventTriggered = true;
         const { pixelX, pixelY } = normalized;
         const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = wrapper;
-        const { width, height } = wrapper.getBoundingClientRect();
 
         const opts = {
           table, wrapper, stickyElems, pixelX, pixelY, scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight, showShadow, callback, isIE11: isIE11(),
@@ -397,13 +394,9 @@ export default function(elems, options = {}) {
           event.preventDefault();
           event.stopPropagation();
           wheelHandler(opts);
-        } else if ( 
-          ((scrollTop === 0 && pixelY > 0) || (scrollTop > 0 && scrollHeight - scrollTop - height > 0))
-          ||
-          ((scrollLeft === 0 && pixelX > 0) || (scrollLeft > 0 && scrollWidth - scrollLeft - width > 0))
-        ) {
+        } else {
           event.preventDefault();
-          wheelHandler(opts);
+          wheelHandler(opts);  
         }
       }, {capture: true});
 
