@@ -350,7 +350,7 @@ function handleMutations(mutations, observer) {
               while (m.target.firstChild) {
                 var _child = m.target.firstChild;
                 if (_child.classList && _child.classList.contains('sns__cell-contents')) {
-                  while (_child.firstChild) {
+                  while (_child && _child.firstChild) {
                     _contents2.appendChild(_child.firstChild);
                   }
                   m.target.removeChild(_child);
