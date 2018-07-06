@@ -1,12 +1,16 @@
 {
   "name": "stick-n-slide",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "homepage": "http://brandalism.com/stick-n-slide",
   "description": "A javascript library that makes table cells stick to the x or y axis (or both) when the table is scrolled.",
-  "keywords": ["javascript", "table", "sticky headers"],
+  "keywords": [
+    "javascript",
+    "table",
+    "sticky headers"
+  ],
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com:nullset/stick-n-slide.git"
+    "type": "git",
+    "url": "https://github.com:nullset/stick-n-slide.git"
   },
   "bugs": {
     "url": "https://github.com/nullset/stick-n-slide/issues"
