@@ -408,7 +408,7 @@ function buildInnerCell(cell) {
       ['Top', 'Right', 'Bottom', 'Left'].forEach(function (side) {
         if (property === 'border') {
           var borderWidth = cellStyles['border' + side + 'Width'];
-          innerCell.style['margin' + altSide(side)] = 'calc(-1 * (' + borderWidth + ' / 2))';
+          innerCell.style['margin' + altSide(side)] = 'calc(-1 * ' + borderWidth + ')';
 
           ['Width', 'Color', 'Style'].forEach(function (attr) {
             var value = cellStyles['' + property + side + attr];
@@ -442,7 +442,7 @@ function verticalAlignment(value) {
 }
 
 function setInnerCellHeights(table) {
-  var stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
+  var stickyElems = Array.prototype.slice.call(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
   stickyElems.forEach(function (cell) {
     cell.style.height = '';
   });
@@ -517,7 +517,7 @@ function setInnerCellHeights(table) {
 
       // --------------------      
 
-      var stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
+      var stickyElems = Array.prototype.slice.call(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
 
       wrapper.style.position = 'relative';
       table.classList.add('sns');
@@ -540,6 +540,10 @@ function setInnerCellHeights(table) {
           ['Top', 'Right', 'Bottom', 'Left'].forEach(function (side) {
             ['Width'].forEach(function (property) {
               var borderWidth = cellStyles['border' + side + property];
+              if (isFirefox) {
+                var value = borderWidth.match(/(\d\.?\d?)([a-z%]+)/);
+                borderWidth = '' + Math.round(value[1]) + value[2];
+              }
               cell.style['margin' + side] = '-' + borderWidth;
             });
           });

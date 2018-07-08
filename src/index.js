@@ -308,13 +308,13 @@ function buildInnerCell(cell) {
       ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
         if (property === 'border') {
           const borderWidth = cellStyles[`border${side}Width`];
-          innerCell.style[`margin${altSide(side)}`] = `calc(-1 * (${borderWidth} / 2))`;
-  
+          innerCell.style[`margin${altSide(side)}`] = `calc(-1 * ${borderWidth})`;
+
           ['Width', 'Color', 'Style'].forEach((attr) => {
             const value = cellStyles[`${property}${side}${attr}`];
             innerCell.style[`${property}${side}${attr}`] = value;
           });
-          
+
         } else {
           innerCell.style[`${property}${side}`] = cellStyles[`${property}${side}`];
         }
@@ -343,7 +343,7 @@ function verticalAlignment(value) {
 }
 
 function setInnerCellHeights(table) {
-  const stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
+  const stickyElems = Array.prototype.slice.call(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
   stickyElems.forEach((cell) => {
     cell.style.height = '';
   });
@@ -410,7 +410,7 @@ export default function(elems, options = {}) {
       
       // --------------------      
 
-      const stickyElems = Array.from(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
+      const stickyElems = Array.prototype.slice.call(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
 
       wrapper.style.position = 'relative';
       table.classList.add('sns');
@@ -432,11 +432,15 @@ export default function(elems, options = {}) {
           const cellStyles = window.getComputedStyle(cell);
           ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
             ['Width'].forEach((property) => {
-              const borderWidth = cellStyles[`border${side}${property}`];
+              let borderWidth = cellStyles[`border${side}${property}`];
+              if (isFirefox) {
+                const value = borderWidth.match(/(\d\.?\d?)([a-z%]+)/);
+                borderWidth = `${Math.round(value[1])}${value[2]}`;
+              }
               cell.style[`margin${side}`] = `-${borderWidth}`;
             });
-          });  
-        }        
+          });
+        }
       });
 
       // Variable that tracks whether "wheel" event was called.
