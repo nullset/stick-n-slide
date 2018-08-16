@@ -31,10 +31,10 @@ table.sns {
       */ }
     table.sns thead *[class*="sns--is-stuck"]:empty:after, table.sns tbody *[class*="sns--is-stuck"]:empty:after {
       content: "\200B"; }
-    table.sns thead *[class*="sns--is-stuck"]:not(.sns__placeholder-cell) b, table.sns thead *[class*="sns--is-stuck"] .sns__cell-contents b, table.sns tbody *[class*="sns--is-stuck"]:not(.sns__placeholder-cell) b, table.sns tbody *[class*="sns--is-stuck"] .sns__cell-contents b {
+    table.sns thead *[class*="sns--is-stuck"]:not(.sns__placeholder-cell) b, table.sns tbody *[class*="sns--is-stuck"]:not(.sns__placeholder-cell) b {
       position: relative;
       z-index: 1; }
-    table.sns thead *[class*="sns--is-stuck"]:not(.sns__placeholder-cell):before, table.sns thead *[class*="sns--is-stuck"] .sns__cell-contents:before, table.sns tbody *[class*="sns--is-stuck"]:not(.sns__placeholder-cell):before, table.sns tbody *[class*="sns--is-stuck"] .sns__cell-contents:before {
+    table.sns thead *[class*="sns--is-stuck"]:not(.sns__placeholder-cell):before, table.sns tbody *[class*="sns--is-stuck"]:not(.sns__placeholder-cell):before {
       content: "";
       position: absolute;
       border: inherit;
