@@ -685,7 +685,7 @@ function setInnerCellHeights(table) {
             ['Width'].forEach(function (property) {
               var borderWidth = cellStyles['border' + side + property];
               if (isFirefox) {
-                var value = borderWidth.match(/(\d\.?\d?)([a-z%]+)/);
+                var value = borderWidth.match(/(\d\.?\d+)([a-z%]+)/);
                 borderWidth = '' + Math.round(value[1]) + value[2];
               }
               cell.style['margin' + side] = '-' + borderWidth;
