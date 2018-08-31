@@ -87,7 +87,7 @@ table {
   table thead th {
     background: #6698f5;
     padding: 30px;
-    border: 1px solid #4f74b9;
+    border: 0.5px solid #4f74b9;
     -webkit-transform-origin: 0 0;
     transform-origin: 0 0; }
   table tbody tr:nth-child(2n+1) th, table tbody tr:nth-child(2n+1) td {
@@ -96,7 +96,7 @@ table {
     background: #efefef; }
   table tbody th, table tbody td {
     padding: 50px 30px;
-    border: 1px solid lightgray; }
+    border: 0.5px solid lightgray; }
   table .sns--is-stuck-x {
     background: #e5eeff !important; }
 

@@ -430,16 +430,68 @@ export default function(elems, options = {}) {
         } else {
           // Everything other than IE11.
           const cellStyles = window.getComputedStyle(cell);
-          ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+          if (!isFirefox) {
             ['Width'].forEach((property) => {
-              let borderWidth = cellStyles[`border${side}${property}`];
-              if (isFirefox) {
-                const value = borderWidth.match(/(\d\.?\d+)([a-z%]+)/);
-                borderWidth = `${Math.round(value[1])}${value[2]}`;
-              }
-              cell.style[`margin${side}`] = `-${borderWidth}`;
+              ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => {
+                let borderWidth = cellStyles[`border${side}${property}`];
+                const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+                cell.style[`margin${side}`] = `-${Math.round(value[1])}${value[2]}`;
+              });
             });
-          });
+          } else {
+            // ['Width'].forEach((property) => {
+            //   [['Top', 'Bottom'], ['Right', 'Left']].forEach((pair) => {
+            //     const pairValues = pair.reduce((acc, side) => {
+            //       let borderWidth = cellStyles[`border${side}${property}`];
+            //       const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+            //       acc.push([value[1], value[2]]);
+            //       return acc;
+            //     }, []);
+            //     if (pairValues[0][1] === pairValues[1][1] && (pairValues[0][0] === 0 || pairValues[1][0] === 0)) {
+            //       const greatestValue = [pairValues[0][0], pairValues[1][0]].sort().pop();
+            //       pair.forEach((side) => {
+            //         cell.style.margin = `${greatestValue}${pairValues[0][1]}`;
+            //       })
+            //     }
+            //   });
+            // });
+
+
+            ['Width'].forEach((property) => {
+              let greatest = 0;
+              let unit;
+              ['Top', 'Bottom', 'Right', 'Left'].forEach((side) => {
+                let borderWidth = cellStyles[`border${side}${property}`];
+                const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+                // arr.push(value[1]);
+                if (value[1] > greatest) {
+                  greatest = value[1];
+                  unit = value[2];
+                }
+                // let num = value[1];
+                // const unit = value[2];
+                // // Because *of course* Firefox has to use subtely different rendering styles for
+                // // borders whose width is greater than 1px.
+                // if (unit === 'px') {
+                //   num = num < 1 ? Math.round(num) : Math.round(num) * 2;
+                // }
+                // borderWidth = `${num}${value[2]}`;
+                // cell.style[`margin${side}`] = `-${borderWidth}`;
+                // cell.style[`margin${side}`] = `-.5${value[2]} -.25${value[2]}`;
+                // cell.style[`margin`] = `-.5${value[2]} -.25${value[2]}`;
+              });
+              cell.style.margin = `-${greatest}${unit}`;
+              // debugger
+              // if (cell.classList.contains('sns--is-stuck-y')) {
+              //   cell.style.margin = `-0.25px -0.5px`;
+              // } else if (cell.classList.contains('sns--is-stuck-x')) {
+              //   cell.style.margin = `-0.5px -0.5px`;
+              // } else {
+              //   cell.style.margin = `-0.5px`;
+              // }
+            });
+
+          }
         }
       });
 
