@@ -434,7 +434,7 @@ export default function(elems, options = {}) {
             ['Width'].forEach((property) => {
               let borderWidth = cellStyles[`border${side}${property}`];
               if (isFirefox) {
-                const value = borderWidth.match(/(\d\.?\d+)([a-z%]+)/);
+                const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
                 borderWidth = `${Math.round(value[1])}${value[2]}`;
               }
               cell.style[`margin${side}`] = `-${borderWidth}`;
