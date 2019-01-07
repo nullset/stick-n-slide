@@ -412,7 +412,9 @@ export default function(elems, options = {}) {
 
       const stickyElems = Array.prototype.slice.call(table.querySelectorAll('.sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x'));
 
-      wrapper.style.position = 'relative';
+      if (getComputedStyle(wrapper).position === 'static') {
+        wrapper.style.position = 'relative';
+      }
       table.classList.add('sns');
       table.style.position = 'relative';
 
