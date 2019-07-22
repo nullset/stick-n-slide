@@ -418,5 +418,7 @@
       <li>Having stuck cells with border widths of more than 1px would produce inconsistent results</li>
     </ul>
 
+    <h3>CSS declaration "overflow: hidden" on cells</h3>
+    <p>Stick-n-Slide works its magic by using negative margins on table cells. This allows simple and automatic passing of relevant cell styles to cell :before elements (making JS unnecessary for basic table styles). Unfortunately this also makes it impossible to add "overflow: hidden" to a cell. If you need "overflow: hidden" you'll need to wrap the cell contents in a <code>&lt;div&gt;</code> and add overflow to <b>that</b> element.</p>
   <script type="text/javascript" src="polyfill.js"></script><script type="text/javascript" src="demo.js"></script><script type="text/javascript" src="index.js"></script></body>
 </html>
