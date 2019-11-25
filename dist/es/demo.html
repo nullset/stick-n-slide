@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-    <title>Webpack demo</title>
-    <style>
-    </style>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Stick-n-Slide Demo</title>
+    <style></style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
-  <link href="demo.css" rel="stylesheet"><link href="index.css" rel="stylesheet"></head>
+    <script src="demo.js"></script>
+  </head>
   <body>
     <h1>Stick-n-Slide</h1>
     <p>Because sometimes you want to stick, and sometimes you want to slide</p>
-    <video id="slipnslide" src="../assets/video.mp4" controls height="200"></video>
+    <!-- <video id="slipnslide" src="../assets/video.mp4" controls height="200"></video>
     <script>
       document.getElementById('slipnslide').playbackRate = 5;
-    </script>
+    </script> -->
 
     <div class="wrapper">
       <table>
@@ -28,7 +28,12 @@
             <th>7</th>
             <th>8</th>
             <th>9</th>
-            <th><div>1</div><div>1</div><div>1</div>10</th>
+            <th>
+              <div>1</div>
+              <div>1</div>
+              <div>1</div>
+              10
+            </th>
             <th>11</th>
             <th>12</th>
             <th>13</th>
@@ -65,14 +70,25 @@
         </thead>
         <tbody>
           <tr>
-            <th><div>xxx</div><span>a</span><b>1</b><span>z</span></th>
+            <th>
+              <div>xxx</div>
+              <span>a</span><b>1</b><span>z</span>
+            </th>
             <th><b>2</b></th>
             <td><b>3</b></td>
             <td><b>4</b></td>
             <td><b>5</b></td>
             <td>6</td>
             <td>7</td>
-            <td><div>1</div><div>2</div><div>3</div>8<div>1</div><div>2</div><div>3</div></td>
+            <td>
+              <div>1</div>
+              <div>2</div>
+              <div>3</div>
+              8
+              <div>1</div>
+              <div>2</div>
+              <div>3</div>
+            </td>
             <td>9</td>
             <td>10</td>
             <td>11</td>
@@ -388,13 +404,24 @@
     <h2>How to use</h2>
     <ol>
       <li>Make a table</li>
-      <li>Ensure that the the table cells have backgrounds, borders defined directly on them</li>
-      <li>Wrap the table in some containing element like a &lt;div&gt;, and make sure the &lt;div&gt; has <code>height/width</code> and <code>overflow</code> specified correctly so the table can be scrolled if it is too large for its container</li>
+      <li>
+        Ensure that the the table cells have backgrounds, borders defined
+        directly on them
+      </li>
+      <li>
+        Wrap the table in some containing element like a &lt;div&gt;, and make
+        sure the &lt;div&gt; has <code>height/width</code> and
+        <code>overflow</code> specified correctly so the table can be scrolled
+        if it is too large for its container
+      </li>
       <li>
         Add classes to the cells that you want to stick in place
         <dl>
           <dt><code>.sns-stuck</code></dt>
-          <dd>Ensures the cell does not move at all when scrolled, in either vertical or horizontal directions</dd>
+          <dd>
+            Ensures the cell does not move at all when scrolled, in either
+            vertical or horizontal directions
+          </dd>
           <dt><code>.sns-stuck-x</code></dt>
           <dd>Cell can be scrolled vertically, but not horizontally</dd>
           <dt><code>.sns-stuck-y</code></dt>
@@ -403,7 +430,10 @@
       </li>
       <li>Get a reference to your table(s), either via native JS or jQuery</li>
       <li>
-        <p>Call <code>stickNSlide(table, {options})</code> or <code>stickNSlide(tables, {options})</code></p>
+        <p>
+          Call <code>stickNSlide(table, {options})</code> or
+          <code>stickNSlide(tables, {options})</code>
+        </p>
         <p>Options may include:</p>
         <dl>
           <dt><code>showShadow</code> - Boolean</dt>
@@ -415,10 +445,21 @@
     <h2>Known limitations</h2>
     <h3>Firefox pre-57.0 (pre-Quantum) versions</h3>
     <ul>
-      <li>Having stuck cells with border widths of more than 1px would produce inconsistent results</li>
+      <li>
+        Having stuck cells with border widths of more than 1px would produce
+        inconsistent results
+      </li>
     </ul>
 
     <h3>CSS declaration "overflow: hidden" on cells</h3>
-    <p>Stick-n-Slide works its magic by using negative margins on table cells. This allows simple and automatic passing of relevant cell styles to cell :before elements (making JS unnecessary for basic table styles). Unfortunately this also makes it impossible to add "overflow: hidden" to a cell. If you need "overflow: hidden" you'll need to wrap the cell contents in a <code>&lt;div&gt;</code> and add overflow to <b>that</b> element.</p>
-  <script type="text/javascript" src="polyfill.js"></script><script type="text/javascript" src="demo.js"></script><script type="text/javascript" src="index.js"></script></body>
+    <p>
+      Stick-n-Slide works its magic by using negative margins on table cells.
+      This allows simple and automatic passing of relevant cell styles to cell
+      :before elements (making JS unnecessary for basic table styles).
+      Unfortunately this also makes it impossible to add "overflow: hidden" to a
+      cell. If you need "overflow: hidden" you'll need to wrap the cell contents
+      in a <code>&lt;div&gt;</code> and add overflow to <b>that</b> element.
+    </p>
+  <script  src="stick-n-slide.js"></script>
+</body>
 </html>

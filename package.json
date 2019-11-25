@@ -27,8 +27,25 @@
   "license": "MIT",
   "scripts": {
     "start": "",
-    "build": "webpack --env production"
+    "build": "rollup -c --environment INCLUDE_DEPS,NODE_ENV:production",
+    "build:dev": "rollup -c -w --environment INCLUDE_DEPS,NODE_ENV:development"
   },
-  "devDependencies": {},
-  "dependencies": {}
+  "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "autoprefixer": "^9.7.2",
+    "rollup": "^1.27.5",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-generate-html-template": "^1.6.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-terser": "^5.1.2"
+  },
+  "dependencies": {
+    "normalize-wheel": "^1.0.1"
+  },
+  "peerDependencies": {}
 }
