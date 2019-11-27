@@ -560,4 +560,4 @@ function index (elems, options = {}) {
 }
 
 export default index;
-//# sourceMappingURL=stick-n-slide.js.map
+//# sourceMappingURL=stick-n-slide.esm.js.map

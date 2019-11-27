@@ -1,8 +1,7 @@
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+(function (factory) {
   typeof define === 'function' && define.amd ? define(factory) :
-  (global = global || self, global['stick-n-slide'] = factory());
-}(this, (function () { 'use strict';
+  factory();
+}((function () { 'use strict';
 
   /**
    * Copyright 2004-present Facebook. All Rights Reserved.
@@ -954,7 +953,7 @@
     });
   }
 
-  function index (elems, options = {}) {
+  function stickNSlide (elems, options = {}) {
     const {
       showShadow,
       callback
@@ -1100,7 +1099,107 @@
     });
   }
 
-  return index;
+  var css$1 = ".wrapper {\n  display: inline-block;\n  overflow: auto;\n  max-width: 100%;\n  max-height: 500px;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n  border: 1px solid red;\n}\n\ntable {\n  border-collapse: collapse;\n  max-height: 400px;\n  max-width: 100%;\n}\ntable thead tr {\n  background: yellow;\n}\ntable thead th {\n  background: #6698f5;\n  padding: 30px;\n  border: 1px solid #4f74b9;\n  -webkit-transform-origin: 0 0;\n          transform-origin: 0 0;\n}\ntable tbody tr:nth-child(2n+1) th, table tbody tr:nth-child(2n+1) td {\n  background: #fff;\n}\ntable tbody tr:nth-child(2n) th, table tbody tr:nth-child(2n) td {\n  background: #efefef;\n}\ntable tbody th, table tbody td {\n  padding: 50px 30px;\n  border: 1px solid lightgray;\n}\ntable .sns--is-stuck-x {\n  background: #e5eeff !important;\n}\n\nbutton[data-active=true] {\n  background: lime;\n}\n\ncode {\n  background: #ddd;\n}";
+  styleInject(css$1);
+
+  function randomColor() {
+    return "#" + (Math.random() * 0xffffff << 0).toString(16);
+  }
+
+  function backgroundColor(event) {
+    event.target.style.backgroundColor = randomColor();
+  }
+
+  function borderColor(event) {
+    event.target.style.borderColor = randomColor();
+  } // function borderWidth(event) {
+  //   event.target.style.borderWidth = randomNumber() + 'px';
+  // }
+  // document.getElementById('borderWidth').addEventListener('click', (event)=> {
+  //   event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+  //   if (event.currentTarget.dataset.active) {
+  //     document.querySelector('table').addEventListener('click', borderWidth);
+  //   } else {
+  //     document.querySelector('table').removeEventListener('click', borderWidth);
+  //   }
+  // });
+
+
+  function mergeCellRow(event) {
+    if (event.target.tagName === "TD" || event.target.tagName === "TH") {
+      if (event.target.nextElementSibling) {
+        event.target.colSpan = event.target.colSpan + event.target.nextElementSibling.colSpan;
+        event.target.nextElementSibling.remove();
+      }
+    }
+  }
+
+  function changeContent(event) {
+    if (event.target.tagName === "TD" || event.target.tagName === "TH") {
+      fetch("http://www.randomtext.me/api/lorem/p-1/5-15").then(response => response.json()).then(json => {
+        event.target.innerHTML = json.text_out;
+      });
+    }
+  }
+
+  $(document).ready(function () {
+    var $table = $("table");
+    $table.find("b").on("click", function () {
+      alert();
+    });
+    $table.find("thead th:nth-child(-n+3)").each((i, th) => {
+      $(th).addClass("sns--is-stuck");
+    });
+    $table.find("thead th:nth-child(n+4)").each((i, th) => {
+      $(th).addClass("sns--is-stuck-y");
+    });
+    $table.find("tbody > tr:nth-child(n+1):nth-child(-n+11) > *:nth-child(-n+3)").addClass("sns--is-stuck-x");
+    $table.find("tbody > tr:nth-child(12) > *:nth-child(-n+2)").addClass("sns--is-stuck-x");
+    $table.find("tbody > tr:nth-child(13) > *:nth-child(-n+1)").addClass("sns--is-stuck-x"); // $table.stickyTable();
+
+    stickNSlide($table);
+    document.getElementById("backgroundColor").addEventListener("click", event => {
+      if (event.currentTarget.dataset.active !== "true") {
+        document.querySelector("table").addEventListener("click", backgroundColor);
+      } else {
+        document.querySelector("table").removeEventListener("click", backgroundColor);
+      }
+
+      event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+    });
+    document.getElementById("borderColor").addEventListener("click", event => {
+      if (event.currentTarget.dataset.active !== "true") {
+        document.querySelector("table").addEventListener("click", borderColor);
+      } else {
+        document.querySelector("table").removeEventListener("click", borderColor);
+      }
+
+      event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+    });
+    document.getElementById("mergeCellRow").addEventListener("click", event => {
+      if (event.currentTarget.dataset.active !== "true") {
+        document.querySelector("table").addEventListener("click", mergeCellRow);
+      } else {
+        document.querySelector("table").removeEventListener("click", mergeCellRow);
+      }
+
+      event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+    });
+    document.getElementById("changeContent").addEventListener("click", event => {
+      if (event.currentTarget.dataset.active !== "true") {
+        document.querySelector("table").addEventListener("click", changeContent);
+      } else {
+        document.querySelector("table").removeEventListener("click", changeContent);
+      }
+
+      event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+    }); // setTimeout(function() {
+    //   $('b').closest('td').each(function() {
+    //     var div = $('<div>blah</div>');
+    //     $(this).prepend(div);
+    //   });
+    // }, 5000);
+  });
 
 })));
-//# sourceMappingURL=stick-n-slide.js.map
+//# sourceMappingURL=demo.js.map

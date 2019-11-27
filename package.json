@@ -19,7 +19,8 @@
     "name": "Nathan Wright",
     "url": "http://brandalism.com"
   },
-  "main": "./dist/index.js",
+  "main": "./dist/stick-n-slide.umd.js",
+  "module": "./dist/stick-n-slide.esm.js",
   "files": [
     "dist/index.js",
     "dist/index.css"
@@ -39,8 +40,8 @@
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-generate-html-template": "^1.6.0",
+    "rollup-plugin-multi-entry": "^2.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-peer-deps-external": "^2.2.0",
     "rollup-plugin-postcss": "^2.0.3",
     "rollup-plugin-terser": "^5.1.2"
   },

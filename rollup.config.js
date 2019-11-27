@@ -5,7 +5,7 @@ import { terser } from "rollup-plugin-terser";
 import postcss from "rollup-plugin-postcss";
 import autoprefixer from "autoprefixer";
 import htmlTemplate from "rollup-plugin-generate-html-template";
-import peerDepsExternal from "rollup-plugin-peer-deps-external";
+import multiEntry from "rollup-plugin-multi-entry";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -14,7 +14,7 @@ export default [
   {
     input: "src/index.js",
     output: {
-      file: "dist/es/stick-n-slide.js",
+      file: "dist/stick-n-slide.esm.js",
       format: "es",
       sourcemap: true
     },
@@ -26,10 +26,6 @@ export default [
       postcss({
         plugins: [autoprefixer]
       }),
-      htmlTemplate({
-        template: "src/demo.html",
-        target: "demo.html"
-      }),
       isProduction && terser()
     ]
   },
@@ -38,17 +34,41 @@ export default [
   {
     input: "src/index.js",
     output: {
-      file: "dist/umd/stick-n-slide.js",
+      file: "dist/stick-n-slide.umd.js",
       format: "umd",
       sourcemap: true,
       name: "stick-n-slide"
     },
     plugins: [
-      // peerDepsExternal({
-      //   includeDependencies: true
-      // }),
       resolve({
-        jsnext: true,
+        // jsnext: true,
+        browser: true,
+        include: "node_modules/**"
+      }),
+      commonjs({
+        include: "node_modules/**"
+      }),
+      babel(),
+      postcss({
+        plugins: [autoprefixer]
+      }),
+      isProduction && terser()
+    ]
+  },
+
+  // Demo code
+  {
+    input: "src/demo/demo.js",
+    output: {
+      file: "dist/demo/demo.js",
+      format: "umd",
+      sourcemap: true,
+      name: "demo",
+      globals: ["$", "jQuery"]
+    },
+    external: ["jQuery", "$"],
+    plugins: [
+      resolve({
         browser: true,
         include: "node_modules/**"
       }),
@@ -60,7 +80,7 @@ export default [
         plugins: [autoprefixer]
       }),
       htmlTemplate({
-        template: "src/demo.html",
+        template: "src/demo/demo.html",
         target: "demo.html"
       }),
       isProduction && terser()
