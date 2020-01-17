@@ -1,4 +1,3 @@
-
 table.sns {
   box-sizing: border-box;
   * {
@@ -7,13 +6,15 @@ table.sns {
   tbody:first-child {
     /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */
     tr:not(:first-child) {
-      th, td {
+      th,
+      td {
         border-top-width: 0;
       }
     }
   }
 
-  thead, tbody {
+  thead,
+  tbody {
     *[class*="sns--is-stuck"] {
       position: relative;
       transition: box-shadow 0.1s;
@@ -27,7 +28,7 @@ table.sns {
           content: "\200B";
         }
       }
-      
+
       /*
         Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders
         (as, from the rendering engine perspective, it is no longer a part of the table).
@@ -47,7 +48,7 @@ table.sns {
           bottom: 0;
           left: 0;
           margin: inherit;
-          transition: box-shadow .1s;
+          transition: box-shadow 0.1s;
           box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);
           z-index: 0;
         }
@@ -79,10 +80,10 @@ table.sns {
       z-index: 100;
     }
     *.sns--is-stuck-x {
-      z-index: 90;
+      z-index: 80;
     }
     *.sns--is-stuck-y {
-      z-index: 80;
+      z-index: 90;
     }
   }
 }

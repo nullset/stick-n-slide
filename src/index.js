@@ -274,8 +274,8 @@ function positionStickyElements(
   offsetX = 0,
   offsetY = 0
 ) {
-  if (elems) {
-    elems.forEach(cell => {
+  elems.forEach(cellsOfType => {
+    for (let cell of cellsOfType) {
       let transforms = [];
       if (
         cell.classList.contains("sns--is-stuck-y") ||
@@ -291,8 +291,8 @@ function positionStickyElements(
       }
       cell.style.transform = transforms.join(" ");
       positionShadow(cell, showShadow, offsetX, offsetY);
-    });
-  }
+    }
+  });
 }
 
 function positionShadow(cell, showShadow, offsetX, offsetY) {
@@ -412,8 +412,8 @@ function verticalAlignment(value) {
 }
 
 function setInnerCellHeights(table) {
-  const stickyElems = Array.prototype.slice.call(
-    table.querySelectorAll(".sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x")
+  const stickyElems = table.getElementsByClassName(
+    "sns--is-stuck sns--is-stuck-y sns--is-stuck-x"
   );
   stickyElems.forEach(cell => {
     cell.style.height = "";
@@ -422,6 +422,30 @@ function setInnerCellHeights(table) {
     stickyElems.forEach(cell => {
       cell.style.height = `${cell.getBoundingClientRect().height}px`;
     });
+  });
+}
+
+function processCells(stickyElems, { isFirefox, isIE11 }) {
+  stickyElems.forEach(cellsOfType => {
+    for (let cell of cellsOfType) {
+      if (isIE11) {
+        // Behavior for IE11.
+        buildInnerCell(cell);
+      } else {
+        // Everything other than IE11.
+        const cellStyles = window.getComputedStyle(cell);
+        ["Top", "Right", "Bottom", "Left"].forEach(side => {
+          ["Width"].forEach(property => {
+            let borderWidth = cellStyles[`border${side}${property}`];
+            if (isFirefox) {
+              const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+              borderWidth = `${Math.round(value[1])}${value[2]}`;
+            }
+            cell.style[`margin${side}`] = `-${borderWidth}`;
+          });
+        });
+      }
+    }
   });
 }
 
@@ -480,6 +504,7 @@ export default function(elems, options = {}) {
             callback,
             isIE11: isIE11()
           };
+          console.log(stickyElems.map(coll => Array.from(coll)).flat().length);
 
           if (isIE || isIEedge) {
             event.preventDefault();
@@ -503,11 +528,14 @@ export default function(elems, options = {}) {
 
       // --------------------
 
-      const stickyElems = Array.prototype.slice.call(
-        table.querySelectorAll(
-          ".sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x"
-        )
-      );
+      const stickyElems = [
+        "sns--is-stuck",
+        "sns--is-stuck-y",
+        "sns--is-stuck-x"
+      ].reduce((acc, className) => {
+        acc.push(table.getElementsByClassName(className));
+        return acc;
+      }, []);
 
       if (getComputedStyle(wrapper).position === "static") {
         wrapper.style.position = "relative";
@@ -521,25 +549,27 @@ export default function(elems, options = {}) {
         }
       });
 
-      stickyElems.forEach(cell => {
-        if (isIE11()) {
-          // Behavior for IE11.
-          buildInnerCell(cell);
-        } else {
-          // Everything other than IE11.
-          const cellStyles = window.getComputedStyle(cell);
-          ["Top", "Right", "Bottom", "Left"].forEach(side => {
-            ["Width"].forEach(property => {
-              let borderWidth = cellStyles[`border${side}${property}`];
-              if (isFirefox) {
-                const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
-                borderWidth = `${Math.round(value[1])}${value[2]}`;
-              }
-              cell.style[`margin${side}`] = `-${borderWidth}`;
-            });
-          });
-        }
-      });
+      // stickyElems.forEach(cell => {
+      //   if (isIE11()) {
+      //     // Behavior for IE11.
+      //     buildInnerCell(cell);
+      //   } else {
+      //     // Everything other than IE11.
+      //     const cellStyles = window.getComputedStyle(cell);
+      //     ["Top", "Right", "Bottom", "Left"].forEach(side => {
+      //       ["Width"].forEach(property => {
+      //         let borderWidth = cellStyles[`border${side}${property}`];
+      //         if (isFirefox) {
+      //           const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+      //           borderWidth = `${Math.round(value[1])}${value[2]}`;
+      //         }
+      //         cell.style[`margin${side}`] = `-${borderWidth}`;
+      //       });
+      //     });
+      //   }
+      // });
+
+      processCells(stickyElems, { isFirefox, isIE11: isIE11() });
 
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
@@ -558,6 +588,11 @@ export default function(elems, options = {}) {
           if (isIE && !isIEedge) {
             let observer = new MutationObserver(handleMutations);
             observer.observe(table, observeConfig);
+          } else {
+            new MutationObserver(mutations => {}).observe({
+              childList: true,
+              subtree: true
+            });
           }
         });
         // ============================
@@ -576,3 +611,9 @@ export default function(elems, options = {}) {
     });
   });
 }
+
+const foo = {
+  init: table => {
+    table = table;
+  }
+};

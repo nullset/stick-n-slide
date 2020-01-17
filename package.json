@@ -27,9 +27,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "",
-    "build": "rollup -c --environment INCLUDE_DEPS,NODE_ENV:production",
-    "build:dev": "rollup -c -w --environment INCLUDE_DEPS,NODE_ENV:development"
+    "start": "rollup -c -w --environment INCLUDE_DEPS,NODE_ENV:development",
+    "build": "rollup -c --environment INCLUDE_DEPS,NODE_ENV:production"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",

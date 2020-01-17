@@ -570,7 +570,7 @@
     }
   }
 
-  var css = "@charset \"UTF-8\";\ntable.sns {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\ntable.sns * {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\ntable.sns tbody:first-child {\n  /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */\n}\ntable.sns tbody:first-child tr:not(:first-child) th, table.sns tbody:first-child tr:not(:first-child) td {\n  border-top-width: 0;\n}\ntable.sns thead *[class*=sns--is-stuck], table.sns tbody *[class*=sns--is-stuck] {\n  position: relative;\n  -webkit-transition: -webkit-box-shadow 0.1s;\n  transition: -webkit-box-shadow 0.1s;\n  transition: box-shadow 0.1s;\n  transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;\n  /*\n    Add a zero-width space character to any empty stuck element. This prevents an issue in IE where\n    cells with no content are collapsed.\n  */\n  /*\n    Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders\n    (as, from the rendering engine perspective, it is no longer a part of the table).\n    We need to add these borders back via some css generated elements.\n  */\n  /*\n    Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.\n    Because of this, clicking on these elements once they have been \"translated\" via translate()\n    can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering\n    which fixes the issue.\n  */\n}\ntable.sns thead *[class*=sns--is-stuck]:empty:after, table.sns tbody *[class*=sns--is-stuck]:empty:after {\n  content: \"​\";\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b, table.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before, table.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before {\n  content: \"\";\n  position: absolute;\n  border: inherit;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: inherit;\n  -webkit-transition: -webkit-box-shadow 0.1s;\n  transition: -webkit-box-shadow 0.1s;\n  transition: box-shadow 0.1s;\n  transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;\n  -webkit-box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n          box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n  z-index: 0;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__placeholder-cell, table.sns tbody *[class*=sns--is-stuck] .sns__placeholder-cell {\n  position: relative;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__cell-inner, table.sns tbody *[class*=sns--is-stuck] .sns__cell-inner {\n  position: relative;\n  height: inherit;\n}\ntable.sns thead *[class*=sns--is-stuck] > *, table.sns tbody *[class*=sns--is-stuck] > * {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *.sns--is-stuck, table.sns tbody *.sns--is-stuck {\n  z-index: 100;\n}\ntable.sns thead *.sns--is-stuck-x, table.sns tbody *.sns--is-stuck-x {\n  z-index: 90;\n}\ntable.sns thead *.sns--is-stuck-y, table.sns tbody *.sns--is-stuck-y {\n  z-index: 80;\n}\n\n@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {\n  table.sns {\n    margin-top: -2px;\n    margin-left: -1px;\n  }\n}";
+  var css = "@charset \"UTF-8\";\ntable.sns {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\ntable.sns * {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\ntable.sns tbody:first-child {\n  /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */\n}\ntable.sns tbody:first-child tr:not(:first-child) th,\ntable.sns tbody:first-child tr:not(:first-child) td {\n  border-top-width: 0;\n}\ntable.sns thead *[class*=sns--is-stuck],\ntable.sns tbody *[class*=sns--is-stuck] {\n  position: relative;\n  -webkit-transition: -webkit-box-shadow 0.1s;\n  transition: -webkit-box-shadow 0.1s;\n  transition: box-shadow 0.1s;\n  transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;\n  /*\n    Add a zero-width space character to any empty stuck element. This prevents an issue in IE where\n    cells with no content are collapsed.\n  */\n  /*\n    Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders\n    (as, from the rendering engine perspective, it is no longer a part of the table).\n    We need to add these borders back via some css generated elements.\n  */\n  /*\n    Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.\n    Because of this, clicking on these elements once they have been \"translated\" via translate()\n    can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering\n    which fixes the issue.\n  */\n}\ntable.sns thead *[class*=sns--is-stuck]:empty:after,\ntable.sns tbody *[class*=sns--is-stuck]:empty:after {\n  content: \"​\";\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before {\n  content: \"\";\n  position: absolute;\n  border: inherit;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: inherit;\n  -webkit-transition: -webkit-box-shadow 0.1s;\n  transition: -webkit-box-shadow 0.1s;\n  transition: box-shadow 0.1s;\n  transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;\n  -webkit-box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n          box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n  z-index: 0;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__placeholder-cell,\ntable.sns tbody *[class*=sns--is-stuck] .sns__placeholder-cell {\n  position: relative;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__cell-inner,\ntable.sns tbody *[class*=sns--is-stuck] .sns__cell-inner {\n  position: relative;\n  height: inherit;\n}\ntable.sns thead *[class*=sns--is-stuck] > *,\ntable.sns tbody *[class*=sns--is-stuck] > * {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *.sns--is-stuck,\ntable.sns tbody *.sns--is-stuck {\n  z-index: 100;\n}\ntable.sns thead *.sns--is-stuck-x,\ntable.sns tbody *.sns--is-stuck-x {\n  z-index: 80;\n}\ntable.sns thead *.sns--is-stuck-y,\ntable.sns tbody *.sns--is-stuck-y {\n  z-index: 90;\n}\n\n@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {\n  table.sns {\n    margin-top: -2px;\n    margin-left: -1px;\n  }\n}";
   styleInject(css);
 
   const observeConfig = {
@@ -815,8 +815,8 @@
   }
 
   function positionStickyElements(table, elems, showShadow, offsetX = 0, offsetY = 0) {
-    if (elems) {
-      elems.forEach(cell => {
+    elems.forEach(cellsOfType => {
+      for (let cell of cellsOfType) {
         let transforms = [];
 
         if (cell.classList.contains("sns--is-stuck-y") || cell.classList.contains("sns--is-stuck")) {
@@ -829,8 +829,8 @@
 
         cell.style.transform = transforms.join(" ");
         positionShadow(cell, showShadow, offsetX, offsetY);
-      });
-    }
+      }
+    });
   }
 
   function positionShadow(cell, showShadow, offsetX, offsetY) {
@@ -943,7 +943,7 @@
   }
 
   function setInnerCellHeights(table) {
-    const stickyElems = Array.prototype.slice.call(table.querySelectorAll(".sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x"));
+    const stickyElems = table.getElementsByClassName("sns--is-stuck sns--is-stuck-y sns--is-stuck-x");
     stickyElems.forEach(cell => {
       cell.style.height = "";
     });
@@ -951,6 +951,35 @@
       stickyElems.forEach(cell => {
         cell.style.height = `${cell.getBoundingClientRect().height}px`;
       });
+    });
+  }
+
+  function processCells(stickyElems, {
+    isFirefox,
+    isIE11
+  }) {
+    stickyElems.forEach(cellsOfType => {
+      for (let cell of cellsOfType) {
+        if (isIE11) {
+          // Behavior for IE11.
+          buildInnerCell(cell);
+        } else {
+          // Everything other than IE11.
+          const cellStyles = window.getComputedStyle(cell);
+          ["Top", "Right", "Bottom", "Left"].forEach(side => {
+            ["Width"].forEach(property => {
+              let borderWidth = cellStyles[`border${side}${property}`];
+
+              if (isFirefox) {
+                const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+                borderWidth = `${Math.round(value[1])}${value[2]}`;
+              }
+
+              cell.style[`margin${side}`] = `-${borderWidth}`;
+            });
+          });
+        }
+      }
     });
   }
 
@@ -1011,6 +1040,7 @@
             callback,
             isIE11: isIE11()
           };
+          console.log(stickyElems.map(coll => Array.from(coll)).flat().length);
 
           if (isIE || isIEedge) {
             event.preventDefault();
@@ -1031,7 +1061,10 @@
           }
         }); // --------------------
 
-        const stickyElems = Array.prototype.slice.call(table.querySelectorAll(".sns--is-stuck, .sns--is-stuck-y, .sns--is-stuck-x"));
+        const stickyElems = ["sns--is-stuck", "sns--is-stuck-y", "sns--is-stuck-x"].reduce((acc, className) => {
+          acc.push(table.getElementsByClassName(className));
+          return acc;
+        }, []);
 
         if (getComputedStyle(wrapper).position === "static") {
           wrapper.style.position = "relative";
@@ -1043,27 +1076,29 @@
           if (table[`offset${side}`] > 0) {
             table.style[side.toLowerCase()] = `-${table[`offset${side}`]}px`;
           }
-        });
-        stickyElems.forEach(cell => {
-          if (isIE11()) {
-            // Behavior for IE11.
-            buildInnerCell(cell);
-          } else {
-            // Everything other than IE11.
-            const cellStyles = window.getComputedStyle(cell);
-            ["Top", "Right", "Bottom", "Left"].forEach(side => {
-              ["Width"].forEach(property => {
-                let borderWidth = cellStyles[`border${side}${property}`];
+        }); // stickyElems.forEach(cell => {
+        //   if (isIE11()) {
+        //     // Behavior for IE11.
+        //     buildInnerCell(cell);
+        //   } else {
+        //     // Everything other than IE11.
+        //     const cellStyles = window.getComputedStyle(cell);
+        //     ["Top", "Right", "Bottom", "Left"].forEach(side => {
+        //       ["Width"].forEach(property => {
+        //         let borderWidth = cellStyles[`border${side}${property}`];
+        //         if (isFirefox) {
+        //           const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+        //           borderWidth = `${Math.round(value[1])}${value[2]}`;
+        //         }
+        //         cell.style[`margin${side}`] = `-${borderWidth}`;
+        //       });
+        //     });
+        //   }
+        // });
 
-                if (isFirefox) {
-                  const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
-                  borderWidth = `${Math.round(value[1])}${value[2]}`;
-                }
-
-                cell.style[`margin${side}`] = `-${borderWidth}`;
-              });
-            });
-          }
+        processCells(stickyElems, {
+          isFirefox,
+          isIE11: isIE11()
         }); // Variable that tracks whether "wheel" event was called.
         // Prevents both "wheel" and "scroll" events being triggered simultaneously.
 
