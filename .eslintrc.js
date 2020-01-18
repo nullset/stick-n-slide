@@ -3,20 +3,20 @@ module.exports = {
     browser: true,
     commonjs: true,
     es6: true,
-    node: true,
+    node: true
   },
-  extends: 'eslint:recommended',
+  extends: "eslint:recommended",
   parserOptions: {
-    sourceType: 'module',
+    sourceType: "module"
   },
   rules: {
-    'comma-dangle': ['error', 'always-multiline'],
-    indent: ['warn', 2],
-    'linebreak-style': ['error', 'unix'],
-    quotes: ['warn', 'single'],
-    semi: ['warn', 'always'],
-    'no-unused-vars': ['warn'],
-    'no-console': 0,
-    'no-debugger': 0,
-  },
+    "comma-dangle": ["error", "always-multiline"],
+    indent: ["warn", 2],
+    "linebreak-style": ["error", "unix"],
+    quotes: ["warn", "single"],
+    semi: ["warn", "always"],
+    "no-unused-vars": ["warn"],
+    "no-console": 0,
+    "no-debugger": 0
+  }
 };

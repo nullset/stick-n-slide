@@ -670,9 +670,3 @@ export default function(elems, options = {}) {
     });
   });
 }
-
-const foo = {
-  init: table => {
-    table = table;
-  }
-};

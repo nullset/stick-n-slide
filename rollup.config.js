@@ -26,7 +26,7 @@ export default [
       postcss({
         plugins: [autoprefixer]
       }),
-      isProduction && terser()
+      isProduction
     ]
   },
 

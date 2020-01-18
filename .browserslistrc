@@ -1,2 +1,8 @@
-> 1% # Browser usage over 1%
-Last 2 versions # Or last two versions
+> 1%
+last 10 Chrome versions
+last 2 Firefox versions
+Firefox ESR
+last 3 Edge versions
+IE 11
+last 2 Safari major versions
+last 2 iOS versions
