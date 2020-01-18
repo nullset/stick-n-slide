@@ -573,6 +573,7 @@
   var css = "@charset \"UTF-8\";\ntable.sns {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\ntable.sns * {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\ntable.sns tbody:first-child {\n  /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */\n}\ntable.sns tbody:first-child tr:not(:first-child) th,\ntable.sns tbody:first-child tr:not(:first-child) td {\n  border-top-width: 0;\n}\ntable.sns thead *[class*=sns--is-stuck],\ntable.sns tbody *[class*=sns--is-stuck] {\n  position: relative;\n  -webkit-transition: -webkit-box-shadow 0.1s;\n  transition: -webkit-box-shadow 0.1s;\n  transition: box-shadow 0.1s;\n  transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;\n  /*\n    Add a zero-width space character to any empty stuck element. This prevents an issue in IE where\n    cells with no content are collapsed.\n  */\n  /*\n    Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders\n    (as, from the rendering engine perspective, it is no longer a part of the table).\n    We need to add these borders back via some css generated elements.\n  */\n  /*\n    Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.\n    Because of this, clicking on these elements once they have been \"translated\" via translate()\n    can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering\n    which fixes the issue.\n  */\n}\ntable.sns thead *[class*=sns--is-stuck]:empty:after,\ntable.sns tbody *[class*=sns--is-stuck]:empty:after {\n  content: \"​\";\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before {\n  content: \"\";\n  position: absolute;\n  border: inherit;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: inherit;\n  -webkit-transition: -webkit-box-shadow 0.1s;\n  transition: -webkit-box-shadow 0.1s;\n  transition: box-shadow 0.1s;\n  transition: box-shadow 0.1s, -webkit-box-shadow 0.1s;\n  -webkit-box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n          box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n  z-index: 0;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__placeholder-cell,\ntable.sns tbody *[class*=sns--is-stuck] .sns__placeholder-cell {\n  position: relative;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__cell-inner,\ntable.sns tbody *[class*=sns--is-stuck] .sns__cell-inner {\n  position: relative;\n  height: inherit;\n}\ntable.sns thead *[class*=sns--is-stuck] > *,\ntable.sns tbody *[class*=sns--is-stuck] > * {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *.sns--is-stuck,\ntable.sns tbody *.sns--is-stuck {\n  z-index: 100;\n}\ntable.sns thead *.sns--is-stuck-x,\ntable.sns tbody *.sns--is-stuck-x {\n  z-index: 80;\n}\ntable.sns thead *.sns--is-stuck-y,\ntable.sns tbody *.sns--is-stuck-y {\n  z-index: 90;\n}\n\n@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {\n  table.sns {\n    margin-top: -2px;\n    margin-left: -1px;\n  }\n}";
   styleInject(css);
 
+  const tableScrollPositions = new WeakMap();
   const observeConfig = {
     childList: true,
     subtree: true
@@ -814,22 +815,48 @@
     return `rgba(${rgb},${opacity})`;
   }
 
-  function positionStickyElements(table, elems, showShadow, offsetX = 0, offsetY = 0) {
-    elems.forEach(cellsOfType => {
-      for (let cell of cellsOfType) {
-        let transforms = [];
+  function setCellTransforms({
+    cell,
+    showShadow,
+    scrollLeft,
+    scrollTop
+  }) {
+    let transforms = [];
 
-        if (cell.classList.contains("sns--is-stuck-y") || cell.classList.contains("sns--is-stuck")) {
-          transforms.push(`translateY(${offsetY}px)`);
+    if (cell.classList.contains("sns--is-stuck-y") || cell.classList.contains("sns--is-stuck")) {
+      transforms.push(`translateY(${scrollTop}px)`);
+    }
+
+    if (cell.classList.contains("sns--is-stuck-x") || cell.classList.contains("sns--is-stuck")) {
+      transforms.push(`translateX(${scrollLeft}px)`);
+    }
+
+    cell.style.transform = transforms.join(" ");
+    positionShadow(cell, showShadow, scrollLeft, scrollTop);
+  }
+
+  function positionStickyElements(table, elems, showShadow, scrollLeft = 0, scrollTop = 0) {
+    requestAnimationFrame(() => {
+      elems.forEach(cellsOfType => {
+        for (let cell of cellsOfType) {
+          setCellTransforms({
+            cell,
+            showShadow,
+            scrollLeft,
+            scrollTop
+          });
         }
-
-        if (cell.classList.contains("sns--is-stuck-x") || cell.classList.contains("sns--is-stuck")) {
-          transforms.push(`translateX(${offsetX}px)`);
+      });
+      tableScrollPositions.set(table, {
+        left: scrollLeft,
+        top: scrollTop
+      });
+      table.dispatchEvent(new CustomEvent("sns:scroll", {
+        detail: {
+          scrollLeft,
+          scrollTop
         }
-
-        cell.style.transform = transforms.join(" ");
-        positionShadow(cell, showShadow, offsetX, offsetY);
-      }
+      }));
     });
   }
 
@@ -954,33 +981,42 @@
     });
   }
 
-  function processCells(stickyElems, {
+  function processCell({
+    cell,
     isFirefox,
-    isIE11
+    isIE11,
+    scrollPositions: {
+      left,
+      top
+    },
+    showShadow
   }) {
-    stickyElems.forEach(cellsOfType => {
-      for (let cell of cellsOfType) {
-        if (isIE11) {
-          // Behavior for IE11.
-          buildInnerCell(cell);
-        } else {
-          // Everything other than IE11.
-          const cellStyles = window.getComputedStyle(cell);
-          ["Top", "Right", "Bottom", "Left"].forEach(side => {
-            ["Width"].forEach(property => {
-              let borderWidth = cellStyles[`border${side}${property}`];
+    if (isIE11) {
+      // Behavior for IE11.
+      buildInnerCell(cell);
+    } else {
+      // Everything other than IE11.
+      const cellStyles = window.getComputedStyle(cell);
+      ["Top", "Right", "Bottom", "Left"].forEach(side => {
+        ["Width"].forEach(property => {
+          let borderWidth = cellStyles[`border${side}${property}`];
 
-              if (isFirefox) {
-                const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
-                borderWidth = `${Math.round(value[1])}${value[2]}`;
-              }
+          if (isFirefox) {
+            const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+            borderWidth = `${Math.round(value[1])}${value[2]}`;
+          }
 
-              cell.style[`margin${side}`] = `-${borderWidth}`;
-            });
-          });
-        }
-      }
-    });
+          cell.style[`margin${side}`] = `-${borderWidth}`;
+        });
+      });
+    }
+
+    setCellTransforms({
+      cell,
+      scrollLeft: left,
+      scrollTop: top,
+      showShadow
+    }); // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
   }
 
   function index (elems, options = {}) {
@@ -993,11 +1029,7 @@
     const isFirefox = userAgent.indexOf("firefox") > -1;
     const isIE = userAgent.indexOf("trident") > -1;
     const isIEedge = userAgent.indexOf("edge") > -1;
-
-    function isIE11() {
-      return isIE && !isIEedge;
-    } // Convert a jQuery object to an array, or convert a single element to an array.
-
+    const isIE11 = isIE && !isIEedge; // Convert a jQuery object to an array, or convert a single element to an array.
 
     if (typeof elems.toArray === "function") {
       elems = elems.toArray();
@@ -1038,7 +1070,7 @@
             clientHeight,
             showShadow,
             callback,
-            isIE11: isIE11()
+            isIE11
           };
           console.log(stickyElems.map(coll => Array.from(coll)).flat().length);
 
@@ -1096,18 +1128,32 @@
         //   }
         // });
 
-        processCells(stickyElems, {
-          isFirefox,
-          isIE11: isIE11()
-        }); // Variable that tracks whether "wheel" event was called.
+        const scrollPositions = {
+          left: wrapper.scrollLeft,
+          top: wrapper.scrollTop
+        };
+        tableScrollPositions.set(table, scrollPositions);
+        stickyElems.forEach(cellsOfType => {
+          for (let cell of cellsOfType) {
+            processCell({
+              cell,
+              isFirefox,
+              isIE11,
+              scrollPositions,
+              showShadow
+            });
+          }
+        }); // processCells(stickyElems, { isFirefox, isIE11: isIE11() });
+        // Variable that tracks whether "wheel" event was called.
         // Prevents both "wheel" and "scroll" events being triggered simultaneously.
 
         let wheelEventTriggered = false; // Set initial position of elements to 0.
 
         requestAnimationFrame(() => {
-          positionStickyElements(table, stickyElems, showShadow, isIE11);
+          // positionStickyElements(table, stickyElems, showShadow, isIE11);
+          positionStickyElements(table, stickyElems, showShadow, wrapper.scrollLeft, wrapper.scrollTop);
 
-          if (isIE11()) {
+          if (isIE11) {
             setInnerCellHeights(table);
           } // ----------------------------
           // Handle IE11 mutations to the table cells.
@@ -1117,6 +1163,36 @@
             if (isIE && !isIEedge) {
               let observer = new MutationObserver(handleMutations);
               observer.observe(table, observeConfig);
+            } else {
+              new MutationObserver(mutations => {
+                const {
+                  left,
+                  top
+                } = tableScrollPositions.get(table);
+                mutations.forEach(mutation => {
+                  const cell = mutation.target;
+                  debugger;
+                  const classList = cell.classList;
+
+                  if (classList.contains("sns--is-stuck") || classList.contains("sns--is-stuck-x") || classList.contains("sns--is-stuck-y")) {
+                    processCell({
+                      cell,
+                      isFirefox,
+                      isIE11,
+                      scrollPositions: tableScrollPositions.get(table),
+                      showShadow
+                    });
+                  } else {
+                    cell.style.margin = "";
+                    cell.style.transform = "";
+                  }
+                });
+              }).observe(table, {
+                // childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["class"]
+              });
             }
           }); // ============================
         });
@@ -1127,7 +1203,7 @@
     window.addEventListener("resize", () => {
       requestAnimationFrame(() => {
         elems.forEach(table => {
-          if (isIE11()) {
+          if (isIE11) {
             setInnerCellHeights(table);
           }
         });

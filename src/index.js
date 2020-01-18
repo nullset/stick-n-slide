@@ -1,6 +1,8 @@
 import normalizeWheel from "normalize-wheel";
 import "./stick-n-slide.scss";
 
+const tableScrollPositions = new WeakMap();
+
 const observeConfig = {
   childList: true,
   subtree: true
@@ -267,31 +269,43 @@ function calculateShadowColor(cell, opacity) {
   return `rgba(${rgb},${opacity})`;
 }
 
+function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
+  let transforms = [];
+  if (
+    cell.classList.contains("sns--is-stuck-y") ||
+    cell.classList.contains("sns--is-stuck")
+  ) {
+    transforms.push(`translateY(${scrollTop}px)`);
+  }
+  if (
+    cell.classList.contains("sns--is-stuck-x") ||
+    cell.classList.contains("sns--is-stuck")
+  ) {
+    transforms.push(`translateX(${scrollLeft}px)`);
+  }
+  cell.style.transform = transforms.join(" ");
+  positionShadow(cell, showShadow, scrollLeft, scrollTop);
+}
+
 function positionStickyElements(
   table,
   elems,
   showShadow,
-  offsetX = 0,
-  offsetY = 0
+  scrollLeft = 0,
+  scrollTop = 0
 ) {
-  elems.forEach(cellsOfType => {
-    for (let cell of cellsOfType) {
-      let transforms = [];
-      if (
-        cell.classList.contains("sns--is-stuck-y") ||
-        cell.classList.contains("sns--is-stuck")
-      ) {
-        transforms.push(`translateY(${offsetY}px)`);
+  requestAnimationFrame(() => {
+    elems.forEach(cellsOfType => {
+      for (let cell of cellsOfType) {
+        setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
       }
-      if (
-        cell.classList.contains("sns--is-stuck-x") ||
-        cell.classList.contains("sns--is-stuck")
-      ) {
-        transforms.push(`translateX(${offsetX}px)`);
-      }
-      cell.style.transform = transforms.join(" ");
-      positionShadow(cell, showShadow, offsetX, offsetY);
-    }
+    });
+    tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
+    table.dispatchEvent(
+      new CustomEvent("sns:scroll", {
+        detail: { scrollLeft, scrollTop }
+      })
+    );
   });
 }
 
@@ -425,28 +439,32 @@ function setInnerCellHeights(table) {
   });
 }
 
-function processCells(stickyElems, { isFirefox, isIE11 }) {
-  stickyElems.forEach(cellsOfType => {
-    for (let cell of cellsOfType) {
-      if (isIE11) {
-        // Behavior for IE11.
-        buildInnerCell(cell);
-      } else {
-        // Everything other than IE11.
-        const cellStyles = window.getComputedStyle(cell);
-        ["Top", "Right", "Bottom", "Left"].forEach(side => {
-          ["Width"].forEach(property => {
-            let borderWidth = cellStyles[`border${side}${property}`];
-            if (isFirefox) {
-              const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
-              borderWidth = `${Math.round(value[1])}${value[2]}`;
-            }
-            cell.style[`margin${side}`] = `-${borderWidth}`;
-          });
-        });
-      }
-    }
-  });
+function processCell({
+  cell,
+  isFirefox,
+  isIE11,
+  scrollPositions: { left, top },
+  showShadow
+}) {
+  if (isIE11) {
+    // Behavior for IE11.
+    buildInnerCell(cell);
+  } else {
+    // Everything other than IE11.
+    const cellStyles = window.getComputedStyle(cell);
+    ["Top", "Right", "Bottom", "Left"].forEach(side => {
+      ["Width"].forEach(property => {
+        let borderWidth = cellStyles[`border${side}${property}`];
+        if (isFirefox) {
+          const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+          borderWidth = `${Math.round(value[1])}${value[2]}`;
+        }
+        cell.style[`margin${side}`] = `-${borderWidth}`;
+      });
+    });
+  }
+  setCellTransforms({ cell, scrollLeft: left, scrollTop: top, showShadow });
+  // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
 }
 
 export default function(elems, options = {}) {
@@ -456,10 +474,7 @@ export default function(elems, options = {}) {
   const isFirefox = userAgent.indexOf("firefox") > -1;
   const isIE = userAgent.indexOf("trident") > -1;
   const isIEedge = userAgent.indexOf("edge") > -1;
-
-  function isIE11() {
-    return isIE && !isIEedge;
-  }
+  const isIE11 = isIE && !isIEedge;
 
   // Convert a jQuery object to an array, or convert a single element to an array.
   if (typeof elems.toArray === "function") {
@@ -502,7 +517,7 @@ export default function(elems, options = {}) {
             clientHeight,
             showShadow,
             callback,
-            isIE11: isIE11()
+            isIE11
           };
           console.log(stickyElems.map(coll => Array.from(coll)).flat().length);
 
@@ -569,7 +584,19 @@ export default function(elems, options = {}) {
       //   }
       // });
 
-      processCells(stickyElems, { isFirefox, isIE11: isIE11() });
+      const scrollPositions = {
+        left: wrapper.scrollLeft,
+        top: wrapper.scrollTop
+      };
+      tableScrollPositions.set(table, scrollPositions);
+
+      stickyElems.forEach(cellsOfType => {
+        for (let cell of cellsOfType) {
+          processCell({ cell, isFirefox, isIE11, scrollPositions, showShadow });
+        }
+      });
+
+      // processCells(stickyElems, { isFirefox, isIE11: isIE11() });
 
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
@@ -577,8 +604,15 @@ export default function(elems, options = {}) {
 
       // Set initial position of elements to 0.
       requestAnimationFrame(() => {
-        positionStickyElements(table, stickyElems, showShadow, isIE11);
-        if (isIE11()) {
+        // positionStickyElements(table, stickyElems, showShadow, isIE11);
+        positionStickyElements(
+          table,
+          stickyElems,
+          showShadow,
+          wrapper.scrollLeft,
+          wrapper.scrollTop
+        );
+        if (isIE11) {
           setInnerCellHeights(table);
         }
 
@@ -589,9 +623,34 @@ export default function(elems, options = {}) {
             let observer = new MutationObserver(handleMutations);
             observer.observe(table, observeConfig);
           } else {
-            new MutationObserver(mutations => {}).observe({
-              childList: true,
-              subtree: true
+            new MutationObserver(mutations => {
+              const { left, top } = tableScrollPositions.get(table);
+              mutations.forEach(mutation => {
+                const cell = mutation.target;
+                debugger;
+                const classList = cell.classList;
+                if (
+                  classList.contains("sns--is-stuck") ||
+                  classList.contains("sns--is-stuck-x") ||
+                  classList.contains("sns--is-stuck-y")
+                ) {
+                  processCell({
+                    cell,
+                    isFirefox,
+                    isIE11,
+                    scrollPositions: tableScrollPositions.get(table),
+                    showShadow
+                  });
+                } else {
+                  cell.style.margin = "";
+                  cell.style.transform = "";
+                }
+              });
+            }).observe(table, {
+              // childList: true,
+              subtree: true,
+              attributes: true,
+              attributeFilter: ["class"]
             });
           }
         });
@@ -604,7 +663,7 @@ export default function(elems, options = {}) {
   window.addEventListener("resize", () => {
     requestAnimationFrame(() => {
       elems.forEach(table => {
-        if (isIE11()) {
+        if (isIE11) {
           setInnerCellHeights(table);
         }
       });
