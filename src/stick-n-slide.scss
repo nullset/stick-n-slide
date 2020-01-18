@@ -61,10 +61,6 @@ table.sns {
         position: relative;
         height: inherit;
       }
-      .sns__cell-contents {
-        // display: inline-block;
-      }
-
       /*
         Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.
         Because of this, clicking on these elements once they have been "translated" via translate()
