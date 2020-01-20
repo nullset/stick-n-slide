@@ -1122,7 +1122,7 @@
           } else {
             scrollHandler(table, _stickyElems, wrapper, showShadow, callback);
           }
-        }); // --------------------
+        });
 
         var _stickyElems = ["sns--is-stuck", "sns--is-stuck-y", "sns--is-stuck-x"].reduce(function (acc, className) {
           acc.push(table.getElementsByClassName(className));
@@ -1185,16 +1185,20 @@
 
                 mutations.forEach(function (mutation) {
                   var cell = mutation.target;
-                  var classList = cell.classList;
+                  if (!/^TH|TD$/.test(cell.nodeName)) return;
 
-                  if (classList.contains("sns--is-stuck") || classList.contains("sns--is-stuck-x") || classList.contains("sns--is-stuck-y")) {
-                    generateBorder({
-                      cell: cell,
-                      isFirefox: isFirefox,
-                      isIE11: isIE11,
-                      scrollPositions: tableScrollPositions.get(table),
-                      showShadow: showShadow
-                    });
+                  if (mutation.addedNodes) {
+                    var classList = cell.classList;
+
+                    if (classList.contains("sns--is-stuck") || classList.contains("sns--is-stuck-x") || classList.contains("sns--is-stuck-y")) {
+                      generateBorder({
+                        cell: cell,
+                        isFirefox: isFirefox,
+                        isIE11: isIE11,
+                        scrollPositions: tableScrollPositions.get(table),
+                        showShadow: showShadow
+                      });
+                    }
                   } else {
                     cell.style.margin = "";
                     cell.style.transform = "";
@@ -1207,7 +1211,7 @@
                 attributeFilter: ["class"]
               });
             }
-          }); // ============================
+          });
         });
       }
 

@@ -604,8 +604,6 @@ function index(elems, options = {}) {
         }
       });
 
-      // --------------------
-
       const stickyElems = [
         "sns--is-stuck",
         "sns--is-stuck-y",
@@ -680,19 +678,22 @@ function index(elems, options = {}) {
               const { left, top } = tableScrollPositions.get(table);
               mutations.forEach(mutation => {
                 const cell = mutation.target;
-                const classList = cell.classList;
-                if (
-                  classList.contains("sns--is-stuck") ||
-                  classList.contains("sns--is-stuck-x") ||
-                  classList.contains("sns--is-stuck-y")
-                ) {
-                  generateBorder({
-                    cell,
-                    isFirefox,
-                    isIE11,
-                    scrollPositions: tableScrollPositions.get(table),
-                    showShadow
-                  });
+                if (!/^TH|TD$/.test(cell.nodeName)) return;
+                if (mutation.addedNodes) {
+                  const classList = cell.classList;
+                  if (
+                    classList.contains("sns--is-stuck") ||
+                    classList.contains("sns--is-stuck-x") ||
+                    classList.contains("sns--is-stuck-y")
+                  ) {
+                    generateBorder({
+                      cell,
+                      isFirefox,
+                      isIE11,
+                      scrollPositions: tableScrollPositions.get(table),
+                      showShadow
+                    });
+                  }
                 } else {
                   cell.style.margin = "";
                   cell.style.transform = "";
@@ -706,7 +707,6 @@ function index(elems, options = {}) {
             });
           }
         });
-        // ============================
       });
     }
     return;
