@@ -1,6 +1,6 @@
 {
   "name": "stick-n-slide",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "homepage": "http://brandalism.com/stick-n-slide",
   "description": "A javascript library that makes table cells stick to the x or y axis (or both) when the table is scrolled.",
   "keywords": [
@@ -46,7 +46,6 @@
     "rollup-plugin-terser": "^5.1.2"
   },
   "dependencies": {
-    "nodelist-foreach-polyfill": "^1.2.0",
     "normalize-wheel": "^1.0.1"
   },
   "peerDependencies": {}
