@@ -576,22 +576,24 @@
   var observeConfig = {
     childList: true,
     subtree: true
-  }; // // Custom event polyfill
-  // (function() {
-  //   if (typeof window.CustomEvent === "function") return false;
-  //   function CustomEvent(event, params) {
-  //     params = params || { bubbles: false, cancelable: false, detail: null };
-  //     var evt = document.createEvent("CustomEvent");
-  //     evt.initCustomEvent(
-  //       event,
-  //       params.bubbles,
-  //       params.cancelable,
-  //       params.detail
-  //     );
-  //     return evt;
-  //   }
-  //   window.CustomEvent = CustomEvent;
-  // })();
+  }; // Custom event polyfill
+
+  (function () {
+    if (typeof window.CustomEvent === "function") return false;
+
+    function CustomEvent(event, params) {
+      params = params || {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      };
+      var evt = document.createEvent("CustomEvent");
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      return evt;
+    }
+
+    window.CustomEvent = CustomEvent;
+  })();
 
   function handleMutations(mutations, observer) {
     observer.disconnect(); // Prevent any further updates to the DOM from making the observer thrash.
@@ -875,12 +877,13 @@
       tableScrollPositions.set(table, {
         left: scrollLeft,
         top: scrollTop
-      }); // TODO: Must polyfill for IE11
-      // table.dispatchEvent(
-      //   new CustomEvent("sns:scroll", {
-      //     detail: { scrollLeft, scrollTop }
-      //   })
-      // );
+      });
+      table.dispatchEvent(new CustomEvent("sns:scroll", {
+        detail: {
+          scrollLeft: scrollLeft,
+          scrollTop: scrollTop
+        }
+      }));
     });
   }
 
@@ -995,18 +998,12 @@
   }
 
   function ie11SetInnerCellHeights(table, stickyElems) {
-    // const stickyElems = table.getElementsByClassName(
-    //   "sns--is-stuck sns--is-stuck-y sns--is-stuck-x"
-    // );
     for (var stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
       for (var typeIdx = 0; typeIdx < stickyElems[stickyIdx].length; typeIdx++) {
         var cell = stickyElems[stickyIdx][typeIdx];
         cell.style.height = "";
       }
-    } // stickyElems.forEach(cell => {
-    //   cell.style.height = "";
-    // });
-
+    }
 
     requestAnimationFrame(function () {
       for (var _stickyIdx = 0; _stickyIdx < stickyElems.length; _stickyIdx++) {
@@ -1141,26 +1138,7 @@
           if (table["offset".concat(side)] > 0) {
             table.style[side.toLowerCase()] = "-".concat(table["offset".concat(side)], "px");
           }
-        }); // stickyElems.forEach(cell => {
-        //   if (isIE11()) {
-        //     // Behavior for IE11.
-        //     buildInnerCell(cell);
-        //   } else {
-        //     // Everything other than IE11.
-        //     const cellStyles = window.getComputedStyle(cell);
-        //     ["Top", "Right", "Bottom", "Left"].forEach(side => {
-        //       ["Width"].forEach(property => {
-        //         let borderWidth = cellStyles[`border${side}${property}`];
-        //         if (isFirefox) {
-        //           const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
-        //           borderWidth = `${Math.round(value[1])}${value[2]}`;
-        //         }
-        //         cell.style[`margin${side}`] = `-${borderWidth}`;
-        //       });
-        //     });
-        //   }
-        // });
-
+        });
         var scrollPositions = {
           left: wrapper.scrollLeft,
           top: wrapper.scrollTop
@@ -1178,15 +1156,7 @@
               showShadow: showShadow
             });
           }
-        } // stickyElems.forEach(cellsOfType => {
-        //   debugger;
-        //   for (let i = 0; i < cellsOfType.length; i++) {
-        //     const cell = cellsOfType[i];
-        //     generateBorder({ cell, isFirefox, isIE11, scrollPositions, showShadow });
-        //   }
-        // });
-        // generateBorders(stickyElems, { isFirefox, isIE11: isIE11() });
-        // Variable that tracks whether "wheel" event was called.
+        } // Variable that tracks whether "wheel" event was called.
         // Prevents both "wheel" and "scroll" events being triggered simultaneously.
 
 
@@ -1214,7 +1184,6 @@
 
                 mutations.forEach(function (mutation) {
                   var cell = mutation.target;
-                  debugger;
                   var classList = cell.classList;
 
                   if (classList.contains("sns--is-stuck") || classList.contains("sns--is-stuck-x") || classList.contains("sns--is-stuck-y")) {
