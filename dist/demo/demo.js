@@ -572,6 +572,131 @@
   var css = "@charset \"UTF-8\";\ntable.sns {\n  box-sizing: border-box;\n}\ntable.sns * {\n  box-sizing: border-box;\n}\ntable.sns tbody:first-child {\n  /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */\n}\ntable.sns tbody:first-child tr:not(:first-child) th,\ntable.sns tbody:first-child tr:not(:first-child) td {\n  border-top-width: 0;\n}\ntable.sns thead *[class*=sns--is-stuck],\ntable.sns tbody *[class*=sns--is-stuck] {\n  position: relative;\n  transition: box-shadow 0.1s;\n  /*\n    Add a zero-width space character to any empty stuck element. This prevents an issue in IE where\n    cells with no content are collapsed.\n  */\n  /*\n    Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders\n    (as, from the rendering engine perspective, it is no longer a part of the table).\n    We need to add these borders back via some css generated elements.\n  */\n  /*\n    Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.\n    Because of this, clicking on these elements once they have been \"translated\" via translate()\n    can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering\n    which fixes the issue.\n  */\n}\ntable.sns thead *[class*=sns--is-stuck]:empty:after,\ntable.sns tbody *[class*=sns--is-stuck]:empty:after {\n  content: \"​\";\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before {\n  content: \"\";\n  position: absolute;\n  border: inherit;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: inherit;\n  transition: box-shadow 0.1s;\n  box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n  z-index: 0;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__placeholder-cell,\ntable.sns tbody *[class*=sns--is-stuck] .sns__placeholder-cell {\n  position: relative;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__cell-inner,\ntable.sns tbody *[class*=sns--is-stuck] .sns__cell-inner {\n  position: relative;\n  height: inherit;\n}\ntable.sns thead *[class*=sns--is-stuck] > *,\ntable.sns tbody *[class*=sns--is-stuck] > * {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *.sns--is-stuck,\ntable.sns tbody *.sns--is-stuck {\n  z-index: 100;\n}\ntable.sns thead *.sns--is-stuck-x,\ntable.sns tbody *.sns--is-stuck-x {\n  z-index: 80;\n}\ntable.sns thead *.sns--is-stuck-y,\ntable.sns tbody *.sns--is-stuck-y {\n  z-index: 90;\n}\n\n@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {\n  table.sns {\n    margin-top: -2px;\n    margin-left: -1px;\n  }\n}";
   styleInject(css);
 
+  function commonjsRequire () {
+  	throw new Error('Dynamic requires are not currently supported by rollup-plugin-commonjs');
+  }
+
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
+
+  function getCjsExportFromNamespace (n) {
+  	return n && n['default'] || n;
+  }
+
+  var _nodeResolve_empty = {};
+
+  var _nodeResolve_empty$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    'default': _nodeResolve_empty
+  });
+
+  var require$$0 = getCjsExportFromNamespace(_nodeResolve_empty$1);
+
+  var uuidRandom = createCommonjsModule(function (module) {
+
+    (function () {
+      var buf,
+          bufIdx = 0,
+          hexBytes = [],
+          i; // Pre-calculate toString(16) for speed
+
+      for (i = 0; i < 256; i++) {
+        hexBytes[i] = (i + 0x100).toString(16).substr(1);
+      } // Buffer random numbers for speed
+      // Reduce memory usage by decreasing this number (min 16)
+      // or improve speed by increasing this number (try 16384)
+
+
+      uuid.BUFFER_SIZE = 4096; // Binary uuids
+
+      uuid.bin = uuidBin; // Clear buffer
+
+      uuid.clearBuffer = function () {
+        buf = null;
+        bufIdx = 0;
+      }; // Test for uuid
+
+
+      uuid.test = function (uuid) {
+        if (typeof uuid === 'string') {
+          return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(uuid);
+        }
+
+        return false;
+      }; // Node & Browser support
+
+
+      var crypt0;
+
+      if (typeof crypto !== 'undefined') {
+        crypt0 = crypto;
+      } else if (typeof window !== 'undefined' && typeof window.msCrypto !== 'undefined') {
+        crypt0 = window.msCrypto; // IE11
+      }
+
+      if ( typeof commonjsRequire === 'function') {
+        crypt0 = crypt0 || require$$0;
+        module.exports = uuid;
+      } else if (typeof window !== 'undefined') {
+        window.uuid = uuid;
+      } // Use best available PRNG
+      // Also expose this so you can override it.
+
+
+      uuid.randomBytes = function () {
+        if (crypt0) {
+          if (crypt0.randomBytes) {
+            return crypt0.randomBytes;
+          }
+
+          if (crypt0.getRandomValues) {
+            return function (n) {
+              var bytes = new Uint8Array(n);
+              crypt0.getRandomValues(bytes);
+              return bytes;
+            };
+          }
+        }
+
+        return function (n) {
+          var i,
+              r = [];
+
+          for (i = 0; i < n; i++) {
+            r.push(Math.floor(Math.random() * 256));
+          }
+
+          return r;
+        };
+      }(); // Buffer some random bytes for speed
+
+
+      function randomBytesBuffered(n) {
+        if (!buf || bufIdx + n > uuid.BUFFER_SIZE) {
+          bufIdx = 0;
+          buf = uuid.randomBytes(uuid.BUFFER_SIZE);
+        }
+
+        return buf.slice(bufIdx, bufIdx += n);
+      } // uuid.bin
+
+
+      function uuidBin() {
+        var b = randomBytesBuffered(16);
+        b[6] = b[6] & 0x0f | 0x40;
+        b[8] = b[8] & 0x3f | 0x80;
+        return b;
+      } // String UUIDv4 (Random)
+
+
+      function uuid() {
+        var b = uuidBin();
+        return hexBytes[b[0]] + hexBytes[b[1]] + hexBytes[b[2]] + hexBytes[b[3]] + '-' + hexBytes[b[4]] + hexBytes[b[5]] + '-' + hexBytes[b[6]] + hexBytes[b[7]] + '-' + hexBytes[b[8]] + hexBytes[b[9]] + '-' + hexBytes[b[10]] + hexBytes[b[11]] + hexBytes[b[12]] + hexBytes[b[13]] + hexBytes[b[14]] + hexBytes[b[15]];
+      }
+    })();
+  });
+
   var tableScrollPositions = new WeakMap();
   var observeConfig = {
     childList: true,
@@ -822,90 +947,50 @@
       callback(newX, newY);
     }
   }
+  //   let transforms = [];
+  //   if (
+  //     cell.classList.contains("sns--is-stuck-y") ||
+  //     cell.classList.contains("sns--is-stuck")
+  //   ) {
+  //     transforms.push(`translateY(${scrollTop}px)`);
+  //   }
+  //   if (
+  //     cell.classList.contains("sns--is-stuck-x") ||
+  //     cell.classList.contains("sns--is-stuck")
+  //   ) {
+  //     transforms.push(`translateX(${scrollLeft}px)`);
+  //   }
+  //   cell.style.transform = transforms.join(" ");
+  //   positionShadow(cell, showShadow, scrollLeft, scrollTop);
+  // }
 
-  function calculateShadowOffset(value) {
-    value = Math.ceil(value / 10);
-
-    if (value > 2) {
-      return 2;
-    } else {
-      return value;
-    }
-  }
-
-  function calculateShadowColor(cell, opacity) {
-    var rgb = window.getComputedStyle(cell).backgroundColor.replace("rgb(", "").replace(")", "").split(",").map(function (value) {
-      return Math.round(parseInt(value, 10) * 0.3);
-    }).join(",");
-    return "rgba(".concat(rgb, ",").concat(opacity, ")");
-  }
-
-  function setCellTransforms(_ref2) {
-    var cell = _ref2.cell,
-        showShadow = _ref2.showShadow,
-        scrollLeft = _ref2.scrollLeft,
-        scrollTop = _ref2.scrollTop;
-    var transforms = [];
-
-    if (cell.classList.contains("sns--is-stuck-y") || cell.classList.contains("sns--is-stuck")) {
-      transforms.push("translateY(".concat(scrollTop, "px)"));
-    }
-
-    if (cell.classList.contains("sns--is-stuck-x") || cell.classList.contains("sns--is-stuck")) {
-      transforms.push("translateX(".concat(scrollLeft, "px)"));
-    }
-
-    cell.style.transform = transforms.join(" ");
-    positionShadow(cell, showShadow, scrollLeft, scrollTop);
-  }
 
   function positionStickyElements(table, elems, showShadow) {
     var scrollLeft = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
     var scrollTop = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-    requestAnimationFrame(function () {
-      elems.forEach(function (cellsOfType) {
-        for (var i = 0; i < cellsOfType.length; i++) {
-          var cell = cellsOfType[i];
-          setCellTransforms({
-            cell: cell,
-            showShadow: showShadow,
-            scrollLeft: scrollLeft,
-            scrollTop: scrollTop
-          });
-        }
-      });
-      tableScrollPositions.set(table, {
-        left: scrollLeft,
-        top: scrollTop
-      });
-      table.dispatchEvent(new CustomEvent("sns:scroll", {
-        detail: {
-          scrollLeft: scrollLeft,
-          scrollTop: scrollTop
-        }
-      }));
-    });
-  }
 
-  function positionShadow(cell, showShadow, offsetX, offsetY) {
-    if (!showShadow) return;
-    var shadowColor = calculateShadowColor(cell, 0.4);
-    var xShadow = "0 0";
-    var yShadow = "0 0";
-    var shadow;
+    var _tableScrollPositions = tableScrollPositions.get(table),
+        id = _tableScrollPositions.id,
+        styleElem = _tableScrollPositions.styleElem;
 
-    if (offsetY) {
-      shadow = calculateShadowOffset(offsetY);
-      yShadow = "0 ".concat(shadow, "px ").concat(shadowColor);
-    }
-
-    if (offsetX) {
-      shadow = calculateShadowOffset(offsetX);
-      xShadow = "".concat(shadow, "px 0 ").concat(shadowColor);
-    }
-
-    cell.style.setProperty("--x-shadow", xShadow);
-    cell.style.setProperty("--y-shadow", yShadow);
+    styleElem.textContent = cellStyles({
+      id: id,
+      left: scrollLeft,
+      top: scrollTop
+    }); // requestAnimationFrame(() => {
+    //   elems.forEach(cellsOfType => {
+    //     for (let i = 0; i < cellsOfType.length; i++) {
+    //       const cell = cellsOfType[i];
+    //       setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
+    //     }
+    //   });
+    //   tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
+    //   table.dispatchEvent(
+    //     new CustomEvent("sns:scroll", {
+    //       detail: { scrollLeft, scrollTop }
+    //     })
+    //   );
+    // });
   }
 
   function scrollHandler(table, stickyElems, wrapper, showShadow, callback) {
@@ -1018,24 +1103,25 @@
     });
   }
 
-  function generateBorder(_ref3) {
-    var cell = _ref3.cell,
-        isFirefox = _ref3.isFirefox,
-        isIE11 = _ref3.isIE11,
-        _ref3$scrollPositions = _ref3.scrollPositions,
-        left = _ref3$scrollPositions.left,
-        top = _ref3$scrollPositions.top,
-        showShadow = _ref3.showShadow;
+  function generateBorder(_ref2) {
+    var cell = _ref2.cell,
+        isFirefox = _ref2.isFirefox,
+        isIE11 = _ref2.isIE11,
+        _ref2$scrollPositions = _ref2.scrollPositions,
+        left = _ref2$scrollPositions.left,
+        top = _ref2$scrollPositions.top,
+        showShadow = _ref2.showShadow;
 
     if (isIE11) {
       // Behavior for IE11.
       buildInnerCell(cell);
     } else {
       // Everything other than IE11.
-      var cellStyles = window.getComputedStyle(cell);
+      var _cellStyles = window.getComputedStyle(cell);
+
       ["Top", "Right", "Bottom", "Left"].forEach(function (side) {
         ["Width"].forEach(function (property) {
-          var borderWidth = cellStyles["border".concat(side).concat(property)];
+          var borderWidth = _cellStyles["border".concat(side).concat(property)];
 
           if (isFirefox) {
             var value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
@@ -1045,14 +1131,16 @@
           cell.style["margin".concat(side)] = "-".concat(borderWidth);
         });
       });
-    }
+    } // setCellTransforms({ cell, scrollLeft: left, scrollTop: top, showShadow });
+    // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
 
-    setCellTransforms({
-      cell: cell,
-      scrollLeft: left,
-      scrollTop: top,
-      showShadow: showShadow
-    }); // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
+  }
+
+  function cellStyles(_ref3) {
+    var id = _ref3.id,
+        left = _ref3.left,
+        top = _ref3.top;
+    return "\n  *[data-sns-id=\"".concat(id, "\"] .sns--is-stuck {\n    transform: translate(").concat(left, "px, ").concat(top, "px);\n  }\n  *[data-sns-id=\"").concat(id, "\"] .sns--is-stuck-x {\n    transform: translateX(").concat(left, "px);\n  }\n  *[data-sns-id=\"").concat(id, "\"] .sns--is-stuck-y {\n    transform: translateY(").concat(top, "px);\n  }");
   }
 
   function stickNSlide (elems) {
@@ -1073,9 +1161,12 @@
     }
 
     elems.forEach(function (table) {
-      if (!table.StickNSlide) {
-        table.StickNSlide = {};
+      if (!tableScrollPositions.get(table)) {
         var wrapper = table.parentElement;
+        var id = uuidRandom({
+          preferBuiltins: false
+        });
+        table.dataset.snsId = id;
         wrapper.addEventListener("wheel", function (event) {
           var normalized = normalizeWheel$1(event);
           wheelEventTriggered = true;
@@ -1139,11 +1230,20 @@
             table.style[side.toLowerCase()] = "-".concat(table["offset".concat(side)], "px");
           }
         });
+        var styleElem = document.createElement("style");
         var scrollPositions = {
-          left: wrapper.scrollLeft,
-          top: wrapper.scrollTop
+          id: id,
+          styleElem: styleElem,
+          left: wrapper.scrollLeft || 0,
+          top: wrapper.scrollTop || 0
         };
         tableScrollPositions.set(table, scrollPositions);
+        styleElem.textContent = cellStyles({
+          id: id,
+          left: scrollPositions.left,
+          top: scrollPositions.top
+        });
+        wrapper.appendChild(styleElem);
 
         for (var stickyIdx = 0; stickyIdx < _stickyElems.length; stickyIdx++) {
           for (var typeIdx = 0; typeIdx < _stickyElems[stickyIdx].length; typeIdx++) {
@@ -1178,9 +1278,9 @@
               observer.observe(table, observeConfig);
             } else {
               new MutationObserver(function (mutations) {
-                var _tableScrollPositions = tableScrollPositions.get(table),
-                    left = _tableScrollPositions.left,
-                    top = _tableScrollPositions.top;
+                var _tableScrollPositions2 = tableScrollPositions.get(table),
+                    left = _tableScrollPositions2.left,
+                    top = _tableScrollPositions2.top;
 
                 mutations.forEach(function (mutation) {
                   var cell = mutation.target;

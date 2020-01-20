@@ -1,5 +1,6 @@
 import normalizeWheel from "normalize-wheel";
 import "./stick-n-slide.scss";
+import uuid from "uuid-random";
 
 const tableScrollPositions = new WeakMap();
 
@@ -288,23 +289,23 @@ function calculateShadowColor(cell, opacity) {
   return `rgba(${rgb},${opacity})`;
 }
 
-function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
-  let transforms = [];
-  if (
-    cell.classList.contains("sns--is-stuck-y") ||
-    cell.classList.contains("sns--is-stuck")
-  ) {
-    transforms.push(`translateY(${scrollTop}px)`);
-  }
-  if (
-    cell.classList.contains("sns--is-stuck-x") ||
-    cell.classList.contains("sns--is-stuck")
-  ) {
-    transforms.push(`translateX(${scrollLeft}px)`);
-  }
-  cell.style.transform = transforms.join(" ");
-  positionShadow(cell, showShadow, scrollLeft, scrollTop);
-}
+// function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
+//   let transforms = [];
+//   if (
+//     cell.classList.contains("sns--is-stuck-y") ||
+//     cell.classList.contains("sns--is-stuck")
+//   ) {
+//     transforms.push(`translateY(${scrollTop}px)`);
+//   }
+//   if (
+//     cell.classList.contains("sns--is-stuck-x") ||
+//     cell.classList.contains("sns--is-stuck")
+//   ) {
+//     transforms.push(`translateX(${scrollLeft}px)`);
+//   }
+//   cell.style.transform = transforms.join(" ");
+//   positionShadow(cell, showShadow, scrollLeft, scrollTop);
+// }
 
 function positionStickyElements(
   table,
@@ -313,21 +314,24 @@ function positionStickyElements(
   scrollLeft = 0,
   scrollTop = 0
 ) {
-  requestAnimationFrame(() => {
-    elems.forEach(cellsOfType => {
-      for (let i = 0; i < cellsOfType.length; i++) {
-        const cell = cellsOfType[i];
-        setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
-      }
-    });
-    tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
+  const { id, styleElem } = tableScrollPositions.get(table);
+  styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
 
-    table.dispatchEvent(
-      new CustomEvent("sns:scroll", {
-        detail: { scrollLeft, scrollTop }
-      })
-    );
-  });
+  // requestAnimationFrame(() => {
+  //   elems.forEach(cellsOfType => {
+  //     for (let i = 0; i < cellsOfType.length; i++) {
+  //       const cell = cellsOfType[i];
+  //       setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
+  //     }
+  //   });
+  //   tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
+
+  //   table.dispatchEvent(
+  //     new CustomEvent("sns:scroll", {
+  //       detail: { scrollLeft, scrollTop }
+  //     })
+  //   );
+  // });
 }
 
 function positionShadow(cell, showShadow, offsetX, offsetY) {
@@ -498,17 +502,21 @@ function generateBorder({
       });
     });
   }
-  setCellTransforms({ cell, scrollLeft: left, scrollTop: top, showShadow });
+  // setCellTransforms({ cell, scrollLeft: left, scrollTop: top, showShadow });
   // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
 }
 
-function iterateCells(stickyElems, props) {
-  for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
-    for (let typeIdx = 0; typeIdx < stickyElems[stickyIdx].length; typeIdx++) {
-      const cell = stickyElems[stickyIdx][typeIdx];
-      generateBorder({ cell, ...props });
-    }
+function cellStyles({ id, left, top }) {
+  return `
+  *[data-sns-id="${id}"] .sns--is-stuck {
+    transform: translate(${left}px, ${top}px);
   }
+  *[data-sns-id="${id}"] .sns--is-stuck-x {
+    transform: translateX(${left}px);
+  }
+  *[data-sns-id="${id}"] .sns--is-stuck-y {
+    transform: translateY(${top}px);
+  }`;
 }
 
 export default function(elems, options = {}) {
@@ -528,9 +536,10 @@ export default function(elems, options = {}) {
   }
 
   elems.forEach(table => {
-    if (!table.StickNSlide) {
-      table.StickNSlide = {};
+    if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
+      const id = uuid({ preferBuiltins: false });
+      table.dataset.snsId = id;
 
       wrapper.addEventListener(
         "wheel",
@@ -605,11 +614,21 @@ export default function(elems, options = {}) {
         }
       });
 
+      const styleElem = document.createElement("style");
       const scrollPositions = {
-        left: wrapper.scrollLeft,
-        top: wrapper.scrollTop
+        id,
+        styleElem,
+        left: wrapper.scrollLeft || 0,
+        top: wrapper.scrollTop || 0
       };
       tableScrollPositions.set(table, scrollPositions);
+
+      styleElem.textContent = cellStyles({
+        id,
+        left: scrollPositions.left,
+        top: scrollPositions.top
+      });
+      wrapper.appendChild(styleElem);
 
       for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
         for (
