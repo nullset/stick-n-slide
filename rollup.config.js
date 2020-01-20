@@ -5,7 +5,6 @@ import { terser } from "rollup-plugin-terser";
 import postcss from "rollup-plugin-postcss";
 import autoprefixer from "autoprefixer";
 import htmlTemplate from "rollup-plugin-generate-html-template";
-import multiEntry from "rollup-plugin-multi-entry";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -22,7 +21,7 @@ export default [
     plugins: [
       resolve({ include: "node_modules/**" }),
       commonjs({ include: "node_modules/**" }),
-      babel(),
+      // babel(),
       postcss({
         plugins: [autoprefixer]
       }),

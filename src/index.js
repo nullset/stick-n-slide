@@ -8,6 +8,25 @@ const observeConfig = {
   subtree: true
 };
 
+// // Custom event polyfill
+// (function() {
+//   if (typeof window.CustomEvent === "function") return false;
+
+//   function CustomEvent(event, params) {
+//     params = params || { bubbles: false, cancelable: false, detail: null };
+//     var evt = document.createEvent("CustomEvent");
+//     evt.initCustomEvent(
+//       event,
+//       params.bubbles,
+//       params.cancelable,
+//       params.detail
+//     );
+//     return evt;
+//   }
+
+//   window.CustomEvent = CustomEvent;
+// })();
+
 function handleMutations(mutations, observer) {
   observer.disconnect(); // Prevent any further updates to the DOM from making the observer thrash.
 
@@ -156,7 +175,7 @@ function handleMutations(mutations, observer) {
     }
   });
 
-  setInnerCellHeights(table);
+  ie11SetInnerCellHeights(table, stickyElems);
 
   requestAnimationFrame(() => {
     observer.observe(table, observeConfig);
@@ -296,16 +315,19 @@ function positionStickyElements(
 ) {
   requestAnimationFrame(() => {
     elems.forEach(cellsOfType => {
-      for (let cell of cellsOfType) {
+      for (let i = 0; i < cellsOfType.length; i++) {
+        const cell = cellsOfType[i];
         setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
       }
     });
     tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
-    table.dispatchEvent(
-      new CustomEvent("sns:scroll", {
-        detail: { scrollLeft, scrollTop }
-      })
-    );
+
+    // TODO: Must polyfill for IE11
+    // table.dispatchEvent(
+    //   new CustomEvent("sns:scroll", {
+    //     detail: { scrollLeft, scrollTop }
+    //   })
+    // );
   });
 }
 
@@ -405,6 +427,7 @@ function buildInnerCell(cell) {
       cell.style[property] = "0";
     });
 
+    innerCell.style.display = "flex";
     innerCell.style.alignItems = verticalAlignment(cellStyles.verticalAlign);
   }
 }
@@ -425,21 +448,42 @@ function verticalAlignment(value) {
   }
 }
 
-function setInnerCellHeights(table) {
-  const stickyElems = table.getElementsByClassName(
-    "sns--is-stuck sns--is-stuck-y sns--is-stuck-x"
-  );
-  stickyElems.forEach(cell => {
-    cell.style.height = "";
-  });
+function ie11SetInnerCellHeights(table, stickyElems) {
+  // const stickyElems = table.getElementsByClassName(
+  //   "sns--is-stuck sns--is-stuck-y sns--is-stuck-x"
+  // );
+
+  for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
+    for (let typeIdx = 0; typeIdx < stickyElems[stickyIdx].length; typeIdx++) {
+      const cell = stickyElems[stickyIdx][typeIdx];
+
+      cell.style.height = "";
+    }
+  }
+
+  // stickyElems.forEach(cell => {
+  //   cell.style.height = "";
+  // });
+
   requestAnimationFrame(() => {
-    stickyElems.forEach(cell => {
-      cell.style.height = `${cell.getBoundingClientRect().height}px`;
-    });
+    for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
+      for (
+        let typeIdx = 0;
+        typeIdx < stickyElems[stickyIdx].length;
+        typeIdx++
+      ) {
+        const cell = stickyElems[stickyIdx][typeIdx];
+        cell.style.height = `${cell.getBoundingClientRect().height}px`;
+      }
+    }
+
+    // stickyElems.forEach(cell => {
+    //   cell.style.height = `${cell.getBoundingClientRect().height}px`;
+    // });
   });
 }
 
-function processCell({
+function generateBorder({
   cell,
   isFirefox,
   isIE11,
@@ -465,6 +509,15 @@ function processCell({
   }
   setCellTransforms({ cell, scrollLeft: left, scrollTop: top, showShadow });
   // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
+}
+
+function iterateCells(stickyElems, props) {
+  for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
+    for (let typeIdx = 0; typeIdx < stickyElems[stickyIdx].length; typeIdx++) {
+      const cell = stickyElems[stickyIdx][typeIdx];
+      generateBorder({ cell, ...props });
+    }
+  }
 }
 
 export default function(elems, options = {}) {
@@ -519,7 +572,6 @@ export default function(elems, options = {}) {
             callback,
             isIE11
           };
-          console.log(stickyElems.map(coll => Array.from(coll)).flat().length);
 
           if (isIE || isIEedge) {
             event.preventDefault();
@@ -590,13 +642,32 @@ export default function(elems, options = {}) {
       };
       tableScrollPositions.set(table, scrollPositions);
 
-      stickyElems.forEach(cellsOfType => {
-        for (let cell of cellsOfType) {
-          processCell({ cell, isFirefox, isIE11, scrollPositions, showShadow });
+      for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
+        for (
+          let typeIdx = 0;
+          typeIdx < stickyElems[stickyIdx].length;
+          typeIdx++
+        ) {
+          const cell = stickyElems[stickyIdx][typeIdx];
+          generateBorder({
+            cell,
+            isFirefox,
+            isIE11,
+            scrollPositions,
+            showShadow
+          });
         }
-      });
+      }
 
-      // processCells(stickyElems, { isFirefox, isIE11: isIE11() });
+      // stickyElems.forEach(cellsOfType => {
+      //   debugger;
+      //   for (let i = 0; i < cellsOfType.length; i++) {
+      //     const cell = cellsOfType[i];
+      //     generateBorder({ cell, isFirefox, isIE11, scrollPositions, showShadow });
+      //   }
+      // });
+
+      // generateBorders(stickyElems, { isFirefox, isIE11: isIE11() });
 
       // Variable that tracks whether "wheel" event was called.
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
@@ -612,8 +683,9 @@ export default function(elems, options = {}) {
           wrapper.scrollLeft,
           wrapper.scrollTop
         );
+
         if (isIE11) {
-          setInnerCellHeights(table);
+          ie11SetInnerCellHeights(table, stickyElems);
         }
 
         // ----------------------------
@@ -634,7 +706,7 @@ export default function(elems, options = {}) {
                   classList.contains("sns--is-stuck-x") ||
                   classList.contains("sns--is-stuck-y")
                 ) {
-                  processCell({
+                  generateBorder({
                     cell,
                     isFirefox,
                     isIE11,
@@ -664,7 +736,7 @@ export default function(elems, options = {}) {
     requestAnimationFrame(() => {
       elems.forEach(table => {
         if (isIE11) {
-          setInnerCellHeights(table);
+          ie11SetInnerCellHeights(table, stickyElems);
         }
       });
     });

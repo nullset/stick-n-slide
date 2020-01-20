@@ -28,12 +28,13 @@
   "license": "MIT",
   "scripts": {
     "start": "rollup -c -w --environment INCLUDE_DEPS,NODE_ENV:development",
-    "build": "rollup -c --environment INCLUDE_DEPS,NODE_ENV:production"
+    "build": "rollup -c --environment INCLUDE_DEPS"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.8.3",
+    "@rollup/plugin-buble": "^0.21.0",
     "autoprefixer": "^9.7.2",
     "rollup": "^1.27.5",
     "rollup-plugin-babel": "^4.3.3",
@@ -45,6 +46,7 @@
     "rollup-plugin-terser": "^5.1.2"
   },
   "dependencies": {
+    "nodelist-foreach-polyfill": "^1.2.0",
     "normalize-wheel": "^1.0.1"
   },
   "peerDependencies": {}
