@@ -1,6 +1,6 @@
 import normalizeWheel from "normalize-wheel";
+import nanoid from "nanoid/index.js";
 import "./stick-n-slide.scss";
-import uuid from "uuid-random";
 
 const tableScrollPositions = new WeakMap();
 
@@ -538,7 +538,7 @@ export default function(elems, options = {}) {
   elems.forEach(table => {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
-      const id = uuid({ preferBuiltins: false });
+      const id = nanoid();
       table.dataset.snsId = id;
 
       wrapper.addEventListener(
@@ -674,32 +674,33 @@ export default function(elems, options = {}) {
             observer.observe(table, observeConfig);
           } else {
             new MutationObserver(mutations => {
-              const { left, top } = tableScrollPositions.get(table);
               mutations.forEach(mutation => {
-                const cell = mutation.target;
-                if (!/^TH|TD$/.test(cell.nodeName)) return;
-                if (mutation.addedNodes) {
-                  const classList = cell.classList;
-                  if (
-                    classList.contains("sns--is-stuck") ||
-                    classList.contains("sns--is-stuck-x") ||
-                    classList.contains("sns--is-stuck-y")
+                if (!/^THEAD|TBODY|TFOOT|TH|TD$/.test(mutation.target.nodeName))
+                  return;
+
+                for (
+                  let stickyIdx = 0;
+                  stickyIdx < stickyElems.length;
+                  stickyIdx++
+                ) {
+                  for (
+                    let typeIdx = 0;
+                    typeIdx < stickyElems[stickyIdx].length;
+                    typeIdx++
                   ) {
+                    const cell = stickyElems[stickyIdx][typeIdx];
                     generateBorder({
                       cell,
                       isFirefox,
                       isIE11,
-                      scrollPositions: tableScrollPositions.get(table),
+                      scrollPositions,
                       showShadow
                     });
                   }
-                } else {
-                  cell.style.margin = "";
-                  cell.style.transform = "";
                 }
               });
-            }).observe(table, {
-              // childList: true,
+            }).observe(wrapper, {
+              childList: true,
               subtree: true,
               attributes: true,
               attributeFilter: ["class"]

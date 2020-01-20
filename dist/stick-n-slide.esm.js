@@ -1,5 +1,68 @@
 import normalizeWheel from 'normalize-wheel';
-import crypto$1 from 'crypto';
+import crypto from 'crypto';
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var random = createCommonjsModule(function (module) {
+if (crypto.randomFillSync) {
+  var buffers = { };
+  module.exports = function (bytes) {
+    var buffer = buffers[bytes];
+    if (!buffer) {
+      buffer = Buffer.allocUnsafe(bytes);
+      if (bytes <= 255) buffers[bytes] = buffer;
+    }
+    return crypto.randomFillSync(buffer)
+  };
+} else {
+  module.exports = crypto.randomBytes;
+}
+});
+
+/**
+ * URL safe symbols.
+ *
+ * This alphabet uses a-z A-Z 0-9 _- symbols.
+ * Symbols order was changed for better gzip compression.
+ *
+ * @name url
+ * @type {string}
+ *
+ * @example
+ * const url = require('nanoid/url')
+ * generate(url, 10) //=> "Uakgb_J5m9"
+ */
+var url =
+  'ModuleSymbhasOwnPr-0123456789ABCDEFGHNRVfgctiUvz_KqYTJkLxpZXIjQW';
+
+/**
+ * Generate secure URL-friendly unique ID.
+ *
+ * By default, ID will have 21 symbols to have a collision probability similar
+ * to UUID v4.
+ *
+ * @param {number} [size=21] The number of symbols in ID.
+ *
+ * @return {string} Random string.
+ *
+ * @example
+ * const nanoid = require('nanoid')
+ * model.id = nanoid() //=> "Uakgb_J5m9g-0JDMbcJqL"
+ *
+ * @name nanoid
+ * @function
+ */
+var nanoid = function (size) {
+  size = size || 21;
+  var bytes = random(size);
+  var id = '';
+  while (size--) {
+    id += url[bytes[size] & 63];
+  }
+  return id
+};
 
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
@@ -30,125 +93,6 @@ function styleInject(css, ref) {
 
 var css = "@charset \"UTF-8\";\ntable.sns {\n  box-sizing: border-box;\n}\ntable.sns * {\n  box-sizing: border-box;\n}\ntable.sns tbody:first-child {\n  /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */\n}\ntable.sns tbody:first-child tr:not(:first-child) th,\ntable.sns tbody:first-child tr:not(:first-child) td {\n  border-top-width: 0;\n}\ntable.sns thead *[class*=sns--is-stuck],\ntable.sns tbody *[class*=sns--is-stuck] {\n  position: relative;\n  transition: box-shadow 0.1s;\n  /*\n    Add a zero-width space character to any empty stuck element. This prevents an issue in IE where\n    cells with no content are collapsed.\n  */\n  /*\n    Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders\n    (as, from the rendering engine perspective, it is no longer a part of the table).\n    We need to add these borders back via some css generated elements.\n  */\n  /*\n    Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.\n    Because of this, clicking on these elements once they have been \"translated\" via translate()\n    can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering\n    which fixes the issue.\n  */\n}\ntable.sns thead *[class*=sns--is-stuck]:empty:after,\ntable.sns tbody *[class*=sns--is-stuck]:empty:after {\n  content: \"​\";\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before {\n  content: \"\";\n  position: absolute;\n  border: inherit;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: inherit;\n  transition: box-shadow 0.1s;\n  box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n  z-index: 0;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__placeholder-cell,\ntable.sns tbody *[class*=sns--is-stuck] .sns__placeholder-cell {\n  position: relative;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__cell-inner,\ntable.sns tbody *[class*=sns--is-stuck] .sns__cell-inner {\n  position: relative;\n  height: inherit;\n}\ntable.sns thead *[class*=sns--is-stuck] > *,\ntable.sns tbody *[class*=sns--is-stuck] > * {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *.sns--is-stuck,\ntable.sns tbody *.sns--is-stuck {\n  z-index: 100;\n}\ntable.sns thead *.sns--is-stuck-x,\ntable.sns tbody *.sns--is-stuck-x {\n  z-index: 80;\n}\ntable.sns thead *.sns--is-stuck-y,\ntable.sns tbody *.sns--is-stuck-y {\n  z-index: 90;\n}\n\n@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {\n  table.sns {\n    margin-top: -2px;\n    margin-left: -1px;\n  }\n}";
 styleInject(css);
-
-function commonjsRequire () {
-	throw new Error('Dynamic requires are not currently supported by rollup-plugin-commonjs');
-}
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-var uuidRandom = createCommonjsModule(function (module) {
-
-(function(){
-
-  var
-    buf,
-    bufIdx = 0,
-    hexBytes = [],
-    i
-  ;
-
-  // Pre-calculate toString(16) for speed
-  for (i = 0; i < 256; i++) {
-    hexBytes[i] = (i + 0x100).toString(16).substr(1);
-  }
-
-  // Buffer random numbers for speed
-  // Reduce memory usage by decreasing this number (min 16)
-  // or improve speed by increasing this number (try 16384)
-  uuid.BUFFER_SIZE = 4096;
-
-  // Binary uuids
-  uuid.bin = uuidBin;
-
-  // Clear buffer
-  uuid.clearBuffer = function() {
-    buf = null;
-    bufIdx = 0;
-  };
-
-  // Test for uuid
-  uuid.test = function(uuid) {
-    if (typeof uuid === 'string') {
-      return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(uuid);
-    }
-    return false;
-  };
-
-  // Node & Browser support
-  var crypt0;
-  if (typeof crypto !== 'undefined') {
-    crypt0 = crypto;
-  } else if( (typeof window !== 'undefined') && (typeof window.msCrypto !== 'undefined')) {
-    crypt0 = window.msCrypto; // IE11
-  }
-
-  if ( (typeof commonjsRequire === 'function')) {
-    crypt0 = crypt0 || crypto$1;
-    module.exports = uuid;
-  } else if (typeof window !== 'undefined') {
-    window.uuid = uuid;
-  }
-
-  // Use best available PRNG
-  // Also expose this so you can override it.
-  uuid.randomBytes = (function(){
-    if (crypt0) {
-      if (crypt0.randomBytes) {
-        return crypt0.randomBytes;
-      }
-      if (crypt0.getRandomValues) {
-        return function(n) {
-          var bytes = new Uint8Array(n);
-          crypt0.getRandomValues(bytes);
-          return bytes;
-        };
-      }
-    }
-    return function(n) {
-      var i, r = [];
-      for (i = 0; i < n; i++) {
-        r.push(Math.floor(Math.random() * 256));
-      }
-      return r;
-    };
-  })();
-
-  // Buffer some random bytes for speed
-  function randomBytesBuffered(n) {
-    if (!buf || ((bufIdx + n) > uuid.BUFFER_SIZE)) {
-      bufIdx = 0;
-      buf = uuid.randomBytes(uuid.BUFFER_SIZE);
-    }
-    return buf.slice(bufIdx, bufIdx += n);
-  }
-
-  // uuid.bin
-  function uuidBin() {
-    var b = randomBytesBuffered(16);
-    b[6] = (b[6] & 0x0f) | 0x40;
-    b[8] = (b[8] & 0x3f) | 0x80;
-    return b;
-  }
-
-  // String UUIDv4 (Random)
-  function uuid() {
-    var b = uuidBin();
-    return hexBytes[b[0]] + hexBytes[b[1]] +
-      hexBytes[b[2]] + hexBytes[b[3]] + '-' +
-      hexBytes[b[4]] + hexBytes[b[5]] + '-' +
-      hexBytes[b[6]] + hexBytes[b[7]] + '-' +
-      hexBytes[b[8]] + hexBytes[b[9]] + '-' +
-      hexBytes[b[10]] + hexBytes[b[11]] +
-      hexBytes[b[12]] + hexBytes[b[13]] +
-      hexBytes[b[14]] + hexBytes[b[15]]
-    ;
-  }
-
-})();
-});
 
 const tableScrollPositions = new WeakMap();
 
@@ -648,7 +592,7 @@ function index(elems, options = {}) {
   elems.forEach(table => {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
-      const id = uuidRandom({ preferBuiltins: false });
+      const id = nanoid();
       table.dataset.snsId = id;
 
       wrapper.addEventListener(
@@ -784,32 +728,33 @@ function index(elems, options = {}) {
             observer.observe(table, observeConfig);
           } else {
             new MutationObserver(mutations => {
-              const { left, top } = tableScrollPositions.get(table);
               mutations.forEach(mutation => {
-                const cell = mutation.target;
-                if (!/^TH|TD$/.test(cell.nodeName)) return;
-                if (mutation.addedNodes) {
-                  const classList = cell.classList;
-                  if (
-                    classList.contains("sns--is-stuck") ||
-                    classList.contains("sns--is-stuck-x") ||
-                    classList.contains("sns--is-stuck-y")
+                if (!/^THEAD|TBODY|TFOOT|TH|TD$/.test(mutation.target.nodeName))
+                  return;
+
+                for (
+                  let stickyIdx = 0;
+                  stickyIdx < stickyElems.length;
+                  stickyIdx++
+                ) {
+                  for (
+                    let typeIdx = 0;
+                    typeIdx < stickyElems[stickyIdx].length;
+                    typeIdx++
                   ) {
+                    const cell = stickyElems[stickyIdx][typeIdx];
                     generateBorder({
                       cell,
                       isFirefox,
                       isIE11,
-                      scrollPositions: tableScrollPositions.get(table),
+                      scrollPositions,
                       showShadow
                     });
                   }
-                } else {
-                  cell.style.margin = "";
-                  cell.style.transform = "";
                 }
               });
-            }).observe(table, {
-              // childList: true,
+            }).observe(wrapper, {
+              childList: true,
               subtree: true,
               attributes: true,
               attributeFilter: ["class"]

@@ -5,6 +5,7 @@ import { terser } from "rollup-plugin-terser";
 import postcss from "rollup-plugin-postcss";
 import autoprefixer from "autoprefixer";
 import htmlTemplate from "rollup-plugin-generate-html-template";
+import replace from "@rollup/plugin-replace";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -19,9 +20,13 @@ export default [
     },
     external: ["normalize-wheel"],
     plugins: [
-      resolve({ include: "node_modules/**" }),
+      resolve({ include: "node_modules/**", preferBuiltins: true }),
       commonjs({ include: "node_modules/**" }),
       // babel(),
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("production")
+      }),
+
       postcss({
         plugins: [autoprefixer]
       }),
@@ -42,11 +47,16 @@ export default [
       resolve({
         // jsnext: true,
         browser: true,
-        include: "node_modules/**"
+        include: "node_modules/**",
+        preferBuiltins: true
       }),
       commonjs({
         include: "node_modules/**"
       }),
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("production")
+      }),
+
       babel(),
       postcss({
         plugins: [autoprefixer]
@@ -69,10 +79,14 @@ export default [
     plugins: [
       resolve({
         browser: true,
-        include: "node_modules/**"
+        include: "node_modules/**",
+        preferBuiltins: true
       }),
       commonjs({
         include: "node_modules/**"
+      }),
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("production")
       }),
       babel(),
       postcss({
