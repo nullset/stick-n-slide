@@ -316,6 +316,8 @@ function positionStickyElements(
 ) {
   const { id, styleElem } = tableScrollPositions.get(table);
   styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
+  table.parentElement.dataset.snsScrollLeft = scrollLeft;
+  table.parentElement.dataset.snsScrollTop = scrollTop;
 
   // requestAnimationFrame(() => {
   //   elems.forEach(cellsOfType => {
@@ -540,6 +542,26 @@ export default function(elems, options = {}) {
       const wrapper = table.parentElement;
       const id = nanoid();
       table.dataset.snsId = id;
+      const styleElem = document.createElement("style");
+
+      // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
+      // that 3rd party libraries can use to interface with Stick-n-Slide.
+      // If these values are changed, then update both the scroll position and the
+      // transform positions of stuck elements.
+      new MutationObserver((mutations, observer) => {
+        const wrapper = mutations[0].target;
+        styleElem.textContent = cellStyles({
+          id,
+          left: wrapper.dataset.snsScrollLeft,
+          top: wrapper.dataset.snsScrollTop
+        });
+        wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
+        wrapper.scrollTop = wrapper.dataset.snsScrollTop;
+      }).observe(wrapper, {
+        attributes: true,
+        attributeFilter: ["data-sns-scroll-left", "data-sns-scroll-top"],
+        attributeOldValue: true
+      });
 
       wrapper.addEventListener(
         "wheel",
@@ -614,7 +636,6 @@ export default function(elems, options = {}) {
         }
       });
 
-      const styleElem = document.createElement("style");
       const scrollPositions = {
         id,
         styleElem,

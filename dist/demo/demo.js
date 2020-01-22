@@ -872,7 +872,9 @@
       id: id,
       left: scrollLeft,
       top: scrollTop
-    }); // requestAnimationFrame(() => {
+    });
+    table.parentElement.dataset.snsScrollLeft = scrollLeft;
+    table.parentElement.dataset.snsScrollTop = scrollTop; // requestAnimationFrame(() => {
     //   elems.forEach(cellsOfType => {
     //     for (let i = 0; i < cellsOfType.length; i++) {
     //       const cell = cellsOfType[i];
@@ -1060,6 +1062,25 @@
         var wrapper = table.parentElement;
         var id = index_browser();
         table.dataset.snsId = id;
+        var styleElem = document.createElement("style"); // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
+        // that 3rd party libraries can use to interface with Stick-n-Slide.
+        // If these values are changed, then update both the scroll position and the
+        // transform positions of stuck elements.
+
+        new MutationObserver(function (mutations, observer) {
+          var wrapper = mutations[0].target;
+          styleElem.textContent = cellStyles({
+            id: id,
+            left: wrapper.dataset.snsScrollLeft,
+            top: wrapper.dataset.snsScrollTop
+          });
+          wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
+          wrapper.scrollTop = wrapper.dataset.snsScrollTop;
+        }).observe(wrapper, {
+          attributes: true,
+          attributeFilter: ["data-sns-scroll-left", "data-sns-scroll-top"],
+          attributeOldValue: true
+        });
         wrapper.addEventListener("wheel", function (event) {
           var normalized = normalizeWheel$1(event);
           wheelEventTriggered = true;
@@ -1123,7 +1144,6 @@
             table.style[side.toLowerCase()] = "-".concat(table["offset".concat(side)], "px");
           }
         });
-        var styleElem = document.createElement("style");
         var scrollPositions = {
           id: id,
           styleElem: styleElem,
