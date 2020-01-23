@@ -540,6 +540,16 @@
 
   var normalizeWheel$1 = normalizeWheel_1;
 
+  if (process.env.NODE_ENV !== 'production') {
+    if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+      throw new Error('React Native does not have a built-in secure random generator. ' + 'If you don’t need unpredictable IDs, you can use `nanoid/non-secure`. ' + 'For secure ID install `expo-random` locally and use `nanoid/async`.');
+    }
+
+    if (typeof self === 'undefined' || !self.crypto && !self.msCrypto) {
+      throw new Error('Your browser does not have secure random generator. ' + 'If you don’t need unpredictable IDs, you can use nanoid/non-secure.');
+    }
+  }
+
   var crypto = self.crypto || self.msCrypto;
   /*
    * This alphabet uses a-z A-Z 0-9 _- symbols.
@@ -1037,7 +1047,7 @@
     var id = _ref3.id,
         left = _ref3.left,
         top = _ref3.top;
-    return "\n  *[data-sns-id=\"".concat(id, "\"] .sns--is-stuck {\n    transform: translate(").concat(left, "px, ").concat(top, "px);\n  }\n  *[data-sns-id=\"").concat(id, "\"] .sns--is-stuck-x {\n    transform: translateX(").concat(left, "px);\n  }\n  *[data-sns-id=\"").concat(id, "\"] .sns--is-stuck-y {\n    transform: translateY(").concat(top, "px);\n  }");
+    return "\n  .sns.sns-".concat(id, " .sns--is-stuck {\n    transform: translate(").concat(left, "px, ").concat(top, "px);\n  }\n  .sns.sns-").concat(id, " .sns--is-stuck-x {\n    transform: translateX(").concat(left, "px);\n  }\n  .sns.sns-").concat(id, " .sns--is-stuck-y {\n    transform: translateY(").concat(top, "px);\n  }");
   }
 
   function stickNSlide (elems) {
@@ -1060,8 +1070,9 @@
     elems.forEach(function (table) {
       if (!tableScrollPositions.get(table)) {
         var wrapper = table.parentElement;
-        var id = index_browser();
-        table.dataset.snsId = id;
+        var id = index_browser(); // table.dataset.snsId = id;
+
+        table.classList.add("sns-".concat(id));
         var styleElem = document.createElement("style"); // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
         // that 3rd party libraries can use to interface with Stick-n-Slide.
         // If these values are changed, then update both the scroll position and the

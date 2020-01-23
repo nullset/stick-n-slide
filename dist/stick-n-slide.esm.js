@@ -564,13 +564,13 @@ function generateBorder({
 
 function cellStyles({ id, left, top }) {
   return `
-  *[data-sns-id="${id}"] .sns--is-stuck {
+  .sns.sns-${id} .sns--is-stuck {
     transform: translate(${left}px, ${top}px);
   }
-  *[data-sns-id="${id}"] .sns--is-stuck-x {
+  .sns.sns-${id} .sns--is-stuck-x {
     transform: translateX(${left}px);
   }
-  *[data-sns-id="${id}"] .sns--is-stuck-y {
+  .sns.sns-${id} .sns--is-stuck-y {
     transform: translateY(${top}px);
   }`;
 }
@@ -595,7 +595,8 @@ function index(elems, options = {}) {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
       const id = nanoid();
-      table.dataset.snsId = id;
+      // table.dataset.snsId = id;
+      table.classList.add(`sns-${id}`);
       const styleElem = document.createElement("style");
 
       // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
