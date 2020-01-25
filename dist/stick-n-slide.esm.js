@@ -361,23 +361,43 @@ function wheelHandler({
   }
 }
 
-// function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
-//   let transforms = [];
-//   if (
-//     cell.classList.contains("sns--is-stuck-y") ||
-//     cell.classList.contains("sns--is-stuck")
-//   ) {
-//     transforms.push(`translateY(${scrollTop}px)`);
-//   }
-//   if (
-//     cell.classList.contains("sns--is-stuck-x") ||
-//     cell.classList.contains("sns--is-stuck")
-//   ) {
-//     transforms.push(`translateX(${scrollLeft}px)`);
-//   }
-//   cell.style.transform = transforms.join(" ");
-//   positionShadow(cell, showShadow, scrollLeft, scrollTop);
-// }
+function calculateShadowOffset(value) {
+  value = Math.ceil(value / 10);
+  if (value > 2) {
+    return 2;
+  } else {
+    return value;
+  }
+}
+
+function calculateShadowColor(cell, opacity) {
+  const rgb = window
+    .getComputedStyle(cell)
+    .backgroundColor.replace("rgb(", "")
+    .replace(")", "")
+    .split(",")
+    .map(value => Math.round(parseInt(value, 10) * 0.3))
+    .join(",");
+  return `rgba(${rgb},${opacity})`;
+}
+
+function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
+  let transforms = [];
+  if (
+    cell.classList.contains("sns--is-stuck-y") ||
+    cell.classList.contains("sns--is-stuck")
+  ) {
+    transforms.push(`translateY(${scrollTop}px)`);
+  }
+  if (
+    cell.classList.contains("sns--is-stuck-x") ||
+    cell.classList.contains("sns--is-stuck")
+  ) {
+    transforms.push(`translateX(${scrollLeft}px)`);
+  }
+  cell.style.transform = transforms.join(" ");
+  positionShadow(cell, showShadow, scrollLeft, scrollTop);
+}
 
 function positionStickyElements(
   table,
@@ -386,26 +406,44 @@ function positionStickyElements(
   scrollLeft = 0,
   scrollTop = 0
 ) {
-  const { id, styleElem } = tableScrollPositions.get(table);
-  styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
+  const { id } = tableScrollPositions.get(table);
+  // styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
   table.parentElement.dataset.snsScrollLeft = scrollLeft;
   table.parentElement.dataset.snsScrollTop = scrollTop;
 
-  // requestAnimationFrame(() => {
-  //   elems.forEach(cellsOfType => {
-  //     for (let i = 0; i < cellsOfType.length; i++) {
-  //       const cell = cellsOfType[i];
-  //       setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
-  //     }
-  //   });
-  //   tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
+  requestAnimationFrame(() => {
+    elems.forEach(cellsOfType => {
+      for (let i = 0; i < cellsOfType.length; i++) {
+        const cell = cellsOfType[i];
+        setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
+      }
+    });
+    tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
 
-  //   table.dispatchEvent(
-  //     new CustomEvent("sns:scroll", {
-  //       detail: { scrollLeft, scrollTop }
-  //     })
-  //   );
-  // });
+    table.dispatchEvent(
+      new CustomEvent("sns:scroll", {
+        detail: { scrollLeft, scrollTop }
+      })
+    );
+  });
+}
+
+function positionShadow(cell, showShadow, offsetX, offsetY) {
+  if (!showShadow) return;
+  const shadowColor = calculateShadowColor(cell, 0.4);
+  let xShadow = "0 0";
+  let yShadow = "0 0";
+  let shadow;
+  if (offsetY) {
+    shadow = calculateShadowOffset(offsetY);
+    yShadow = `0 ${shadow}px ${shadowColor}`;
+  }
+  if (offsetX) {
+    shadow = calculateShadowOffset(offsetX);
+    xShadow = `${shadow}px 0 ${shadowColor}`;
+  }
+  cell.style.setProperty("--x-shadow", xShadow);
+  cell.style.setProperty("--y-shadow", yShadow);
 }
 
 function scrollHandler(table, stickyElems, wrapper, showShadow, callback) {
@@ -562,19 +600,6 @@ function generateBorder({
   // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
 }
 
-function cellStyles({ id, left, top }) {
-  return `
-  .sns.sns-${id} .sns--is-stuck {
-    transform: translate(${left}px, ${top}px);
-  }
-  .sns.sns-${id} .sns--is-stuck-x {
-    transform: translateX(${left}px);
-  }
-  .sns.sns-${id} .sns--is-stuck-y {
-    transform: translateY(${top}px);
-  }`;
-}
-
 function index(elems, options = {}) {
   const { showShadow, callback } = options;
   // Must test for FF, because it does some seriously horrible things to the table layout.
@@ -595,9 +620,8 @@ function index(elems, options = {}) {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
       const id = nanoid();
-      // table.dataset.snsId = id;
       table.classList.add(`sns-${id}`);
-      const styleElem = document.createElement("style");
+      // const styleElem = document.createElement("style");
 
       // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
       // that 3rd party libraries can use to interface with Stick-n-Slide.
@@ -605,11 +629,11 @@ function index(elems, options = {}) {
       // transform positions of stuck elements.
       new MutationObserver((mutations, observer) => {
         const wrapper = mutations[0].target;
-        styleElem.textContent = cellStyles({
-          id,
-          left: wrapper.dataset.snsScrollLeft,
-          top: wrapper.dataset.snsScrollTop
-        });
+        // styleElem.textContent = cellStyles({
+        //   id,
+        //   left: wrapper.dataset.snsScrollLeft,
+        //   top: wrapper.dataset.snsScrollTop
+        // });
         wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
         wrapper.scrollTop = wrapper.dataset.snsScrollTop;
       }).observe(wrapper, {
@@ -693,18 +717,18 @@ function index(elems, options = {}) {
 
       const scrollPositions = {
         id,
-        styleElem,
+        // styleElem,
         left: wrapper.scrollLeft || 0,
         top: wrapper.scrollTop || 0
       };
       tableScrollPositions.set(table, scrollPositions);
 
-      styleElem.textContent = cellStyles({
-        id,
-        left: scrollPositions.left,
-        top: scrollPositions.top
-      });
-      wrapper.appendChild(styleElem);
+      // styleElem.textContent = cellStyles({
+      //   id,
+      //   left: scrollPositions.left,
+      //   top: scrollPositions.top
+      // });
+      // wrapper.appendChild(styleElem);
 
       for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
         for (

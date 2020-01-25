@@ -289,23 +289,23 @@ function calculateShadowColor(cell, opacity) {
   return `rgba(${rgb},${opacity})`;
 }
 
-// function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
-//   let transforms = [];
-//   if (
-//     cell.classList.contains("sns--is-stuck-y") ||
-//     cell.classList.contains("sns--is-stuck")
-//   ) {
-//     transforms.push(`translateY(${scrollTop}px)`);
-//   }
-//   if (
-//     cell.classList.contains("sns--is-stuck-x") ||
-//     cell.classList.contains("sns--is-stuck")
-//   ) {
-//     transforms.push(`translateX(${scrollLeft}px)`);
-//   }
-//   cell.style.transform = transforms.join(" ");
-//   positionShadow(cell, showShadow, scrollLeft, scrollTop);
-// }
+function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
+  let transforms = [];
+  if (
+    cell.classList.contains("sns--is-stuck-y") ||
+    cell.classList.contains("sns--is-stuck")
+  ) {
+    transforms.push(`translateY(${scrollTop}px)`);
+  }
+  if (
+    cell.classList.contains("sns--is-stuck-x") ||
+    cell.classList.contains("sns--is-stuck")
+  ) {
+    transforms.push(`translateX(${scrollLeft}px)`);
+  }
+  cell.style.transform = transforms.join(" ");
+  positionShadow(cell, showShadow, scrollLeft, scrollTop);
+}
 
 function positionStickyElements(
   table,
@@ -314,26 +314,26 @@ function positionStickyElements(
   scrollLeft = 0,
   scrollTop = 0
 ) {
-  const { id, styleElem } = tableScrollPositions.get(table);
-  styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
+  const { id } = tableScrollPositions.get(table);
+  // styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
   table.parentElement.dataset.snsScrollLeft = scrollLeft;
   table.parentElement.dataset.snsScrollTop = scrollTop;
 
-  // requestAnimationFrame(() => {
-  //   elems.forEach(cellsOfType => {
-  //     for (let i = 0; i < cellsOfType.length; i++) {
-  //       const cell = cellsOfType[i];
-  //       setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
-  //     }
-  //   });
-  //   tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
+  requestAnimationFrame(() => {
+    elems.forEach(cellsOfType => {
+      for (let i = 0; i < cellsOfType.length; i++) {
+        const cell = cellsOfType[i];
+        setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
+      }
+    });
+    tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
 
-  //   table.dispatchEvent(
-  //     new CustomEvent("sns:scroll", {
-  //       detail: { scrollLeft, scrollTop }
-  //     })
-  //   );
-  // });
+    table.dispatchEvent(
+      new CustomEvent("sns:scroll", {
+        detail: { scrollLeft, scrollTop }
+      })
+    );
+  });
 }
 
 function positionShadow(cell, showShadow, offsetX, offsetY) {
@@ -542,7 +542,7 @@ export default function(elems, options = {}) {
       const wrapper = table.parentElement;
       const id = nanoid();
       table.classList.add(`sns-${id}`);
-      const styleElem = document.createElement("style");
+      // const styleElem = document.createElement("style");
 
       // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
       // that 3rd party libraries can use to interface with Stick-n-Slide.
@@ -550,11 +550,11 @@ export default function(elems, options = {}) {
       // transform positions of stuck elements.
       new MutationObserver((mutations, observer) => {
         const wrapper = mutations[0].target;
-        styleElem.textContent = cellStyles({
-          id,
-          left: wrapper.dataset.snsScrollLeft,
-          top: wrapper.dataset.snsScrollTop
-        });
+        // styleElem.textContent = cellStyles({
+        //   id,
+        //   left: wrapper.dataset.snsScrollLeft,
+        //   top: wrapper.dataset.snsScrollTop
+        // });
         wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
         wrapper.scrollTop = wrapper.dataset.snsScrollTop;
       }).observe(wrapper, {
@@ -638,18 +638,18 @@ export default function(elems, options = {}) {
 
       const scrollPositions = {
         id,
-        styleElem,
+        // styleElem,
         left: wrapper.scrollLeft || 0,
         top: wrapper.scrollTop || 0
       };
       tableScrollPositions.set(table, scrollPositions);
 
-      styleElem.textContent = cellStyles({
-        id,
-        left: scrollPositions.left,
-        top: scrollPositions.top
-      });
-      wrapper.appendChild(styleElem);
+      // styleElem.textContent = cellStyles({
+      //   id,
+      //   left: scrollPositions.left,
+      //   top: scrollPositions.top
+      // });
+      // wrapper.appendChild(styleElem);
 
       for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
         for (

@@ -541,16 +541,6 @@
 
   var normalizeWheel$1 = normalizeWheel_1;
 
-  if (process.env.NODE_ENV !== 'production') {
-    if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
-      throw new Error('React Native does not have a built-in secure random generator. ' + 'If you don’t need unpredictable IDs, you can use `nanoid/non-secure`. ' + 'For secure ID install `expo-random` locally and use `nanoid/async`.');
-    }
-
-    if (typeof self === 'undefined' || !self.crypto && !self.msCrypto) {
-      throw new Error('Your browser does not have secure random generator. ' + 'If you don’t need unpredictable IDs, you can use nanoid/non-secure.');
-    }
-  }
-
   var crypto = self.crypto || self.msCrypto;
   /*
    * This alphabet uses a-z A-Z 0-9 _- symbols.
@@ -853,52 +843,97 @@
       callback(newX, newY);
     }
   }
-  //   let transforms = [];
-  //   if (
-  //     cell.classList.contains("sns--is-stuck-y") ||
-  //     cell.classList.contains("sns--is-stuck")
-  //   ) {
-  //     transforms.push(`translateY(${scrollTop}px)`);
-  //   }
-  //   if (
-  //     cell.classList.contains("sns--is-stuck-x") ||
-  //     cell.classList.contains("sns--is-stuck")
-  //   ) {
-  //     transforms.push(`translateX(${scrollLeft}px)`);
-  //   }
-  //   cell.style.transform = transforms.join(" ");
-  //   positionShadow(cell, showShadow, scrollLeft, scrollTop);
-  // }
 
+  function calculateShadowOffset(value) {
+    value = Math.ceil(value / 10);
+
+    if (value > 2) {
+      return 2;
+    } else {
+      return value;
+    }
+  }
+
+  function calculateShadowColor(cell, opacity) {
+    var rgb = window.getComputedStyle(cell).backgroundColor.replace("rgb(", "").replace(")", "").split(",").map(function (value) {
+      return Math.round(parseInt(value, 10) * 0.3);
+    }).join(",");
+    return "rgba(".concat(rgb, ",").concat(opacity, ")");
+  }
+
+  function setCellTransforms(_ref2) {
+    var cell = _ref2.cell,
+        showShadow = _ref2.showShadow,
+        scrollLeft = _ref2.scrollLeft,
+        scrollTop = _ref2.scrollTop;
+    var transforms = [];
+
+    if (cell.classList.contains("sns--is-stuck-y") || cell.classList.contains("sns--is-stuck")) {
+      transforms.push("translateY(".concat(scrollTop, "px)"));
+    }
+
+    if (cell.classList.contains("sns--is-stuck-x") || cell.classList.contains("sns--is-stuck")) {
+      transforms.push("translateX(".concat(scrollLeft, "px)"));
+    }
+
+    cell.style.transform = transforms.join(" ");
+    positionShadow(cell, showShadow, scrollLeft, scrollTop);
+  }
 
   function positionStickyElements(table, elems, showShadow) {
     var scrollLeft = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
     var scrollTop = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
 
     var _tableScrollPositions = tableScrollPositions.get(table),
-        id = _tableScrollPositions.id,
-        styleElem = _tableScrollPositions.styleElem;
+        id = _tableScrollPositions.id; // styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
 
-    styleElem.textContent = cellStyles({
-      id: id,
-      left: scrollLeft,
-      top: scrollTop
-    });
+
     table.parentElement.dataset.snsScrollLeft = scrollLeft;
-    table.parentElement.dataset.snsScrollTop = scrollTop; // requestAnimationFrame(() => {
-    //   elems.forEach(cellsOfType => {
-    //     for (let i = 0; i < cellsOfType.length; i++) {
-    //       const cell = cellsOfType[i];
-    //       setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
-    //     }
-    //   });
-    //   tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
-    //   table.dispatchEvent(
-    //     new CustomEvent("sns:scroll", {
-    //       detail: { scrollLeft, scrollTop }
-    //     })
-    //   );
-    // });
+    table.parentElement.dataset.snsScrollTop = scrollTop;
+    requestAnimationFrame(function () {
+      elems.forEach(function (cellsOfType) {
+        for (var i = 0; i < cellsOfType.length; i++) {
+          var cell = cellsOfType[i];
+          setCellTransforms({
+            cell: cell,
+            showShadow: showShadow,
+            scrollLeft: scrollLeft,
+            scrollTop: scrollTop
+          });
+        }
+      });
+      tableScrollPositions.set(table, {
+        left: scrollLeft,
+        top: scrollTop
+      });
+      table.dispatchEvent(new CustomEvent("sns:scroll", {
+        detail: {
+          scrollLeft: scrollLeft,
+          scrollTop: scrollTop
+        }
+      }));
+    });
+  }
+
+  function positionShadow(cell, showShadow, offsetX, offsetY) {
+    if (!showShadow) return;
+    var shadowColor = calculateShadowColor(cell, 0.4);
+    var xShadow = "0 0";
+    var yShadow = "0 0";
+    var shadow;
+
+    if (offsetY) {
+      shadow = calculateShadowOffset(offsetY);
+      yShadow = "0 ".concat(shadow, "px ").concat(shadowColor);
+    }
+
+    if (offsetX) {
+      shadow = calculateShadowOffset(offsetX);
+      xShadow = "".concat(shadow, "px 0 ").concat(shadowColor);
+    }
+
+    cell.style.setProperty("--x-shadow", xShadow);
+    cell.style.setProperty("--y-shadow", yShadow);
   }
 
   function scrollHandler(table, stickyElems, wrapper, showShadow, callback) {
@@ -1011,14 +1046,14 @@
     });
   }
 
-  function generateBorder(_ref2) {
-    var cell = _ref2.cell,
-        isFirefox = _ref2.isFirefox,
-        isIE11 = _ref2.isIE11,
-        _ref2$scrollPositions = _ref2.scrollPositions,
-        left = _ref2$scrollPositions.left,
-        top = _ref2$scrollPositions.top,
-        showShadow = _ref2.showShadow;
+  function generateBorder(_ref3) {
+    var cell = _ref3.cell,
+        isFirefox = _ref3.isFirefox,
+        isIE11 = _ref3.isIE11,
+        _ref3$scrollPositions = _ref3.scrollPositions,
+        left = _ref3$scrollPositions.left,
+        top = _ref3$scrollPositions.top,
+        showShadow = _ref3.showShadow;
 
     if (isIE11) {
       // Behavior for IE11.
@@ -1044,13 +1079,6 @@
 
   }
 
-  function cellStyles(_ref3) {
-    var id = _ref3.id,
-        left = _ref3.left,
-        top = _ref3.top;
-    return "\n  .sns.sns-".concat(id, " .sns--is-stuck {\n    transform: translate(").concat(left, "px, ").concat(top, "px);\n  }\n  .sns.sns-").concat(id, " .sns--is-stuck-x {\n    transform: translateX(").concat(left, "px);\n  }\n  .sns.sns-").concat(id, " .sns--is-stuck-y {\n    transform: translateY(").concat(top, "px);\n  }");
-  }
-
   function index (elems) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     var showShadow = options.showShadow,
@@ -1071,21 +1099,20 @@
     elems.forEach(function (table) {
       if (!tableScrollPositions.get(table)) {
         var wrapper = table.parentElement;
-        var id = index_browser(); // table.dataset.snsId = id;
-
-        table.classList.add("sns-".concat(id));
-        var styleElem = document.createElement("style"); // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
+        var id = index_browser();
+        table.classList.add("sns-".concat(id)); // const styleElem = document.createElement("style");
+        // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
         // that 3rd party libraries can use to interface with Stick-n-Slide.
         // If these values are changed, then update both the scroll position and the
         // transform positions of stuck elements.
 
         new MutationObserver(function (mutations, observer) {
-          var wrapper = mutations[0].target;
-          styleElem.textContent = cellStyles({
-            id: id,
-            left: wrapper.dataset.snsScrollLeft,
-            top: wrapper.dataset.snsScrollTop
-          });
+          var wrapper = mutations[0].target; // styleElem.textContent = cellStyles({
+          //   id,
+          //   left: wrapper.dataset.snsScrollLeft,
+          //   top: wrapper.dataset.snsScrollTop
+          // });
+
           wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
           wrapper.scrollTop = wrapper.dataset.snsScrollTop;
         }).observe(wrapper, {
@@ -1158,17 +1185,16 @@
         });
         var scrollPositions = {
           id: id,
-          styleElem: styleElem,
+          // styleElem,
           left: wrapper.scrollLeft || 0,
           top: wrapper.scrollTop || 0
         };
-        tableScrollPositions.set(table, scrollPositions);
-        styleElem.textContent = cellStyles({
-          id: id,
-          left: scrollPositions.left,
-          top: scrollPositions.top
-        });
-        wrapper.appendChild(styleElem);
+        tableScrollPositions.set(table, scrollPositions); // styleElem.textContent = cellStyles({
+        //   id,
+        //   left: scrollPositions.left,
+        //   top: scrollPositions.top
+        // });
+        // wrapper.appendChild(styleElem);
 
         for (var stickyIdx = 0; stickyIdx < _stickyElems.length; stickyIdx++) {
           for (var typeIdx = 0; typeIdx < _stickyElems[stickyIdx].length; typeIdx++) {
