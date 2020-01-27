@@ -408,24 +408,25 @@ function positionStickyElements(
 ) {
   const { id } = tableScrollPositions.get(table);
   // styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
+  // requestAnimationFrame(() => {
+  elems.forEach(cellsOfType => {
+    for (let i = 0; i < cellsOfType.length; i++) {
+      const cell = cellsOfType[i];
+      setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
+    }
+  });
+
   table.parentElement.dataset.snsScrollLeft = scrollLeft;
   table.parentElement.dataset.snsScrollTop = scrollTop;
 
-  requestAnimationFrame(() => {
-    elems.forEach(cellsOfType => {
-      for (let i = 0; i < cellsOfType.length; i++) {
-        const cell = cellsOfType[i];
-        setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
-      }
-    });
-    tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
+  tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
 
-    table.dispatchEvent(
-      new CustomEvent("sns:scroll", {
-        detail: { scrollLeft, scrollTop }
-      })
-    );
-  });
+  table.dispatchEvent(
+    new CustomEvent("sns:scroll", {
+      detail: { scrollLeft, scrollTop }
+    })
+  );
+  // });
 }
 
 function positionShadow(cell, showShadow, offsetX, offsetY) {
@@ -629,13 +630,21 @@ function index(elems, options = {}) {
       // transform positions of stuck elements.
       new MutationObserver((mutations, observer) => {
         const wrapper = mutations[0].target;
-        // styleElem.textContent = cellStyles({
-        //   id,
-        //   left: wrapper.dataset.snsScrollLeft,
-        //   top: wrapper.dataset.snsScrollTop
-        // });
+
+        // if (
+        //   parseFloat(wrapper.dataset.snsScrollLeft) !== wrapper.scrollLeft ||
+        //   parseFloat(wrapper.dataset.snsScrollTop) !== wrapper.scrollTop
+        // )
+        positionStickyElements(
+          table,
+          stickyElems,
+          showShadow,
+          wrapper.dataset.snsScrollLeft,
+          wrapper.dataset.snsScrollTop
+        );
         wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
         wrapper.scrollTop = wrapper.dataset.snsScrollTop;
+        observer.takeRecords();
       }).observe(wrapper, {
         attributes: true,
         attributeFilter: ["data-sns-scroll-left", "data-sns-scroll-top"],

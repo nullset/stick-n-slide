@@ -886,33 +886,32 @@
 
     var _tableScrollPositions = tableScrollPositions.get(table),
         id = _tableScrollPositions.id; // styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
+    // requestAnimationFrame(() => {
 
 
-    table.parentElement.dataset.snsScrollLeft = scrollLeft;
-    table.parentElement.dataset.snsScrollTop = scrollTop;
-    requestAnimationFrame(function () {
-      elems.forEach(function (cellsOfType) {
-        for (var i = 0; i < cellsOfType.length; i++) {
-          var cell = cellsOfType[i];
-          setCellTransforms({
-            cell: cell,
-            showShadow: showShadow,
-            scrollLeft: scrollLeft,
-            scrollTop: scrollTop
-          });
-        }
-      });
-      tableScrollPositions.set(table, {
-        left: scrollLeft,
-        top: scrollTop
-      });
-      table.dispatchEvent(new CustomEvent("sns:scroll", {
-        detail: {
+    elems.forEach(function (cellsOfType) {
+      for (var i = 0; i < cellsOfType.length; i++) {
+        var cell = cellsOfType[i];
+        setCellTransforms({
+          cell: cell,
+          showShadow: showShadow,
           scrollLeft: scrollLeft,
           scrollTop: scrollTop
-        }
-      }));
+        });
+      }
     });
+    table.parentElement.dataset.snsScrollLeft = scrollLeft;
+    table.parentElement.dataset.snsScrollTop = scrollTop;
+    tableScrollPositions.set(table, {
+      left: scrollLeft,
+      top: scrollTop
+    });
+    table.dispatchEvent(new CustomEvent("sns:scroll", {
+      detail: {
+        scrollLeft: scrollLeft,
+        scrollTop: scrollTop
+      }
+    })); // });
   }
 
   function positionShadow(cell, showShadow, offsetX, offsetY) {
@@ -1107,14 +1106,15 @@
         // transform positions of stuck elements.
 
         new MutationObserver(function (mutations, observer) {
-          var wrapper = mutations[0].target; // styleElem.textContent = cellStyles({
-          //   id,
-          //   left: wrapper.dataset.snsScrollLeft,
-          //   top: wrapper.dataset.snsScrollTop
-          // });
+          var wrapper = mutations[0].target; // if (
+          //   parseFloat(wrapper.dataset.snsScrollLeft) !== wrapper.scrollLeft ||
+          //   parseFloat(wrapper.dataset.snsScrollTop) !== wrapper.scrollTop
+          // )
 
+          positionStickyElements(table, _stickyElems, showShadow, wrapper.dataset.snsScrollLeft, wrapper.dataset.snsScrollTop);
           wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
           wrapper.scrollTop = wrapper.dataset.snsScrollTop;
+          observer.takeRecords();
         }).observe(wrapper, {
           attributes: true,
           attributeFilter: ["data-sns-scroll-left", "data-sns-scroll-top"],
