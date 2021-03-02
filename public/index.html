@@ -9,10 +9,682 @@
     <title>Snowpack App</title>
   </head>
   <body>
-    <img id="img" src="/logo.svg" />
-    <canvas id="canvas"></canvas>
+      <h1>Stick-n-Slide</h1>
+      <p>Because sometimes you want to stick, and sometimes you want to slide</p>
+      <!-- <video id="slipnslide" src="../assets/video.mp4" controls height="200"></video>
+                                                              <script>
+                                                                document.getElementById('slipnslide').playbackRate = 5;
+                                                              </script> -->
+      
+      <div class="wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+              <th>6</th>
+              <th>7</th>
+              <th>8</th>
+              <th>9</th>
+              <th>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                10
+              </th>
+              <th>11</th>
+              <th>12</th>
+              <th>13</th>
+              <th>14</th>
+              <th>15</th>
+              <th>16</th>
+              <th>17</th>
+              <th>18</th>
+              <th>19</th>
+              <th>20</th>
+            </tr>
+            <tr>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+              <th>6</th>
+              <th>7</th>
+              <th>8</th>
+              <th>9</th>
+              <th>10</th>
+              <th>11</th>
+              <th>12</th>
+              <th>13</th>
+              <th>14</th>
+              <th>15</th>
+              <th>16</th>
+              <th>17</th>
+              <th>18</th>
+              <th>19</th>
+              <th>20</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>
+                <div>xxx</div>
+                <span>a</span><b>1</b><span>z</span>
+              </th>
+              <th><b>2</b></th>
+              <td><b>3</b></td>
+              <td><b>4</b></td>
+              <td><b>5</b></td>
+              <td>6</td>
+              <td>7</td>
+              <td>
+                <div>1</div>
+                <div>2</div>
+                <div>3</div>
+                8
+                <div>1</div>
+                <div>2</div>
+                <div>3</div>
+              </td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>2</td>
+              <td>3</td>
+              <td>4</td>
+              <td>5</td>
+              <td>6</td>
+              <td>7</td>
+              <td>8</td>
+              <td>9</td>
+              <td>10</td>
+              <td>11</td>
+              <td>12</td>
+              <td>13</td>
+              <td>14</td>
+              <td>15</td>
+              <td>16</td>
+              <td>17</td>
+              <td>18</td>
+              <td>19</td>
+              <td>20</td>
+            </tr>
+          </tbody>
+          <tfoot></tfoot>
+        </table>
+      </div>
+      
+      <div>
+        <button id="backgroundColor">Change background</button>
+        <button id="borderColor">Change border color</button>
+        <!-- <button id="borderWidth">Change border width</button> -->
+        <button id="mergeCellRow">Merge cell</button>
+        <button id="changeContent">Change content</button>
+      </div>
+      
+      <h2>How to use</h2>
+      <ol>
+        <li>Make a table</li>
+        <li>
+          Ensure that the the table cells have backgrounds, borders defined
+          directly on them
+        </li>
+        <li>
+          Wrap the table in some containing element like a &lt;div&gt;, and make
+          sure the &lt;div&gt; has <code>height/width</code> and
+          <code>overflow</code> specified correctly so the table can be scrolled
+          if it is too large for its container
+        </li>
+        <li>
+          Add classes to the cells that you want to stick in place
+          <dl>
+            <dt><code>.sns-stuck</code></dt>
+            <dd>
+              Ensures the cell does not move at all when scrolled, in either
+              vertical or horizontal directions
+            </dd>
+            <dt><code>.sns-stuck-x</code></dt>
+            <dd>Cell can be scrolled vertically, but not horizontally</dd>
+            <dt><code>.sns-stuck-y</code></dt>
+            <dd>Cell can be scrolled horizontally, but not vertically</dd>
+          </dl>
+        </li>
+        <li>Get a reference to your table(s), either via native JS or jQuery</li>
+        <li>
+          <p>
+            Call <code>stickNSlide(table, {options})</code> or
+            <code>stickNSlide(tables, {options})</code>
+          </p>
+          <p>Options may include:</p>
+          <dl>
+            <dt><code>showShadow</code> - Boolean</dt>
+            <dd>Shows a small shadow offset from the stuck elements</dd>
+          </dl>
+        </li>
+      </ol>
+      
+      <h2>Known limitations</h2>
+      <h3>Firefox pre-57.0 (pre-Quantum) versions</h3>
+      <ul>
+        <li>
+          Having stuck cells with border widths of more than 1px would produce
+          inconsistent results
+        </li>
+      </ul>
+      
+      <h3>CSS declaration "overflow: hidden" on cells</h3>
+      <p>
+        Stick-n-Slide works its magic by using negative margins on table cells.
+        This allows simple and automatic passing of relevant cell styles to cell
+        :before elements (making JS unnecessary for basic table styles).
+        Unfortunately this also makes it impossible to add "overflow: hidden" to a
+        cell. If you need "overflow: hidden" you'll need to wrap the cell contents
+        in a <code>&lt;div&gt;</code> and add overflow to <b>that</b> element.
+      </p>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script type="module" src="/dist/index.js"></script>
+    <script type="module">
+      import stickNSlide from '/dist/index.js';
+
+      function randomColor() {
+        return '#' + ((Math.random() * 0xffffff) << 0).toString(16);
+      }
+
+      function randomNumber() {
+        return Math.floor(Math.random() * 6) + 1;
+      }
+
+      function backgroundColor(event) {
+        event.target.style.backgroundColor = randomColor();
+      }
+
+      function borderColor(event) {
+        event.target.style.borderColor = randomColor();
+      }
+
+      // function borderWidth(event) {
+      //   event.target.style.borderWidth = randomNumber() + 'px';
+      // }
+
+      // document.getElementById('borderWidth').addEventListener('click', (event)=> {
+      //   event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+      //   if (event.currentTarget.dataset.active) {
+      //     document.querySelector('table').addEventListener('click', borderWidth);
+      //   } else {
+      //     document.querySelector('table').removeEventListener('click', borderWidth);
+      //   }
+      // });
+
+      function mergeCellRow(event) {
+        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
+          if (event.target.nextElementSibling) {
+            event.target.colSpan =
+              event.target.colSpan + event.target.nextElementSibling.colSpan;
+            event.target.nextElementSibling.remove();
+          }
+        }
+      }
+
+      function changeContent(event) {
+        if (event.target.tagName === 'TD' || event.target.tagName === 'TH') {
+          fetch('http://www.randomtext.me/api/lorem/p-1/5-15')
+            .then((response) => response.json())
+            .then((json) => {
+              event.target.innerHTML = json.text_out;
+            });
+        }
+      }
+
+      window.addEventListener('load', function () {
+        const table = document.querySelector('table');
+        // table.querySelectorAll(':scope b')..on('click', function () {
+        //   alert();
+        // });
+
+        table.querySelectorAll(':scope thead th:nth-child(-n+3)').forEach((th) => {
+          th.classList.add('sns--is-stuck');
+        });
+
+        table.querySelectorAll(':scope thead th:nth-child(n+4)').forEach((th) => {
+          th.classList.add('sns--is-stuck-y');
+        });
+
+        table
+          .querySelectorAll(
+            ':scope tbody > tr:nth-child(n+1):nth-child(-n+11) > *:nth-child(-n+3)',
+          )
+          .forEach((node) => node.classList.add('sns--is-stuck-x'));
+
+        table
+          .querySelectorAll(':scope tbody > tr:nth-child(12) > *:nth-child(-n+2)')
+          .forEach((node) => node.classList.add('sns--is-stuck-x'));
+
+        table
+          .querySelectorAll(':scope tbody > tr:nth-child(13) > *:nth-child(-n+1)')
+          .forEach((node) => node.classList.add('sns--is-stuck-x'));
+
+        // table.stickyTable();
+        stickNSlide(table);
+
+        document
+          .getElementById('backgroundColor')
+          .addEventListener('click', (event) => {
+            if (event.currentTarget.dataset.active !== 'true') {
+              document
+                .querySelector('table')
+                .addEventListener('click', backgroundColor);
+            } else {
+              document
+                .querySelector('table')
+                .removeEventListener('click', backgroundColor);
+            }
+            event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+          });
+
+        document.getElementById('borderColor').addEventListener('click', (event) => {
+          if (event.currentTarget.dataset.active !== 'true') {
+            document.querySelector('table').addEventListener('click', borderColor);
+          } else {
+            document.querySelector('table').removeEventListener('click', borderColor);
+          }
+          event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+        });
+
+        document.getElementById('mergeCellRow').addEventListener('click', (event) => {
+          if (event.currentTarget.dataset.active !== 'true') {
+            document.querySelector('table').addEventListener('click', mergeCellRow);
+          } else {
+            document
+              .querySelector('table')
+              .removeEventListener('click', mergeCellRow);
+          }
+          event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+        });
+
+        document
+          .getElementById('changeContent')
+          .addEventListener('click', (event) => {
+            if (event.currentTarget.dataset.active !== 'true') {
+              document
+                .querySelector('table')
+                .addEventListener('click', changeContent);
+            } else {
+              document
+                .querySelector('table')
+                .removeEventListener('click', changeContent);
+            }
+            event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+          });
+      });
+
+        // $(document).ready(function () {
+        //   var table = $('table');
+        //   table.querySelectorAll(':scope b').on('click', function () {
+        //     alert();
+        //   });
+
+        //   table.querySelectorAll(':scope thead th:nth-child(-n+3)').each((i, th) => {
+        //     $(th).classList.add('sns--is-stuck');
+        //   });
+
+        //   table.querySelectorAll(':scope thead th:nth-child(n+4)').each((i, th) => {
+        //     $(th).classList.add('sns--is-stuck-y');
+        //   });
+
+        //   table
+        //     .querySelectorAll(':scope tbody > tr:nth-child(n+1):nth-child(-n+11) > *:nth-child(-n+3)')
+        //     .classList.add('sns--is-stuck-x');
+
+        //   table
+        //     .querySelectorAll(':scope tbody > tr:nth-child(12) > *:nth-child(-n+2)')
+        //     .classList.add('sns--is-stuck-x');
+        //   table
+        //     .querySelectorAll(':scope tbody > tr:nth-child(13) > *:nth-child(-n+1)')
+        //     .classList.add('sns--is-stuck-x');
+
+        //   // table.stickyTable();
+        //   stickNSlide(table);
+
+        //   document
+        //     .getElementById('backgroundColor')
+        //     .addEventListener('click', (event) => {
+        //       if (event.currentTarget.dataset.active !== 'true') {
+        //         document
+        //           .querySelector('table')
+        //           .addEventListener('click', backgroundColor);
+        //       } else {
+        //         document
+        //           .querySelector('table')
+        //           .removeEventListener('click', backgroundColor);
+        //       }
+        //       event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+        //     });
+
+        //   document.getElementById('borderColor').addEventListener('click', (event) => {
+        //     if (event.currentTarget.dataset.active !== 'true') {
+        //       document.querySelector('table').addEventListener('click', borderColor);
+        //     } else {
+        //       document.querySelector('table').removeEventListener('click', borderColor);
+        //     }
+        //     event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+        //   });
+
+        //   document.getElementById('mergeCellRow').addEventListener('click', (event) => {
+        //     if (event.currentTarget.dataset.active !== 'true') {
+        //       document.querySelector('table').addEventListener('click', mergeCellRow);
+        //     } else {
+        //       document
+        //         .querySelector('table')
+        //         .removeEventListener('click', mergeCellRow);
+        //     }
+        //     event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+        //   });
+
+        //   document
+        //     .getElementById('changeContent')
+        //     .addEventListener('click', (event) => {
+        //       if (event.currentTarget.dataset.active !== 'true') {
+        //         document
+        //           .querySelector('table')
+        //           .addEventListener('click', changeContent);
+        //       } else {
+        //         document
+        //           .querySelector('table')
+        //           .removeEventListener('click', changeContent);
+        //       }
+        //       event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+        //     });
+
+        //   // setTimeout(function() {
+        //   //   $('b').closest('td').each(function() {
+        //   //     var div = $('<div>blah</div>');
+        //   //     $(this).prepend(div);
+        //   //   });
+        //   // }, 5000);
+        // });
+
+    </script>
+    <!-- <script src="/demo.js"></script> -->
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

@@ -1,4 +1,31 @@
 {
+  "name": "stick-n-slide",
+  "version": "1.2.19",
+  "homepage": "http://brandalism.com/stick-n-slide",
+  "description": "A javascript library that makes table cells stick to the x or y axis (or both) when the table is scrolled.",
+  "keywords": [
+    "javascript",
+    "table",
+    "sticky headers"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com:nullset/stick-n-slide.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nullset/stick-n-slide/issues"
+  },
+  "author": {
+    "name": "Nathan Wright",
+    "url": "http://brandalism.com"
+  },
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "files": [
+    "src/index.js",
+    "src/index.css"
+  ],
+  "license": "MIT",
   "scripts": {
     "start": "snowpack dev",
     "build": "snowpack build",
@@ -7,7 +34,7 @@
     "lint": "prettier --check \"src/**/*.js\""
   },
   "dependencies": {
-    "canvas-confetti": "^1.2.0"
+    "normalize-wheel": "^1.0.1"
   },
   "devDependencies": {
     "prettier": "^2.0.5",
