@@ -48,7 +48,7 @@
     "rollup-plugin-terser": "^5.1.2"
   },
   "dependencies": {
-    "nanoid": "^2.1.9",
+    "nanoid": "^3.1.31",
     "normalize-wheel": "^1.0.1"
   },
   "peerDependencies": {}
