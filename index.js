@@ -176,8 +176,6 @@ function handleMutations(mutations, observer) {
     }
   });
 
-  ie11SetInnerCellHeights(table, stickyElems);
-
   requestAnimationFrame(() => {
     observer.observe(table, observeConfig);
   });
@@ -226,7 +224,6 @@ function wheelHandler({
   clientHeight,
   showShadow,
   callback,
-  isIE11,
 }) {
   const maxWidth = scrollWidth - clientWidth;
   const maxHeight = scrollHeight - clientHeight;
@@ -245,25 +242,19 @@ function wheelHandler({
     newY = 0;
   }
 
-  if (isIE11) {
-    positionStickyElements(table, stickyElems, showShadow, newX, newY);
-    wrapper.scrollLeft = newX;
-    wrapper.scrollTop = newY;
-  } else {
-    wrapper.scrollLeft = newX;
-    wrapper.scrollTop = newY;
+  wrapper.scrollLeft = newX;
+  wrapper.scrollTop = newY;
 
-    // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
-    // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
-    // and then use that same scroll value as the left/top offset for the stuck elements.
-    positionStickyElements(
-      table,
-      stickyElems,
-      showShadow,
-      wrapper.scrollLeft,
-      wrapper.scrollTop
-    );
-  }
+  // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
+  // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
+  // and then use that same scroll value as the left/top offset for the stuck elements.
+  positionStickyElements(
+    table,
+    stickyElems,
+    showShadow,
+    wrapper.scrollLeft,
+    wrapper.scrollTop
+  );
   if (callback) {
     callback(newX, newY);
   }
@@ -453,59 +444,23 @@ function verticalAlignment(value) {
   }
 }
 
-function ie11SetInnerCellHeights(table, stickyElems) {
-  for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
-    for (let typeIdx = 0; typeIdx < stickyElems[stickyIdx].length; typeIdx++) {
-      const cell = stickyElems[stickyIdx][typeIdx];
-
-      cell.style.height = "";
-    }
-  }
-
-  requestAnimationFrame(() => {
-    for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
-      for (
-        let typeIdx = 0;
-        typeIdx < stickyElems[stickyIdx].length;
-        typeIdx++
-      ) {
-        const cell = stickyElems[stickyIdx][typeIdx];
-        cell.style.height = `${cell.getBoundingClientRect().height}px`;
-      }
-    }
-
-    // stickyElems.forEach(cell => {
-    //   cell.style.height = `${cell.getBoundingClientRect().height}px`;
-    // });
-  });
-}
-
 function generateBorder({
   cell,
   isFirefox,
-  isIE11,
   scrollPositions: { left, top },
   showShadow,
 }) {
-  if (isIE11) {
-    // Behavior for IE11.
-    buildInnerCell(cell);
-  } else {
-    // Everything other than IE11.
-    const cellStyles = window.getComputedStyle(cell);
-    ["Top", "Right", "Bottom", "Left"].forEach((side) => {
-      ["Width"].forEach((property) => {
-        let borderWidth = cellStyles[`border${side}${property}`];
-        if (isFirefox) {
-          const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
-          borderWidth = `${Math.round(value[1])}${value[2]}`;
-        }
-        cell.style[`margin${side}`] = `-${borderWidth}`;
-      });
+  const cellStyles = window.getComputedStyle(cell);
+  ["Top", "Right", "Bottom", "Left"].forEach((side) => {
+    ["Width"].forEach((property) => {
+      let borderWidth = cellStyles[`border${side}${property}`];
+      if (isFirefox) {
+        const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
+        borderWidth = `${Math.round(value[1])}${value[2]}`;
+      }
+      cell.style[`margin${side}`] = `-${borderWidth}`;
     });
-  }
-  // setCellTransforms({ cell, scrollLeft: left, scrollTop: top, showShadow });
-  // cell.style.transform = `translateX(${left}px) translateY(${top}px)`;
+  });
 }
 
 function cellStyles({ id, left, top }) {
@@ -526,9 +481,6 @@ export default function (elems, options = {}) {
   // Must test for FF, because it does some seriously horrible things to the table layout.
   const userAgent = navigator.userAgent.toLowerCase();
   const isFirefox = userAgent.indexOf("firefox") > -1;
-  const isIE = userAgent.indexOf("trident") > -1;
-  const isIEedge = userAgent.indexOf("edge") > -1;
-  const isIE11 = isIE && !isIEedge;
 
   // Convert a jQuery object to an array, or convert a single element to an array.
   if (typeof elems.toArray === "function") {
@@ -592,17 +544,10 @@ export default function (elems, options = {}) {
             clientHeight,
             showShadow,
             callback,
-            isIE11,
           };
 
-          if (isIE || isIEedge) {
-            event.preventDefault();
-            event.stopPropagation();
-            wheelHandler(opts);
-          } else {
-            event.preventDefault();
-            wheelHandler(opts);
-          }
+          event.preventDefault();
+          wheelHandler(opts);
         },
         { capture: true }
       );
@@ -661,7 +606,6 @@ export default function (elems, options = {}) {
           generateBorder({
             cell,
             isFirefox,
-            isIE11,
             scrollPositions,
             showShadow,
           });
@@ -674,7 +618,7 @@ export default function (elems, options = {}) {
 
       // Set initial position of elements to 0.
       requestAnimationFrame(() => {
-        // positionStickyElements(table, stickyElems, showShadow, isIE11);
+        // positionStickyElements(table, stickyElems, showShadow);
         positionStickyElements(
           table,
           stickyElems,
@@ -682,64 +626,8 @@ export default function (elems, options = {}) {
           wrapper.scrollLeft,
           wrapper.scrollTop
         );
-
-        if (isIE11) {
-          ie11SetInnerCellHeights(table, stickyElems);
-        }
-
-        // ----------------------------
-        // Handle IE11 mutations to the table cells.
-        requestAnimationFrame(() => {
-          if (isIE && !isIEedge) {
-            let observer = new MutationObserver(handleMutations);
-            observer.observe(table, observeConfig);
-          } else {
-            new MutationObserver((mutations) => {
-              mutations.forEach((mutation) => {
-                if (!/^THEAD|TBODY|TFOOT|TH|TD$/.test(mutation.target.nodeName))
-                  return;
-
-                for (
-                  let stickyIdx = 0;
-                  stickyIdx < stickyElems.length;
-                  stickyIdx++
-                ) {
-                  for (
-                    let typeIdx = 0;
-                    typeIdx < stickyElems[stickyIdx].length;
-                    typeIdx++
-                  ) {
-                    const cell = stickyElems[stickyIdx][typeIdx];
-                    generateBorder({
-                      cell,
-                      isFirefox,
-                      isIE11,
-                      scrollPositions,
-                      showShadow,
-                    });
-                  }
-                }
-              });
-            }).observe(wrapper, {
-              childList: true,
-              subtree: true,
-              attributes: true,
-              attributeFilter: ["class"],
-            });
-          }
-        });
       });
     }
     return;
-  });
-
-  window.addEventListener("resize", () => {
-    requestAnimationFrame(() => {
-      elems.forEach((table) => {
-        if (isIE11) {
-          ie11SetInnerCellHeights(table, stickyElems);
-        }
-      });
-    });
   });
 }
