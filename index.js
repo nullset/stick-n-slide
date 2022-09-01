@@ -1,108 +1,16 @@
-import normalizeWheel from 'normalize-wheel';
-import crypto from 'crypto';
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-var random = createCommonjsModule(function (module) {
-if (crypto.randomFillSync) {
-  var buffers = { };
-  module.exports = function (bytes) {
-    var buffer = buffers[bytes];
-    if (!buffer) {
-      buffer = Buffer.allocUnsafe(bytes);
-      if (bytes <= 255) buffers[bytes] = buffer;
-    }
-    return crypto.randomFillSync(buffer)
-  };
-} else {
-  module.exports = crypto.randomBytes;
-}
-});
-
-/**
- * URL safe symbols.
- *
- * This alphabet uses a-z A-Z 0-9 _- symbols.
- * Symbols order was changed for better gzip compression.
- *
- * @name url
- * @type {string}
- *
- * @example
- * const url = require('nanoid/url')
- * generate(url, 10) //=> "Uakgb_J5m9"
- */
-var url =
-  'ModuleSymbhasOwnPr-0123456789ABCDEFGHNRVfgctiUvz_KqYTJkLxpZXIjQW';
-
-/**
- * Generate secure URL-friendly unique ID.
- *
- * By default, ID will have 21 symbols to have a collision probability similar
- * to UUID v4.
- *
- * @param {number} [size=21] The number of symbols in ID.
- *
- * @return {string} Random string.
- *
- * @example
- * const nanoid = require('nanoid')
- * model.id = nanoid() //=> "Uakgb_J5m9g-0JDMbcJqL"
- *
- * @name nanoid
- * @function
- */
-var nanoid = function (size) {
-  size = size || 21;
-  var bytes = random(size);
-  var id = '';
-  while (size--) {
-    id += url[bytes[size] & 63];
-  }
-  return id
-};
-
-function styleInject(css, ref) {
-  if ( ref === void 0 ) ref = {};
-  var insertAt = ref.insertAt;
-
-  if (!css || typeof document === 'undefined') { return; }
-
-  var head = document.head || document.getElementsByTagName('head')[0];
-  var style = document.createElement('style');
-  style.type = 'text/css';
-
-  if (insertAt === 'top') {
-    if (head.firstChild) {
-      head.insertBefore(style, head.firstChild);
-    } else {
-      head.appendChild(style);
-    }
-  } else {
-    head.appendChild(style);
-  }
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
-}
-
-var css = "@charset \"UTF-8\";\ntable.sns {\n  box-sizing: border-box;\n}\ntable.sns * {\n  box-sizing: border-box;\n}\ntable.sns tbody:first-child {\n  /* If a table does *not* start with a <thead>, ensure that cells within the <tbody> secondary <tr> do not have a top border. */\n}\ntable.sns tbody:first-child tr:not(:first-child) th,\ntable.sns tbody:first-child tr:not(:first-child) td {\n  border-top-width: 0;\n}\ntable.sns thead *[class*=sns--is-stuck],\ntable.sns tbody *[class*=sns--is-stuck] {\n  position: relative;\n  transition: box-shadow 0.1s;\n  /*\n    Add a zero-width space character to any empty stuck element. This prevents an issue in IE where\n    cells with no content are collapsed.\n  */\n  /*\n    Because transform removes our <th> from the normal flow of the page, it loses its top and bottom borders\n    (as, from the rendering engine perspective, it is no longer a part of the table).\n    We need to add these borders back via some css generated elements.\n  */\n  /*\n    Elements like input, select, textarea, button can be rendered by tho OS rather than the browser.\n    Because of this, clicking on these elements once they have been \"translated\" via translate()\n    can become impossible. By positioning them and adding a z-index, we force the browser to handle rendering\n    which fixes the issue.\n  */\n}\ntable.sns thead *[class*=sns--is-stuck]:empty:after,\ntable.sns tbody *[class*=sns--is-stuck]:empty:after {\n  content: \"​\";\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell) b {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before,\ntable.sns tbody *[class*=sns--is-stuck]:not(.sns__placeholder-cell):before {\n  content: \"\";\n  position: absolute;\n  border: inherit;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: inherit;\n  transition: box-shadow 0.1s;\n  box-shadow: var(--x-shadow, 0), var(--y-shadow, 0);\n  z-index: 0;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__placeholder-cell,\ntable.sns tbody *[class*=sns--is-stuck] .sns__placeholder-cell {\n  position: relative;\n}\ntable.sns thead *[class*=sns--is-stuck] .sns__cell-inner,\ntable.sns tbody *[class*=sns--is-stuck] .sns__cell-inner {\n  position: relative;\n  height: inherit;\n}\ntable.sns thead *[class*=sns--is-stuck] > *,\ntable.sns tbody *[class*=sns--is-stuck] > * {\n  position: relative;\n  z-index: 1;\n}\ntable.sns thead *.sns--is-stuck,\ntable.sns tbody *.sns--is-stuck {\n  z-index: 100;\n}\ntable.sns thead *.sns--is-stuck-x,\ntable.sns tbody *.sns--is-stuck-x {\n  z-index: 80;\n}\ntable.sns thead *.sns--is-stuck-y,\ntable.sns tbody *.sns--is-stuck-y {\n  z-index: 90;\n}\n\n@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {\n  table.sns {\n    margin-top: -2px;\n    margin-left: -1px;\n  }\n}";
-styleInject(css);
+import normalizeWheel from "normalize-wheel";
+import nanoid from "nanoid/index.js";
+import "./stick-n-slide.scss";
 
 const tableScrollPositions = new WeakMap();
 
 const observeConfig = {
   childList: true,
-  subtree: true
+  subtree: true,
 };
 
 // Custom event polyfill
-(function() {
+(function () {
   if (typeof window.CustomEvent === "function") return false;
 
   function CustomEvent(event, params) {
@@ -125,10 +33,10 @@ function handleMutations(mutations, observer) {
 
   const table = closest(mutations[0].target, "sns");
 
-  mutations.forEach(m => {
+  mutations.forEach((m) => {
     if (!table.classList.contains("sns--pause-mutation")) {
       if (m.type === "childList") {
-        Array.prototype.slice.call(m.removedNodes).forEach(removedNode => {
+        Array.prototype.slice.call(m.removedNodes).forEach((removedNode) => {
           if (removedNode.classList) {
             if (m.target.tagName == "TR") {
               // 0) Rebuild entire table TH/TD
@@ -153,7 +61,7 @@ function handleMutations(mutations, observer) {
                     } else if (attrName === "class") {
                       Array.prototype.slice
                         .call(removedNode.classList)
-                        .forEach(className => {
+                        .forEach((className) => {
                           addedNode.classList.add(className);
                         });
                     } else {
@@ -182,7 +90,7 @@ function handleMutations(mutations, observer) {
             }
           }
         });
-        Array.prototype.slice.call(m.addedNodes).forEach(addedNode => {
+        Array.prototype.slice.call(m.addedNodes).forEach((addedNode) => {
           // 1) Rebuild placeholder-cell
           if (m.target.classList.contains("sns__placeholder-cell")) {
             if (m.target.innerCellStyle) {
@@ -239,7 +147,7 @@ function handleMutations(mutations, observer) {
             if (
               !Array.prototype.slice
                 .call(m.target.children)
-                .find(node => node.classList.contains("sns__cell-contents"))
+                .find((node) => node.classList.contains("sns__cell-contents"))
             ) {
               // 2.1 - Build from scratch
               contents.appendChild(addedNode);
@@ -318,7 +226,7 @@ function wheelHandler({
   clientHeight,
   showShadow,
   callback,
-  isIE11
+  isIE11,
 }) {
   const maxWidth = scrollWidth - clientWidth;
   const maxHeight = scrollHeight - clientHeight;
@@ -359,6 +267,26 @@ function wheelHandler({
   if (callback) {
     callback(newX, newY);
   }
+}
+
+function calculateShadowOffset(value) {
+  value = Math.ceil(value / 10);
+  if (value > 2) {
+    return 2;
+  } else {
+    return value;
+  }
+}
+
+function calculateShadowColor(cell, opacity) {
+  const rgb = window
+    .getComputedStyle(cell)
+    .backgroundColor.replace("rgb(", "")
+    .replace(")", "")
+    .split(",")
+    .map((value) => Math.round(parseInt(value, 10) * 0.3))
+    .join(",");
+  return `rgba(${rgb},${opacity})`;
 }
 
 // function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
@@ -406,6 +334,24 @@ function positionStickyElements(
   //     })
   //   );
   // });
+}
+
+function positionShadow(cell, showShadow, offsetX, offsetY) {
+  if (!showShadow) return;
+  const shadowColor = calculateShadowColor(cell, 0.4);
+  let xShadow = "0 0";
+  let yShadow = "0 0";
+  let shadow;
+  if (offsetY) {
+    shadow = calculateShadowOffset(offsetY);
+    yShadow = `0 ${shadow}px ${shadowColor}`;
+  }
+  if (offsetX) {
+    shadow = calculateShadowOffset(offsetX);
+    xShadow = `${shadow}px 0 ${shadowColor}`;
+  }
+  cell.style.setProperty("--x-shadow", xShadow);
+  cell.style.setProperty("--y-shadow", yShadow);
 }
 
 function scrollHandler(table, stickyElems, wrapper, showShadow, callback) {
@@ -466,15 +412,15 @@ function buildInnerCell(cell) {
   cell.appendChild(innerCell);
 
   if (setStyles) {
-    ["padding", "border"].forEach(property => {
-      ["Top", "Right", "Bottom", "Left"].forEach(side => {
+    ["padding", "border"].forEach((property) => {
+      ["Top", "Right", "Bottom", "Left"].forEach((side) => {
         if (property === "border") {
           const borderWidth = cellStyles[`border${side}Width`];
           innerCell.style[
             `margin${altSide(side)}`
           ] = `calc(-1 * ${borderWidth})`;
 
-          ["Width", "Color", "Style"].forEach(attr => {
+          ["Width", "Color", "Style"].forEach((attr) => {
             const value = cellStyles[`${property}${side}${attr}`];
             innerCell.style[`${property}${side}${attr}`] = value;
           });
@@ -539,7 +485,7 @@ function generateBorder({
   isFirefox,
   isIE11,
   scrollPositions: { left, top },
-  showShadow
+  showShadow,
 }) {
   if (isIE11) {
     // Behavior for IE11.
@@ -547,8 +493,8 @@ function generateBorder({
   } else {
     // Everything other than IE11.
     const cellStyles = window.getComputedStyle(cell);
-    ["Top", "Right", "Bottom", "Left"].forEach(side => {
-      ["Width"].forEach(property => {
+    ["Top", "Right", "Bottom", "Left"].forEach((side) => {
+      ["Width"].forEach((property) => {
         let borderWidth = cellStyles[`border${side}${property}`];
         if (isFirefox) {
           const value = borderWidth.match(/([^a-z%]+)([a-z%]+)/);
@@ -575,7 +521,7 @@ function cellStyles({ id, left, top }) {
   }`;
 }
 
-function index(elems, options = {}) {
+export default function (elems, options = {}) {
   const { showShadow, callback } = options;
   // Must test for FF, because it does some seriously horrible things to the table layout.
   const userAgent = navigator.userAgent.toLowerCase();
@@ -591,11 +537,10 @@ function index(elems, options = {}) {
     elems = [elems];
   }
 
-  elems.forEach(table => {
+  elems.forEach((table) => {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
       const id = nanoid();
-      // table.dataset.snsId = id;
       table.classList.add(`sns-${id}`);
       const styleElem = document.createElement("style");
 
@@ -608,19 +553,19 @@ function index(elems, options = {}) {
         styleElem.textContent = cellStyles({
           id,
           left: wrapper.dataset.snsScrollLeft,
-          top: wrapper.dataset.snsScrollTop
+          top: wrapper.dataset.snsScrollTop,
         });
         wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
         wrapper.scrollTop = wrapper.dataset.snsScrollTop;
       }).observe(wrapper, {
         attributes: true,
         attributeFilter: ["data-sns-scroll-left", "data-sns-scroll-top"],
-        attributeOldValue: true
+        attributeOldValue: true,
       });
 
       wrapper.addEventListener(
         "wheel",
-        event => {
+        (event) => {
           const normalized = normalizeWheel(event);
           wheelEventTriggered = true;
           const { pixelX, pixelY } = normalized;
@@ -630,7 +575,7 @@ function index(elems, options = {}) {
             scrollWidth,
             scrollHeight,
             clientWidth,
-            clientHeight
+            clientHeight,
           } = wrapper;
 
           const opts = {
@@ -647,7 +592,7 @@ function index(elems, options = {}) {
             clientHeight,
             showShadow,
             callback,
-            isIE11
+            isIE11,
           };
 
           if (isIE || isIEedge) {
@@ -673,7 +618,7 @@ function index(elems, options = {}) {
       const stickyElems = [
         "sns--is-stuck",
         "sns--is-stuck-y",
-        "sns--is-stuck-x"
+        "sns--is-stuck-x",
       ].reduce((acc, className) => {
         acc.push(table.getElementsByClassName(className));
         return acc;
@@ -685,7 +630,7 @@ function index(elems, options = {}) {
       table.classList.add("sns");
       table.style.position = "relative";
 
-      ["Top", "Left"].forEach(side => {
+      ["Top", "Left"].forEach((side) => {
         if (table[`offset${side}`] > 0) {
           table.style[side.toLowerCase()] = `-${table[`offset${side}`]}px`;
         }
@@ -695,14 +640,14 @@ function index(elems, options = {}) {
         id,
         styleElem,
         left: wrapper.scrollLeft || 0,
-        top: wrapper.scrollTop || 0
+        top: wrapper.scrollTop || 0,
       };
       tableScrollPositions.set(table, scrollPositions);
 
       styleElem.textContent = cellStyles({
         id,
         left: scrollPositions.left,
-        top: scrollPositions.top
+        top: scrollPositions.top,
       });
       wrapper.appendChild(styleElem);
 
@@ -718,7 +663,7 @@ function index(elems, options = {}) {
             isFirefox,
             isIE11,
             scrollPositions,
-            showShadow
+            showShadow,
           });
         }
       }
@@ -749,8 +694,8 @@ function index(elems, options = {}) {
             let observer = new MutationObserver(handleMutations);
             observer.observe(table, observeConfig);
           } else {
-            new MutationObserver(mutations => {
-              mutations.forEach(mutation => {
+            new MutationObserver((mutations) => {
+              mutations.forEach((mutation) => {
                 if (!/^THEAD|TBODY|TFOOT|TH|TD$/.test(mutation.target.nodeName))
                   return;
 
@@ -770,7 +715,7 @@ function index(elems, options = {}) {
                       isFirefox,
                       isIE11,
                       scrollPositions,
-                      showShadow
+                      showShadow,
                     });
                   }
                 }
@@ -779,7 +724,7 @@ function index(elems, options = {}) {
               childList: true,
               subtree: true,
               attributes: true,
-              attributeFilter: ["class"]
+              attributeFilter: ["class"],
             });
           }
         });
@@ -790,7 +735,7 @@ function index(elems, options = {}) {
 
   window.addEventListener("resize", () => {
     requestAnimationFrame(() => {
-      elems.forEach(table => {
+      elems.forEach((table) => {
         if (isIE11) {
           ie11SetInnerCellHeights(table, stickyElems);
         }
@@ -798,6 +743,3 @@ function index(elems, options = {}) {
     });
   });
 }
-
-export default index;
-//# sourceMappingURL=stick-n-slide.esm.js.map

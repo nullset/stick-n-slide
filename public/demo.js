@@ -1,5 +1,4 @@
 import stickNSlide from "../index";
-// import $ from "jquery";
 import "./demo.scss";
 
 function randomColor() {
@@ -44,16 +43,16 @@ function mergeCellRow(event) {
 function changeContent(event) {
   if (event.target.tagName === "TD" || event.target.tagName === "TH") {
     fetch("http://www.randomtext.me/api/lorem/p-1/5-15")
-      .then(response => response.json())
-      .then(json => {
+      .then((response) => response.json())
+      .then((json) => {
         event.target.innerHTML = json.text_out;
       });
   }
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
   var $table = $("table");
-  $table.find("b").on("click", function() {
+  $table.find("b").on("click", function () {
     alert();
   });
 
@@ -81,7 +80,7 @@ $(document).ready(function() {
 
   document
     .getElementById("backgroundColor")
-    .addEventListener("click", event => {
+    .addEventListener("click", (event) => {
       if (event.currentTarget.dataset.active !== "true") {
         document
           .querySelector("table")
@@ -94,7 +93,7 @@ $(document).ready(function() {
       event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
     });
 
-  document.getElementById("borderColor").addEventListener("click", event => {
+  document.getElementById("borderColor").addEventListener("click", (event) => {
     if (event.currentTarget.dataset.active !== "true") {
       document.querySelector("table").addEventListener("click", borderColor);
     } else {
@@ -103,7 +102,7 @@ $(document).ready(function() {
     event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
   });
 
-  document.getElementById("mergeCellRow").addEventListener("click", event => {
+  document.getElementById("mergeCellRow").addEventListener("click", (event) => {
     if (event.currentTarget.dataset.active !== "true") {
       document.querySelector("table").addEventListener("click", mergeCellRow);
     } else {
@@ -114,16 +113,20 @@ $(document).ready(function() {
     event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
   });
 
-  document.getElementById("changeContent").addEventListener("click", event => {
-    if (event.currentTarget.dataset.active !== "true") {
-      document.querySelector("table").addEventListener("click", changeContent);
-    } else {
-      document
-        .querySelector("table")
-        .removeEventListener("click", changeContent);
-    }
-    event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
-  });
+  document
+    .getElementById("changeContent")
+    .addEventListener("click", (event) => {
+      if (event.currentTarget.dataset.active !== "true") {
+        document
+          .querySelector("table")
+          .addEventListener("click", changeContent);
+      } else {
+        document
+          .querySelector("table")
+          .removeEventListener("click", changeContent);
+      }
+      event.currentTarget.dataset.active = !event.currentTarget.dataset.active;
+    });
 
   // setTimeout(function() {
   //   $('b').closest('td').each(function() {
