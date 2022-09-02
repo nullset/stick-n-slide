@@ -74,12 +74,18 @@ table.sns {
     }
     *.sns--is-stuck {
       z-index: 100;
+      will-change: transform;
+      transform: translate(var(--sns-scroll-left), var(--sns-scroll-top));
     }
     *.sns--is-stuck-x {
       z-index: 80;
+      will-change: transform;
+      transform: translateX(var(--sns-scroll-left));
     }
     *.sns--is-stuck-y {
       z-index: 90;
+      will-change: transform;
+      transform: translateY(var(--sns-scroll-top));
     }
   }
 }

@@ -1,201 +1,7 @@
 import normalizeWheel from "normalize-wheel";
-import nanoid from "nanoid/index.js";
 import "./stick-n-slide.scss";
 
 const tableScrollPositions = new WeakMap();
-
-const observeConfig = {
-  childList: true,
-  subtree: true,
-};
-
-// Custom event polyfill
-(function () {
-  if (typeof window.CustomEvent === "function") return false;
-
-  function CustomEvent(event, params) {
-    params = params || { bubbles: false, cancelable: false, detail: null };
-    var evt = document.createEvent("CustomEvent");
-    evt.initCustomEvent(
-      event,
-      params.bubbles,
-      params.cancelable,
-      params.detail
-    );
-    return evt;
-  }
-
-  window.CustomEvent = CustomEvent;
-})();
-
-function handleMutations(mutations, observer) {
-  observer.disconnect(); // Prevent any further updates to the DOM from making the observer thrash.
-
-  const table = closest(mutations[0].target, "sns");
-
-  mutations.forEach((m) => {
-    if (!table.classList.contains("sns--pause-mutation")) {
-      if (m.type === "childList") {
-        Array.prototype.slice.call(m.removedNodes).forEach((removedNode) => {
-          if (removedNode.classList) {
-            if (m.target.tagName == "TR") {
-              // 0) Rebuild entire table TH/TD
-              Array.prototype.slice
-                .call(m.removedNodes)
-                .forEach((removedNode, i) => {
-                  const addedNode = m.addedNodes[i];
-
-                  // Merge DOM attributes
-                  const oldAttrs = removedNode.attributes;
-                  for (let i = oldAttrs.length - 1; i >= 0; i--) {
-                    const attrName = oldAttrs[i].name;
-                    const attrValue = oldAttrs[i].value;
-                    if (attrName === "style") {
-                      const oldStyle = (
-                        removedNode.getAttribute("style") || ""
-                      ).replace(/;$/, "");
-                      addedNode.setAttribute(
-                        "style",
-                        `${oldStyle}; ${addedNode.getAttribute("style")}`
-                      );
-                    } else if (attrName === "class") {
-                      Array.prototype.slice
-                        .call(removedNode.classList)
-                        .forEach((className) => {
-                          addedNode.classList.add(className);
-                        });
-                    } else {
-                      if (addedNode.getAttribute(attrName) === null) {
-                        addedNode.setAttribute(attrName, attrValue);
-                      }
-                    }
-                  }
-
-                  // Build up inner cell and contents
-                  const innerCell = removedNode.firstChild;
-                  const contents = innerCell.firstChild;
-                  while (contents.firstChild) {
-                    contents.removeChild(contents.firstChild);
-                  }
-
-                  while (addedNode.firstChild) {
-                    contents.appendChild(addedNode.firstChild);
-                  }
-
-                  addedNode.appendChild(innerCell);
-                });
-            } else if (removedNode.classList.contains("sns__cell-inner")) {
-              // 1.1 - From scratch
-              m.target.innerCellStyle = removedNode.getAttribute("style");
-            }
-          }
-        });
-        Array.prototype.slice.call(m.addedNodes).forEach((addedNode) => {
-          // 1) Rebuild placeholder-cell
-          if (m.target.classList.contains("sns__placeholder-cell")) {
-            if (m.target.innerCellStyle) {
-              // 1.1 - From scratch
-              const innerCell = document.createElement("div");
-              innerCell.setAttribute("class", "sns__cell-inner");
-              innerCell.setAttribute("style", m.target.innerCellStyle);
-              delete m.target.innerCellStyle;
-
-              const contents = document.createElement("div");
-              contents.classList.add("sns__cell-contents");
-              contents.appendChild(addedNode);
-
-              innerCell.appendChild(contents);
-              m.target.appendChild(innerCell);
-            } else {
-              // 1.2 - When a direct descendent of placeholder-cell has been created
-              const innerCell = document.createElement("div");
-              innerCell.setAttribute("class", "sns__cell-inner");
-
-              const contents = document.createElement("div");
-              contents.classList.add("sns__cell-contents");
-
-              while (m.target.firstChild) {
-                const child = m.target.firstChild;
-                if (
-                  child.classList &&
-                  child.classList.contains("sns__cell-inner")
-                ) {
-                  innerCell.setAttribute(
-                    "style",
-                    m.target.firstChild.getAttribute("style")
-                  );
-                  while (child.firstChild.firstChild) {
-                    contents.appendChild(child.firstChild.firstChild);
-                  }
-                  m.target.removeChild(child);
-                } else {
-                  contents.appendChild(child);
-                }
-              }
-
-              innerCell.appendChild(contents);
-
-              m.target.appendChild(innerCell);
-            }
-          }
-
-          // 2) Rebuild cell-inner
-          if (m.target.classList.contains("sns__cell-inner")) {
-            const contents = document.createElement("div");
-            contents.classList.add("sns__cell-contents");
-
-            if (
-              !Array.prototype.slice
-                .call(m.target.children)
-                .find((node) => node.classList.contains("sns__cell-contents"))
-            ) {
-              // 2.1 - Build from scratch
-              contents.appendChild(addedNode);
-              m.target.appendChild(contents);
-            } else {
-              // 2.2 - When a direct descendent of cell-inner has been created
-              while (m.target.firstChild) {
-                const child = m.target.firstChild;
-                if (
-                  child.classList &&
-                  child.classList.contains("sns__cell-contents")
-                ) {
-                  while (child && child.firstChild) {
-                    contents.appendChild(child.firstChild);
-                  }
-                  m.target.removeChild(child);
-                } else {
-                  contents.appendChild(child);
-                }
-              }
-              m.target.appendChild(contents);
-            }
-          }
-        });
-      }
-    }
-  });
-
-  requestAnimationFrame(() => {
-    observer.observe(table, observeConfig);
-  });
-}
-
-function closest(elem, classMatcher) {
-  if (elem.classList) {
-    if (elem.classList.contains(classMatcher)) {
-      return elem;
-    } else {
-      if (elem.parentElement) {
-        return closest(elem.parentElement, classMatcher);
-      } else {
-        return;
-      }
-    }
-  } else {
-    return closest(elem.parentElement, classMatcher);
-  }
-}
 
 function altSide(side) {
   switch (side) {
@@ -242,19 +48,12 @@ function wheelHandler({
     newY = 0;
   }
 
-  wrapper.scrollLeft = newX;
-  wrapper.scrollTop = newY;
-
   // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
   // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
-  // and then use that same scroll value as the left/top offset for the stuck elements.
-  positionStickyElements(
-    table,
-    stickyElems,
-    showShadow,
-    wrapper.scrollLeft,
-    wrapper.scrollTop
-  );
+  // and then use the rendered scroll value as the left/top offset for the stuck elements.
+  wrapper.scrollTo(newX, newY);
+  positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
+
   if (callback) {
     callback(newX, newY);
   }
@@ -280,89 +79,17 @@ function calculateShadowColor(cell, opacity) {
   return `rgba(${rgb},${opacity})`;
 }
 
-// function setCellTransforms({ cell, showShadow, scrollLeft, scrollTop }) {
-//   let transforms = [];
-//   if (
-//     cell.classList.contains("sns--is-stuck-y") ||
-//     cell.classList.contains("sns--is-stuck")
-//   ) {
-//     transforms.push(`translateY(${scrollTop}px)`);
-//   }
-//   if (
-//     cell.classList.contains("sns--is-stuck-x") ||
-//     cell.classList.contains("sns--is-stuck")
-//   ) {
-//     transforms.push(`translateX(${scrollLeft}px)`);
-//   }
-//   cell.style.transform = transforms.join(" ");
-//   positionShadow(cell, showShadow, scrollLeft, scrollTop);
-// }
-
-function positionStickyElements(
-  table,
-  elems,
-  showShadow,
-  scrollLeft = 0,
-  scrollTop = 0
-) {
-  const { id, styleElem } = tableScrollPositions.get(table);
-  styleElem.textContent = cellStyles({ id, left: scrollLeft, top: scrollTop });
-  table.parentElement.dataset.snsScrollLeft = scrollLeft;
-  table.parentElement.dataset.snsScrollTop = scrollTop;
-
-  // requestAnimationFrame(() => {
-  //   elems.forEach(cellsOfType => {
-  //     for (let i = 0; i < cellsOfType.length; i++) {
-  //       const cell = cellsOfType[i];
-  //       setCellTransforms({ cell, showShadow, scrollLeft, scrollTop });
-  //     }
-  //   });
-  //   tableScrollPositions.set(table, { left: scrollLeft, top: scrollTop });
-
-  //   table.dispatchEvent(
-  //     new CustomEvent("sns:scroll", {
-  //       detail: { scrollLeft, scrollTop }
-  //     })
-  //   );
-  // });
+function positionStickyElements(table, scrollLeft = 0, scrollTop = 0) {
+  table.parentElement.style.setProperty("--sns-scroll-left", `${scrollLeft}px`);
+  table.parentElement.style.setProperty("--sns-scroll-top", `${scrollTop}px`);
 }
 
-function positionShadow(cell, showShadow, offsetX, offsetY) {
-  if (!showShadow) return;
-  const shadowColor = calculateShadowColor(cell, 0.4);
-  let xShadow = "0 0";
-  let yShadow = "0 0";
-  let shadow;
-  if (offsetY) {
-    shadow = calculateShadowOffset(offsetY);
-    yShadow = `0 ${shadow}px ${shadowColor}`;
-  }
-  if (offsetX) {
-    shadow = calculateShadowOffset(offsetX);
-    xShadow = `${shadow}px 0 ${shadowColor}`;
-  }
-  cell.style.setProperty("--x-shadow", xShadow);
-  cell.style.setProperty("--y-shadow", yShadow);
+function scrollHandler(table, wrapper, callback) {
+  updateScrollPosition(table, wrapper, callback);
 }
 
-function scrollHandler(table, stickyElems, wrapper, showShadow, callback) {
-  updateScrollPosition(table, stickyElems, wrapper, showShadow, callback);
-}
-
-function updateScrollPosition(
-  table,
-  stickyElems,
-  wrapper,
-  showShadow,
-  callback
-) {
-  positionStickyElements(
-    table,
-    stickyElems,
-    showShadow,
-    wrapper.scrollLeft,
-    wrapper.scrollTop
-  );
+function updateScrollPosition(table, wrapper, callback) {
+  positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
   if (callback) {
     callback(wrapper.scrollLeft, wrapper.scrollTop);
   }
@@ -388,13 +115,7 @@ function buildInnerCell(cell) {
       }
       innerCell.setAttribute("style", cell.firstChild.getAttribute("style"));
       innerCell.style.height = "";
-      if ("removeNode" in cell.firstChild) {
-        // IE11 specific method.
-        cell.firstChild.removeNode(true);
-      } else {
-        // All other browsers ... technically not needed (since this code path only deals with IE11) but good to have for testing in other browsers.
-        cell.firstChild.remove();
-      }
+      cell.firstChild.remove();
       setStyles = false;
     }
   }
@@ -492,28 +213,6 @@ export default function (elems, options = {}) {
   elems.forEach((table) => {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
-      const id = nanoid();
-      table.classList.add(`sns-${id}`);
-      const styleElem = document.createElement("style");
-
-      // The data-sns-scroll-left & data-sns-scroll-top attributes are attributes
-      // that 3rd party libraries can use to interface with Stick-n-Slide.
-      // If these values are changed, then update both the scroll position and the
-      // transform positions of stuck elements.
-      new MutationObserver((mutations, observer) => {
-        const wrapper = mutations[0].target;
-        styleElem.textContent = cellStyles({
-          id,
-          left: wrapper.dataset.snsScrollLeft,
-          top: wrapper.dataset.snsScrollTop,
-        });
-        wrapper.scrollLeft = wrapper.dataset.snsScrollLeft;
-        wrapper.scrollTop = wrapper.dataset.snsScrollTop;
-      }).observe(wrapper, {
-        attributes: true,
-        attributeFilter: ["data-sns-scroll-left", "data-sns-scroll-top"],
-        attributeOldValue: true,
-      });
 
       wrapper.addEventListener(
         "wheel",
@@ -582,19 +281,10 @@ export default function (elems, options = {}) {
       });
 
       const scrollPositions = {
-        id,
-        styleElem,
         left: wrapper.scrollLeft || 0,
         top: wrapper.scrollTop || 0,
       };
       tableScrollPositions.set(table, scrollPositions);
-
-      styleElem.textContent = cellStyles({
-        id,
-        left: scrollPositions.left,
-        top: scrollPositions.top,
-      });
-      wrapper.appendChild(styleElem);
 
       for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
         for (
@@ -619,13 +309,7 @@ export default function (elems, options = {}) {
       // Set initial position of elements to 0.
       requestAnimationFrame(() => {
         // positionStickyElements(table, stickyElems, showShadow);
-        positionStickyElements(
-          table,
-          stickyElems,
-          showShadow,
-          wrapper.scrollLeft,
-          wrapper.scrollTop
-        );
+        positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
       });
     }
     return;
