@@ -214,39 +214,45 @@ export default function (elems, options = {}) {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
 
+      function wheelFn(event) {
+        const normalized = normalizeWheel(event);
+        const { pixelX, pixelY } = normalized;
+        const {
+          scrollLeft,
+          scrollTop,
+          scrollWidth,
+          scrollHeight,
+          clientWidth,
+          clientHeight,
+        } = wrapper;
+
+        const opts = {
+          table,
+          wrapper,
+          stickyElems,
+          pixelX,
+          pixelY,
+          scrollLeft,
+          scrollTop,
+          scrollWidth,
+          scrollHeight,
+          clientWidth,
+          clientHeight,
+          showShadow,
+          callback,
+        };
+
+        event.preventDefault();
+        wheelHandler(opts);
+      }
+
       wrapper.addEventListener(
         "wheel",
         (event) => {
-          const normalized = normalizeWheel(event);
+          wheelFn(event);
           wheelEventTriggered = true;
-          const { pixelX, pixelY } = normalized;
-          const {
-            scrollLeft,
-            scrollTop,
-            scrollWidth,
-            scrollHeight,
-            clientWidth,
-            clientHeight,
-          } = wrapper;
-
-          const opts = {
-            table,
-            wrapper,
-            stickyElems,
-            pixelX,
-            pixelY,
-            scrollLeft,
-            scrollTop,
-            scrollWidth,
-            scrollHeight,
-            clientWidth,
-            clientHeight,
-            showShadow,
-            callback,
-          };
 
           event.preventDefault();
-          wheelHandler(opts);
         },
         { capture: true }
       );
@@ -255,7 +261,7 @@ export default function (elems, options = {}) {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
-          scrollHandler(table, stickyElems, wrapper, showShadow, callback);
+          scrollHandler(table, wrapper, callback);
         }
       });
 
