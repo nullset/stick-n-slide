@@ -4,6 +4,7 @@ specifiers:
   normalize-wheel: ^1.0.1
   sass: ^1.54.8
   vite: ^3.0.7
+  vite-plugin-css-injected-by-js: ^2.0.4
 
 dependencies:
   normalize-wheel: 1.0.1
@@ -11,6 +12,7 @@ dependencies:
 devDependencies:
   sass: 1.54.8
   vite: 3.0.9_sass@1.54.8
+  vite-plugin-css-injected-by-js: 2.0.4_vite@3.0.9
 
 packages:
 
@@ -398,6 +400,14 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+    dev: true
+
+  /vite-plugin-css-injected-by-js/2.0.4_vite@3.0.9:
+    resolution: {integrity: sha512-Ka4SfOLdcR8qFyQKwaMpwVSmis0X9rptTq6MSbbyH0SSVfMVGsfKTHd5u0xmNUZh2YNb6PVoCjOB0h8x+YJWFw==}
+    peerDependencies:
+      vite: '>2.0.0-0'
+    dependencies:
+      vite: 3.0.9_sass@1.54.8
     dev: true
 
   /vite/3.0.9_sass@1.54.8:
