@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="icon" type="image/svg+xml" href="/table.svg" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <title>Stick-n-Slide Demo</title>
-    <style></style>
+    <!-- <link rel="stylesheet" type="text/css" href="./demo.scss" media="screen" /> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
   </head>
   <body>
@@ -459,5 +460,25 @@
       cell. If you need "overflow: hidden" you'll need to wrap the cell contents
       in a <code>&lt;div&gt;</code> and add overflow to <b>that</b> element.
     </p>
+
+    <h2>Release details</h2>
+    <h3>2.0.0</h3>
+    <p>
+      Mainly minor changes, but using <a href="https://vitejs.dev/">Vite</a> for
+      building, so bumping the major version just in case there are unforseen
+      import issues. Also includes:
+    </p>
+    <ul>
+      <li>Performance improvements to Safari scroll experience.</li>
+      <li>Removed IE11 support.</li>
+      <li>Removed option for cell shadows.</li>
+      <li>
+        Switch to using CSS variables for updating cell transforms versus
+        individual <code>style</code> changes.
+      </li>
+    </ul>
+
+    <script type="module" src="/index.js"></script>
+    <script type="module" src="/public/demo.js"></script>
   </body>
 </html>
