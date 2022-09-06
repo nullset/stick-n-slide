@@ -314,6 +314,35 @@ export default function (elems, options = {}) {
       // Prevents both "wheel" and "scroll" events being triggered simultaneously.
       let wheelEventTriggered = false;
 
+      // Watch if any new cells are added/removed and update accordingly.
+      new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (!/^THEAD|TBODY|TFOOT|TH|TD$/.test(mutation.target.nodeName))
+            return;
+
+          for (let stickyIdx = 0; stickyIdx < stickyElems.length; stickyIdx++) {
+            for (
+              let typeIdx = 0;
+              typeIdx < stickyElems[stickyIdx].length;
+              typeIdx++
+            ) {
+              const cell = stickyElems[stickyIdx][typeIdx];
+              generateBorder({
+                cell,
+                isFirefox,
+                scrollPositions,
+                showShadow,
+              });
+            }
+          }
+        });
+      }).observe(wrapper, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+
       // Set initial position of elements to 0.
       requestAnimationFrame(() => {
         // positionStickyElements(table, stickyElems, showShadow);
