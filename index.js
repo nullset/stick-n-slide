@@ -51,12 +51,14 @@ function wheelHandler({
   // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
   // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
   // and then use the rendered scroll value as the left/top offset for the stuck elements.
-  wrapper.scrollTo(newX, newY);
-  positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
+  queueMicrotask(() => {
+    wrapper.scrollTo(newX, newY);
+    positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
 
-  if (callback) {
-    callback(newX, newY);
-  }
+    if (callback) {
+      callback(newX, newY);
+    }
+  });
 }
 
 function calculateShadowOffset(value) {
