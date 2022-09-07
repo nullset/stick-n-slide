@@ -51,14 +51,12 @@ function wheelHandler({
   // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
   // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
   // and then use the rendered scroll value as the left/top offset for the stuck elements.
-  queueMicrotask(() => {
-    wrapper.scrollTo(newX, newY);
-    positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
+  wrapper.scrollTo(newX, newY);
+  // positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
 
-    if (callback) {
-      callback(newX, newY);
-    }
-  });
+  if (callback) {
+    callback(newX, newY);
+  }
 }
 
 function calculateShadowOffset(value) {
@@ -216,56 +214,41 @@ export default function (elems, options = {}) {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
 
+      // Variable that tracks whether "wheel" event was called.
+      // Prevents both "wheel" and "scroll" events being triggered simultaneously.
+      let wheelEventTriggered = false;
+
       function wheelFn(event) {
+        const target = event.currentTarget;
         const normalized = normalizeWheel(event);
-        const { pixelX, pixelY } = normalized;
-        const {
-          scrollLeft,
-          scrollTop,
-          scrollWidth,
-          scrollHeight,
-          clientWidth,
-          clientHeight,
-        } = wrapper;
 
-        const opts = {
-          table,
-          wrapper,
-          stickyElems,
-          pixelX,
-          pixelY,
-          scrollLeft,
-          scrollTop,
-          scrollWidth,
-          scrollHeight,
-          clientWidth,
-          clientHeight,
-          showShadow,
-          callback,
-        };
-
+        target.scrollTo(
+          target.scrollLeft + normalized.pixelX,
+          target.scrollTop + normalized.pixelY
+        );
         event.preventDefault();
-        wheelHandler(opts);
+        wheelEventTriggered = true;
+
+        requestAnimationFrame(() => {
+          target.style.setProperty(
+            "--sns-scroll-left",
+            `${target.scrollLeft}px`
+          );
+          target.style.setProperty("--sns-scroll-top", `${target.scrollTop}px`);
+        });
       }
 
-      wrapper.addEventListener(
-        "wheel",
-        (event) => {
-          wheelFn(event);
-          wheelEventTriggered = true;
+      wrapper.addEventListener("wheel", wheelFn, { capture: true });
 
-          event.preventDefault();
-        },
-        { capture: true }
-      );
-
-      wrapper.addEventListener("scroll", () => {
+      function scrollFn() {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
           scrollHandler(table, wrapper, callback);
         }
-      });
+      }
+
+      wrapper.addEventListener("scroll", scrollFn);
 
       const stickyElems = [
         "sns--is-stuck",
@@ -309,10 +292,6 @@ export default function (elems, options = {}) {
           });
         }
       }
-
-      // Variable that tracks whether "wheel" event was called.
-      // Prevents both "wheel" and "scroll" events being triggered simultaneously.
-      let wheelEventTriggered = false;
 
       // Watch if any new cells are added/removed and update accordingly.
       new MutationObserver((mutations) => {
