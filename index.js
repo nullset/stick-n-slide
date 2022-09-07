@@ -16,51 +16,6 @@ function altSide(side) {
   }
 }
 
-function wheelHandler({
-  table,
-  wrapper,
-  stickyElems,
-  pixelX,
-  pixelY,
-  scrollLeft,
-  scrollTop,
-  scrollWidth,
-  scrollHeight,
-  clientWidth,
-  clientHeight,
-  showShadow,
-  callback,
-}) {
-  const maxWidth = scrollWidth - clientWidth;
-  const maxHeight = scrollHeight - clientHeight;
-  let newX = scrollLeft + pixelX;
-  let newY = scrollTop + pixelY;
-  if (newX >= maxWidth) {
-    newX = maxWidth;
-  }
-  if (newX <= 0) {
-    newX = 0;
-  }
-  if (newY >= maxHeight) {
-    newY = maxHeight;
-  }
-  if (newY <= 0) {
-    newY = 0;
-  }
-
-  // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
-  // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
-  // and then use the rendered scroll value as the left/top offset for the stuck elements.
-  queueMicrotask(() => {
-    wrapper.scrollTo(newX, newY);
-    positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
-
-    if (callback) {
-      callback(newX, newY);
-    }
-  });
-}
-
 function calculateShadowOffset(value) {
   value = Math.ceil(value / 10);
   if (value > 2) {
@@ -94,60 +49,6 @@ function updateScrollPosition(table, wrapper, callback) {
   positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
   if (callback) {
     callback(wrapper.scrollLeft, wrapper.scrollTop);
-  }
-}
-
-function buildInnerCell(cell) {
-  const cellStyles = window.getComputedStyle(cell);
-  cell.classList.add("sns__placeholder-cell");
-  let innerCell = document.createElement("div");
-  innerCell.setAttribute("class", "sns__cell-inner");
-  let cellContents = document.createElement("div");
-  cellContents.setAttribute("class", "sns__cell-contents");
-  let setStyles = true;
-  while (cell.firstChild) {
-    cellContents.appendChild(cell.firstChild);
-    if (
-      cell.firstChild &&
-      cell.firstChild.classList &&
-      cell.firstChild.classList.contains("sns__cell-inner")
-    ) {
-      while (cell.firstChild.firstChild.firstChild) {
-        cellContents.appendChild(cell.firstChild.firstChild.firstChild);
-      }
-      innerCell.setAttribute("style", cell.firstChild.getAttribute("style"));
-      innerCell.style.height = "";
-      cell.firstChild.remove();
-      setStyles = false;
-    }
-  }
-  innerCell.appendChild(cellContents);
-  cell.innerHTML = "";
-  cell.appendChild(innerCell);
-
-  if (setStyles) {
-    ["padding", "border"].forEach((property) => {
-      ["Top", "Right", "Bottom", "Left"].forEach((side) => {
-        if (property === "border") {
-          const borderWidth = cellStyles[`border${side}Width`];
-          innerCell.style[
-            `margin${altSide(side)}`
-          ] = `calc(-1 * ${borderWidth})`;
-
-          ["Width", "Color", "Style"].forEach((attr) => {
-            const value = cellStyles[`${property}${side}${attr}`];
-            innerCell.style[`${property}${side}${attr}`] = value;
-          });
-        } else {
-          innerCell.style[`${property}${side}`] =
-            cellStyles[`${property}${side}`];
-        }
-      });
-      cell.style[property] = "0";
-    });
-
-    innerCell.style.display = "flex";
-    innerCell.style.alignItems = verticalAlignment(cellStyles.verticalAlign);
   }
 }
 
@@ -216,56 +117,48 @@ export default function (elems, options = {}) {
     if (!tableScrollPositions.get(table)) {
       const wrapper = table.parentElement;
 
+      // Variable that tracks whether "wheel" event was called.
+      // Prevents both "wheel" and "scroll" events being triggered simultaneously.
+      let wheelEventTriggered = false;
+
       function wheelFn(event) {
+        const target = event.currentTarget;
         const normalized = normalizeWheel(event);
-        const { pixelX, pixelY } = normalized;
-        const {
-          scrollLeft,
-          scrollTop,
-          scrollWidth,
-          scrollHeight,
-          clientWidth,
-          clientHeight,
-        } = wrapper;
 
-        const opts = {
-          table,
-          wrapper,
-          stickyElems,
-          pixelX,
-          pixelY,
-          scrollLeft,
-          scrollTop,
-          scrollWidth,
-          scrollHeight,
-          clientWidth,
-          clientHeight,
-          showShadow,
-          callback,
-        };
-
+        // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
+        // rather to a sub-pixel value that is "pretty close" to what you specified. This can cause the scrolled area to become out of sync with the "stuck" areas. To work around that, set the scroll value
+        // and then use the rendered scroll value as the left/top offset for the stuck elements.
+        target.scrollTo(
+          target.scrollLeft + normalized.pixelX,
+          target.scrollTop + normalized.pixelY
+        );
         event.preventDefault();
-        wheelHandler(opts);
+        wheelEventTriggered = true;
+
+        requestAnimationFrame(() => {
+          target.style.setProperty(
+            "--sns-scroll-left",
+            `${target.scrollLeft}px`
+          );
+          target.style.setProperty("--sns-scroll-top", `${target.scrollTop}px`);
+
+          if (callback) {
+            callback(target.scrollX, target.scrollY);
+          }
+        });
       }
 
-      wrapper.addEventListener(
-        "wheel",
-        (event) => {
-          wheelFn(event);
-          wheelEventTriggered = true;
+      wrapper.addEventListener("wheel", wheelFn, { capture: true });
 
-          event.preventDefault();
-        },
-        { capture: true }
-      );
-
-      wrapper.addEventListener("scroll", () => {
+      function scrollFn() {
         if (wheelEventTriggered) {
           wheelEventTriggered = false;
         } else {
           scrollHandler(table, wrapper, callback);
         }
-      });
+      }
+
+      wrapper.addEventListener("scroll", scrollFn);
 
       const stickyElems = [
         "sns--is-stuck",
@@ -309,10 +202,6 @@ export default function (elems, options = {}) {
           });
         }
       }
-
-      // Variable that tracks whether "wheel" event was called.
-      // Prevents both "wheel" and "scroll" events being triggered simultaneously.
-      let wheelEventTriggered = false;
 
       // Watch if any new cells are added/removed and update accordingly.
       new MutationObserver((mutations) => {
