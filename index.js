@@ -52,60 +52,6 @@ function updateScrollPosition(table, wrapper, callback) {
   }
 }
 
-function buildInnerCell(cell) {
-  const cellStyles = window.getComputedStyle(cell);
-  cell.classList.add("sns__placeholder-cell");
-  let innerCell = document.createElement("div");
-  innerCell.setAttribute("class", "sns__cell-inner");
-  let cellContents = document.createElement("div");
-  cellContents.setAttribute("class", "sns__cell-contents");
-  let setStyles = true;
-  while (cell.firstChild) {
-    cellContents.appendChild(cell.firstChild);
-    if (
-      cell.firstChild &&
-      cell.firstChild.classList &&
-      cell.firstChild.classList.contains("sns__cell-inner")
-    ) {
-      while (cell.firstChild.firstChild.firstChild) {
-        cellContents.appendChild(cell.firstChild.firstChild.firstChild);
-      }
-      innerCell.setAttribute("style", cell.firstChild.getAttribute("style"));
-      innerCell.style.height = "";
-      cell.firstChild.remove();
-      setStyles = false;
-    }
-  }
-  innerCell.appendChild(cellContents);
-  cell.innerHTML = "";
-  cell.appendChild(innerCell);
-
-  if (setStyles) {
-    ["padding", "border"].forEach((property) => {
-      ["Top", "Right", "Bottom", "Left"].forEach((side) => {
-        if (property === "border") {
-          const borderWidth = cellStyles[`border${side}Width`];
-          innerCell.style[
-            `margin${altSide(side)}`
-          ] = `calc(-1 * ${borderWidth})`;
-
-          ["Width", "Color", "Style"].forEach((attr) => {
-            const value = cellStyles[`${property}${side}${attr}`];
-            innerCell.style[`${property}${side}${attr}`] = value;
-          });
-        } else {
-          innerCell.style[`${property}${side}`] =
-            cellStyles[`${property}${side}`];
-        }
-      });
-      cell.style[property] = "0";
-    });
-
-    innerCell.style.display = "flex";
-    innerCell.style.alignItems = verticalAlignment(cellStyles.verticalAlign);
-  }
-}
-
 // Convert regular `vertical-align` CSS into flexbox friendly alternative.
 function verticalAlignment(value) {
   switch (value) {
