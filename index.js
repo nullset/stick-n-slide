@@ -16,49 +16,6 @@ function altSide(side) {
   }
 }
 
-function wheelHandler({
-  table,
-  wrapper,
-  stickyElems,
-  pixelX,
-  pixelY,
-  scrollLeft,
-  scrollTop,
-  scrollWidth,
-  scrollHeight,
-  clientWidth,
-  clientHeight,
-  showShadow,
-  callback,
-}) {
-  const maxWidth = scrollWidth - clientWidth;
-  const maxHeight = scrollHeight - clientHeight;
-  let newX = scrollLeft + pixelX;
-  let newY = scrollTop + pixelY;
-  if (newX >= maxWidth) {
-    newX = maxWidth;
-  }
-  if (newX <= 0) {
-    newX = 0;
-  }
-  if (newY >= maxHeight) {
-    newY = maxHeight;
-  }
-  if (newY <= 0) {
-    newY = 0;
-  }
-
-  // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
-  // rather to a sub-pixel value that is "pretty close" to what you specified. To work around that, set the scroll value
-  // and then use the rendered scroll value as the left/top offset for the stuck elements.
-  wrapper.scrollTo(newX, newY);
-  // positionStickyElements(table, wrapper.scrollLeft, wrapper.scrollTop);
-
-  if (callback) {
-    callback(newX, newY);
-  }
-}
-
 function calculateShadowOffset(value) {
   value = Math.ceil(value / 10);
   if (value > 2) {
@@ -222,6 +179,9 @@ export default function (elems, options = {}) {
         const target = event.currentTarget;
         const normalized = normalizeWheel(event);
 
+        // Modern browsers have a nasty habit of setting scrollLeft/scrollTop not to the actual integer value you specified, but
+        // rather to a sub-pixel value that is "pretty close" to what you specified. This can cause the scrolled area to become out of sync with the "stuck" areas. To work around that, set the scroll value
+        // and then use the rendered scroll value as the left/top offset for the stuck elements.
         target.scrollTo(
           target.scrollLeft + normalized.pixelX,
           target.scrollTop + normalized.pixelY
@@ -235,6 +195,10 @@ export default function (elems, options = {}) {
             `${target.scrollLeft}px`
           );
           target.style.setProperty("--sns-scroll-top", `${target.scrollTop}px`);
+
+          if (callback) {
+            callback(target.scrollX, target.scrollY);
+          }
         });
       }
 
