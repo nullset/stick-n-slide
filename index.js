@@ -74,6 +74,7 @@ function generateBorder({
   scrollPositions: { left, top },
   showShadow,
 }) {
+  if (!cell) return;
   const cellStyles = window.getComputedStyle(cell);
   ["Top", "Right", "Bottom", "Left"].forEach((side) => {
     ["Width"].forEach((property) => {
